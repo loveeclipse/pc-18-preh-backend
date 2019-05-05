@@ -13,13 +13,12 @@ public class RouterVerticle extends AbstractVerticle {
 
     private static final int PORT = 5151;
     private static final String URL = "/api/event";
-    private MongoDBConnection mongoDBConnection;
+    private MongoDBConnection mongoDBConnection = new MongoDBConnection();
 
     @Override
     public void start() {
         Router router = Router.router(vertx);
-        router.route().handler(BodyHandler.create());
-        router.post(URL).handler(this::handlerCreate);
+        initializeRouter(router);
         vertx
                 .createHttpServer()
                 .requestHandler(router)
@@ -35,12 +34,12 @@ public class RouterVerticle extends AbstractVerticle {
             sendResponse(HttpResponseStatus.BAD_REQUEST, response);
         }
         else {
-            System.out.println("OK");
-            sendResponse(HttpResponseStatus.CREATED, response);
+            System.out.println("OK - request send correctly");
             mongoDBConnection.databaseConnection();
             mongoDBConnection.dbOperation(result);
-            sendResponse(HttpResponseStatus.CREATED, response);
+            //sendResponse(HttpResponseStatus.CREATED, response);
         }
+        response.putHeader("content-type", "application/json").setStatusCode(201).end(result.encodePrettily());
     }
 
     private void sendResponse(HttpResponseStatus statusCode, HttpServerResponse response) {
@@ -50,5 +49,6 @@ public class RouterVerticle extends AbstractVerticle {
     // initialize all roting service
     private void initializeRouter(Router router){
         router.route().handler(BodyHandler.create());
+        router.post(URL).handler(this::handlerCreate);
     }
 }
