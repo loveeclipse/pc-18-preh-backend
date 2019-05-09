@@ -1,6 +1,6 @@
 # Pre-Hospital
 ## A Pervasive Computing Project
-bla bla bla bla bla bla bla bla bla bla bla bla bla
+<!-- bla bla bla bla bla bla bla bla bla bla bla bla bla -->
 # Continuous Integration
 
 <!--- METTERE IL NOSTRO --->
