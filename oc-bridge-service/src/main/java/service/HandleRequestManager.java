@@ -65,8 +65,9 @@ class HandleRequestManager {
     static void handleUpdateEvent(RoutingContext routingContext){
         HttpServerResponse response = routingContext.response();
         MultiMap params = routingContext.request().params();
-        JsonObject document = new JsonObject().put("_id", params.get("eventId"));
+        JsonObject query = new JsonObject().put("_id", params.get("eventId"));
         params.remove("eventId");
+        JsonObject document = new JsonObject();
         try {
             params.forEach(entry -> {
                 if (entry.getKey().equals("secondary")) {
@@ -74,16 +75,25 @@ class HandleRequestManager {
                 } else
                     document.put(entry.getKey(), entry.getValue());
             });
-
-            // TODO usando save o insert viene sostituito il documento, possibile soluzione: prendo la risorsa e sostituisco
-            //      a mano i campi poi salvo il nuovo documento, vedere se c'è un metodo migliore, altrimenti updateCollection
-            MongoDb.getClient(vertx).save("events", document, result -> {
-                if (result.succeeded()) {
+            JsonObject update = new JsonObject().put("$set", document);
+            MongoDb.getClient(vertx).updateCollection("events", query, update, res -> {
+                if (res.succeeded()) {
+                    System.out.println("bene");
                     response.setStatusCode(200).end();
                 } else {
                     response.setStatusCode(500).end();
                 }
             });
+
+            // TODO usando save o insert viene sostituito il documento, possibile soluzione: prendo la risorsa e sostituisco
+            //      a mano i campi poi salvo il nuovo documento, vedere se c'è un metodo migliore, altrimenti updateCollection
+            /*MongoDb.getClient(vertx).save("events", document, result -> {
+                if (result.succeeded()) {
+                    response.setStatusCode(200).end();
+                } else {
+                    response.setStatusCode(500).end();
+                }
+            });*/
         } catch (IllegalArgumentException ex) {
             response.setStatusCode(400).end();
         }
