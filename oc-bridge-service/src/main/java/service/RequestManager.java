@@ -50,11 +50,14 @@ class RequestManager {
             if(result.succeeded()){
                 try {
                     JsonObject resultJson = result.result().get(0);
-                    resultJson.put("eventId", resultJson.remove("_id"));
-                    response
-                            .putHeader("eventInformation", resultJson.toString())
-                            .setStatusCode(200)
-                            .end();
+                    resultJson.remove("_id");
+                    if (resultJson.size() > 0)
+                        response
+                                .putHeader("eventInformation", resultJson.toString())
+                                .setStatusCode(200)
+                                .end();
+                    else
+                        response.setStatusCode(204).end();
                 } catch (IndexOutOfBoundsException ex) {    // nessuna risorsa trovata o parametro errato?
                     response.setStatusCode(400).end();
                 }
@@ -68,7 +71,7 @@ class RequestManager {
         HttpServerResponse response = routingContext.response();
         MultiMap params = routingContext.request().params();
         JsonObject query = new JsonObject().put("_id", params.get("eventId"));
-        System.out.println(query);
+        params.remove("eventId");
         JsonObject document = new JsonObject();
         try {
             params.forEach(entry -> {
