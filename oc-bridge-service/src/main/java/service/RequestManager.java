@@ -1,15 +1,17 @@
 package service;
 
-import database.MongoDb;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.RoutingContext;
 import java.util.UUID;
 
 class HandleRequestManager {
     private static Vertx vertx;
+    private static final JsonObject CONFIG = new JsonObject()
+            .put("connection_string", "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr");
 
     static void setVertx(Vertx vertx) {
         HandleRequestManager.vertx = vertx;
@@ -20,7 +22,7 @@ class HandleRequestManager {
         String uuid = UUID.randomUUID().toString();
         JsonObject document = new JsonObject().put("_id", uuid);
 
-        MongoDb.getClient(vertx).insert("events", document, result -> {
+        MongoClient.createNonShared(vertx, CONFIG).insert("events", document, result -> {
             if (result.succeeded()) {
                 response
                         .putHeader("eventId", uuid)
@@ -44,7 +46,7 @@ class HandleRequestManager {
         String eventId = routingContext.request().getParam("eventId");
         JsonObject queryResult = new JsonObject().put("_id", eventId);
 
-        MongoDb.getClient(vertx).find("events", queryResult, result -> {
+        MongoClient.createNonShared(vertx, CONFIG).find("events", queryResult, result -> {
             if(result.succeeded()){
                 try {
                     JsonObject resultJson = result.result().get(0);
@@ -66,7 +68,7 @@ class HandleRequestManager {
         HttpServerResponse response = routingContext.response();
         MultiMap params = routingContext.request().params();
         JsonObject query = new JsonObject().put("_id", params.get("eventId"));
-        params.remove("eventId");
+        System.out.println(query);
         JsonObject document = new JsonObject();
         try {
             params.forEach(entry -> {
@@ -76,9 +78,8 @@ class HandleRequestManager {
                     document.put(entry.getKey(), entry.getValue());
             });
             JsonObject update = new JsonObject().put("$set", document);
-            MongoDb.getClient(vertx).updateCollection("events", query, update, res -> {
+            MongoClient.createNonShared(vertx, CONFIG).updateCollection("events", query, update, res -> {
                 if (res.succeeded()) {
-                    System.out.println("bene");
                     response.setStatusCode(200).end();
                 } else {
                     response.setStatusCode(500).end();
@@ -87,7 +88,7 @@ class HandleRequestManager {
 
             // TODO usando save o insert viene sostituito il documento, possibile soluzione: prendo la risorsa e sostituisco
             //      a mano i campi poi salvo il nuovo documento, vedere se c'è un metodo migliore, altrimenti updateCollection
-            /*MongoDb.getClient(vertx).save("events", document, result -> {
+            /*MongoClient.createNonShared(vertx, CONFIG).save("events", document, result -> {
                 if (result.succeeded()) {
                     response.setStatusCode(200).end();
                 } else {
