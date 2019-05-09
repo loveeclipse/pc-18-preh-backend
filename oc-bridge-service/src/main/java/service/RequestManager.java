@@ -8,13 +8,13 @@ import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.RoutingContext;
 import java.util.UUID;
 
-class HandleRequestManager {
+class RequestManager {
     private static Vertx vertx;
     private static final JsonObject CONFIG = new JsonObject()
             .put("connection_string", "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr");
 
     static void setVertx(Vertx vertx) {
-        HandleRequestManager.vertx = vertx;
+        RequestManager.vertx = vertx;
     }
 
     static void handleCreateEvent(RoutingContext routingContext) {
@@ -85,16 +85,6 @@ class HandleRequestManager {
                     response.setStatusCode(500).end();
                 }
             });
-
-            // TODO usando save o insert viene sostituito il documento, possibile soluzione: prendo la risorsa e sostituisco
-            //      a mano i campi poi salvo il nuovo documento, vedere se c'è un metodo migliore, altrimenti updateCollection
-            /*MongoClient.createNonShared(vertx, CONFIG).save("events", document, result -> {
-                if (result.succeeded()) {
-                    response.setStatusCode(200).end();
-                } else {
-                    response.setStatusCode(500).end();
-                }
-            });*/
         } catch (IllegalArgumentException ex) {
             response.setStatusCode(400).end();
         }

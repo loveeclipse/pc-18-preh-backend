@@ -13,12 +13,12 @@ public class OcBridge extends AbstractVerticle {
     }
 
     private Router createRouter() {
-        HandleRequestManager.setVertx(vertx);
+        RequestManager.setVertx(vertx);
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
-        router.post("/api/event").handler(HandleRequestManager::handleCreateEvent);
-        router.get("/api/event/:eventId").handler(HandleRequestManager::handleGetEventById);
-        router.patch("/api/event/:eventId").handler(HandleRequestManager::handleUpdateEvent);
+        router.post("/api/event").handler(RequestManager::handleCreateEvent);
+        router.get("/api/event/:eventId").handler(RequestManager::handleGetEventById);
+        router.patch("/api/event/:eventId").handler(RequestManager::handleUpdateEvent);
         return router;
     }
 
