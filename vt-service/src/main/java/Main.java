@@ -1,4 +1,4 @@
-import core.RouterVerticle;
+import service.RouterVerticle;
 import io.vertx.core.Vertx;
 
 public class Main {
