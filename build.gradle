@@ -2,6 +2,8 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'base'
     apply plugin: 'com.dorongold.task-tree'
+    apply plugin: 'java'
+    apply plugin: 'checkstyle'
 
     repositories {
         jcenter()
@@ -9,13 +11,11 @@ allprojects {
     }
 }
 
-subprojects {
-    apply plugin: 'java'
-    apply plugin: 'checkstyle'
-    group 'pc-18-ph'
-    version '1.0-SNAPSHOT'
+version '1.0-SNAPSHOT'
+sourceCompatibility = 1.8
 
-    sourceCompatibility = 1.8
+subprojects {
+    group 'pc-18-ph'
 
     repositories {
         mavenCentral()
@@ -30,8 +30,13 @@ subprojects {
     }
 
     checkstyle {
-        toolVersion '7.8.1'
-        configFile file("config/checkstyle/checkstyle.xml")
+        toolVersion = '8.2'
+        configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+        configProperties = [
+                'checkstyle.cache.file': "${buildDir}/checkstyle.cache",
+        ]
+        ignoreFailures = true
+        showViolations = true
     }
 
 }
@@ -44,6 +49,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "gradle.plugin.com.dorongold.plugins:task-tree:1.3"
+        classpath "gradle.plugin.com.dorongold.plugins:task-tree:1.3.1"
     }
 }

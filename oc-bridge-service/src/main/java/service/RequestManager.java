@@ -44,8 +44,9 @@ class RequestManager {
     static void handleGetEventById(RoutingContext routingContext){
         HttpServerResponse response = routingContext.response();
         String eventId = routingContext.request().getParam("eventId");
+        try{
+            UUID.fromString(eventId);
         JsonObject queryResult = new JsonObject().put("_id", eventId);
-
         MongoClient.createNonShared(vertx, CONFIG).find("events", queryResult, result -> {
             if(result.succeeded()){
                 try {
@@ -58,13 +59,16 @@ class RequestManager {
                                 .end();
                     else
                         response.setStatusCode(204).end();
-                } catch (IndexOutOfBoundsException ex) {    // nessuna risorsa trovata o parametro errato?
-                    response.setStatusCode(400).end();
+                } catch (IndexOutOfBoundsException ex) {
+                    response.setStatusCode(404).end();
                 }
             }else {
                 response.setStatusCode(500).end();
             }
         });
+    } catch (IllegalArgumentException exception){
+            response.setStatusCode(400).end();
+    }
     }
 
     static void handleUpdateEvent(RoutingContext routingContext){
