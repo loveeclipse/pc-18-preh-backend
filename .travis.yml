@@ -1,10 +1,17 @@
 language: java
-
 jdk:
 - oraclejdk8
-
 before_install:
 - chmod +x gradlew
-
 script:
 - "./gradlew clean build -P=travis"
+deploy:
+  provider: releases
+  api_key:
+    secure: GV45uoIMaWKjWahvzQlyrHS/QWCgqcbLvDBOcTOhyQhx/s4LPdNJJl/CBJ9A6vDLA8LlKhzc+EKgSNfD22zwwoZtaa54G2BCgcSX5b0tLUEEP+Q2qpYSar4y9zn4vlW7eZmOqRVztTE2hRzDiPwdtSjpeFezPvJgdZls77QAwQvNKZDyRiPcqISLu2rxm8w8otasSx1ghiWFxWuxOLnt96Tgd+tq40eSomc5oAnsN4JHW4wXW9Aa6SbZeorwJ3VYMYhg3xGEnou4EHI2a10o8uWk2SR9QO+MtNybMCXHx2GGxVR3+pQ91091AmXIi4TcOHI0Jvn5OBF9TqDY9Jax+SgcdX6Ly/4yp0mXBHZIk0VJmwdCtP9XfiLCbqM0HEaU+44G/D3oqgWc7TIg6kwyedr4+1RdNuJ+5LuTqcQezAuvJiHk2aArdfl4+n/KOIhCPYJSKhdaeCkMk7kKbNoassz80hxX0jz0RaCVPdD62ABeA8uD+TDHQF+qy1m9Zvg0BOTnKeAA6TSYPbltyVFfXa6VohwPOJzM667GwvqnQ2j6DxPorBYLh/ll9eZcR2h7W3ODnkB9Rnnjo0AFOBy8dcgxxz2rlCwz+sC7xWEW95PzSSEiYdJKCDKJBApdjoByxqIOV2TvQ6EyP4LmLrMAXZQS3cVaw77AJfcx3adXWyw=
+  skip_cleanup: true
+  file_glob: true
+  file: distibution/*
+  on:
+    repo: loveeclipse/pc-18-ph
+    tags: true
