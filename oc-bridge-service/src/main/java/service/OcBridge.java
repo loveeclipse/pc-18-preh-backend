@@ -6,6 +6,7 @@ import io.vertx.ext.web.handler.BodyHandler;
 
 public class OcBridge extends AbstractVerticle {
     private static final int PORT = 10000;
+    private static final String HOST = "localhost";
 
     @Override
     public void start() {
@@ -13,7 +14,7 @@ public class OcBridge extends AbstractVerticle {
     }
 
     private Router createRouter() {
-        RequestManager.setVertx(vertx);
+        RequestManager.initializeRequestManager(vertx);
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
         router.post("/api/event").handler(RequestManager::handleCreateEvent);
@@ -26,7 +27,7 @@ public class OcBridge extends AbstractVerticle {
         vertx
                 .createHttpServer()
                 .requestHandler(router)
-                .listen(PORT);
+                .listen(PORT, HOST);
         System.out.println("Service ready.");
     }
 }

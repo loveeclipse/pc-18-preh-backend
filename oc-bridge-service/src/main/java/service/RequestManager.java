@@ -6,15 +6,25 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.RoutingContext;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.InputStream;
+import java.util.Map;
 import java.util.UUID;
 
 class RequestManager {
     private static Vertx vertx;
-    private static final JsonObject CONFIG = new JsonObject()
-            .put("connection_string", "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr");
+    private static JsonObject config = new JsonObject();
 
-    static void setVertx(Vertx vertx) {
+    static void initializeRequestManager(Vertx vertx) {
         RequestManager.vertx = vertx;
+
+        Yaml yaml = new Yaml();
+        InputStream inputStream = OcBridge.class
+                .getClassLoader()
+                .getResourceAsStream("mongoConfig.yaml");
+        Map<String, Object> obj = yaml.load(inputStream);
+        config.put("connection_string", obj.get("connection_string"));
     }
 
     static void handleCreateEvent(RoutingContext routingContext) {
@@ -22,7 +32,7 @@ class RequestManager {
         String uuid = UUID.randomUUID().toString();
         JsonObject document = new JsonObject().put("_id", uuid);
 
-        MongoClient.createNonShared(vertx, CONFIG).insert("events", document, result -> {
+        MongoClient.createNonShared(vertx, config).insert("events", document, result -> {
             if (result.succeeded()) {
                 response
                         .putHeader("eventId", uuid)
@@ -47,7 +57,7 @@ class RequestManager {
         try{
             UUID.fromString(eventId);
         JsonObject queryResult = new JsonObject().put("_id", eventId);
-        MongoClient.createNonShared(vertx, CONFIG).find("events", queryResult, result -> {
+        MongoClient.createNonShared(vertx, config).find("events", queryResult, result -> {
             if(result.succeeded()){
                 try {
                     JsonObject resultJson = result.result().get(0);
@@ -85,7 +95,7 @@ class RequestManager {
                     document.put(entry.getKey(), entry.getValue());
             });
             JsonObject update = new JsonObject().put("$set", document);
-            MongoClient.createNonShared(vertx, CONFIG).updateCollection("events", query, update, res -> {
+            MongoClient.createNonShared(vertx, config).updateCollection("events", query, update, res -> {
                 if (res.succeeded()) {
                     response.setStatusCode(200).end();
                 } else {
