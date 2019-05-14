@@ -97,7 +97,10 @@ class RequestManager {
             JsonObject update = new JsonObject().put("$set", document);
             MongoClient.createNonShared(vertx, config).updateCollection("events", query, update, res -> {
                 if (res.succeeded()) {
-                    response.setStatusCode(200).end();
+                    if (res.result().getDocModified() == 0)
+                        response.setStatusCode(400).end();
+                    else
+                        response.setStatusCode(200).end();
                 } else {
                     response.setStatusCode(500).end();
                 }
