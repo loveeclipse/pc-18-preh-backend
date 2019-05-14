@@ -17,9 +17,9 @@ public class OcBridge extends AbstractVerticle {
         RequestManager.initializeRequestManager(vertx);
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
-        router.post("/api/event").handler(RequestManager::handleCreateEvent);
-        router.get("/api/event/:eventId").handler(RequestManager::handleGetEventById);
-        router.patch("/api/event/:eventId").handler(RequestManager::handleUpdateEvent);
+        router.post("/v1/event").handler(RequestManager::handleCreateEvent);
+        router.get("/v1/event/:eventId").handler(RequestManager::handleGetEventById);
+        router.patch("/v1/event/:eventId").handler(RequestManager::handleUpdateEvent);
         return router;
     }
 
