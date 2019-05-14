@@ -56,29 +56,29 @@ class RequestManager {
         String eventId = routingContext.request().getParam("eventId");
         try{
             UUID.fromString(eventId);
-        JsonObject queryResult = new JsonObject().put("_id", eventId);
-        MongoClient.createNonShared(vertx, config).find("events", queryResult, result -> {
-            if(result.succeeded()){
-                try {
-                    JsonObject resultJson = result.result().get(0);
-                    resultJson.remove("_id");
-                    if (resultJson.size() > 0)
-                        response
-                                .putHeader("eventInformation", resultJson.toString())
-                                .setStatusCode(200)
-                                .end();
-                    else
-                        response.setStatusCode(204).end();
-                } catch (IndexOutOfBoundsException ex) {
-                    response.setStatusCode(404).end();
+            JsonObject queryResult = new JsonObject().put("_id", eventId);
+            MongoClient.createNonShared(vertx, config).find("events", queryResult, result -> {
+                if(result.succeeded()){
+                    try {
+                        JsonObject resultJson = result.result().get(0);
+                        resultJson.remove("_id");
+                        if (resultJson.size() > 0)
+                            response
+                                    .putHeader("eventInformation", resultJson.toString())
+                                    .setStatusCode(200)
+                                    .end();
+                        else
+                            response.setStatusCode(204).end();
+                    } catch (IndexOutOfBoundsException ex) {
+                        response.setStatusCode(404).end();
+                    }
+                }else {
+                    response.setStatusCode(500).end();
                 }
-            }else {
-                response.setStatusCode(500).end();
-            }
-        });
-    } catch (IllegalArgumentException exception){
+            });
+        } catch (IllegalArgumentException exception){
             response.setStatusCode(400).end();
-    }
+        }
     }
 
     static void handleUpdateEvent(RoutingContext routingContext){
