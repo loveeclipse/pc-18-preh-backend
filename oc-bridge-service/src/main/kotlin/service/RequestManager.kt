@@ -1,6 +1,6 @@
 package service
 
-import io.netty.handler.codec.http.HttpResponseStatus
+import io.netty.handler.codec.http.HttpResponseStatus.*
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
@@ -31,10 +31,10 @@ object RequestManager {
             when {
                 result.succeeded() -> response
                         .putHeader("Content-Type", "application/json")
-                        .setStatusCode(HttpResponseStatus.CREATED.code())
+                        .setStatusCode(CREATED.code())
                         .end(Json.encodePrettily(document))
                 isDuplicateKey(result.cause().message) -> handleCreateEvent(routingContext)
-                else -> response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end()
+                else -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
             }
         }
     }
@@ -55,20 +55,20 @@ object RequestManager {
                         if (resultJson.size() > 0)
                             response
                                     .putHeader("Content-Type", "application/json")
-                                    .setStatusCode(HttpResponseStatus.OK.code())
+                                    .setStatusCode(OK.code())
                                     .end(Json.encodePrettily(resultJson))
                         else
-                            response.setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end()
+                            response.setStatusCode(NO_CONTENT.code()).end()
                     } catch (ex: IndexOutOfBoundsException) {
-                        response.setStatusCode(HttpResponseStatus.BAD_REQUEST.code()).end()
+                        response.setStatusCode(BAD_REQUEST.code()).end()
                     }
 
                 } else {
-                    response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end()
+                    response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                 }
             }
         } catch (exception: IllegalArgumentException) {
-            response.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end()
+            response.setStatusCode(NOT_FOUND.code()).end()
         }
 
     }
@@ -81,11 +81,11 @@ object RequestManager {
         MongoClient.createNonShared(vertx, CONFIG).updateCollection(COLLECTION_NAME, query, update) { res ->
             if (res.succeeded()) {
                 when {
-                    res.result().docModified == 0L -> response.setStatusCode(HttpResponseStatus.BAD_REQUEST.code()).end()
-                    else -> response.setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end()
+                    res.result().docModified == 0L -> response.setStatusCode(BAD_REQUEST.code()).end()
+                    else -> response.setStatusCode(OK.code()).end()
                 }
             } else {
-                response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end()
+                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
             }
         }
     }
