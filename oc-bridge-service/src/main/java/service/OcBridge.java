@@ -10,7 +10,11 @@ public class OcBridge extends AbstractVerticle {
 
     @Override
     public void start() {
-        startServer(createRouter());
+        vertx
+                .createHttpServer()
+                .requestHandler(createRouter())
+                .listen(PORT, HOST);
+        System.out.println("Service ready.");
     }
 
     private Router createRouter() {
@@ -21,13 +25,5 @@ public class OcBridge extends AbstractVerticle {
         router.get("/v1/events/:eventId").handler(RequestManager::handleGetEventById);
         router.patch("/v1/events/:eventId").handler(RequestManager::handleUpdateEvent);
         return router;
-    }
-
-    private void startServer(Router router) {
-        vertx
-                .createHttpServer()
-                .requestHandler(router)
-                .listen(PORT, HOST);
-        System.out.println("Service ready.");
     }
 }
