@@ -16,6 +16,7 @@ object RequestManager {
     private const val EVENT_ID = "eventId"
     private const val COLLECTION_NAME = "events"
     private const val DUPLICATED_KEY_CODE = "E11000"
+    private const val SECONDARY = "secondary"
 
 
     fun initializeRequestManager(vertx: Vertx) {
@@ -75,18 +76,26 @@ object RequestManager {
 
     fun handleUpdateEvent(routingContext: RoutingContext) {
         val response = routingContext.response()
-        val body = routingContext.bodyAsJson
-        val query = JsonObject().put(DOCUMENT_ID, routingContext.request().getParam(EVENT_ID))
-        val update = JsonObject().put("\$set", body)
-        MongoClient.createNonShared(vertx, CONFIG).updateCollection(COLLECTION_NAME, query, update) { res ->
-            if (res.succeeded()) {
-                when {
-                    res.result().docModified == 0L -> response.setStatusCode(BAD_REQUEST.code()).end()
-                    else -> response.setStatusCode(OK.code()).end()
+        val eventId = routingContext.request().getParam(EVENT_ID)
+        try {
+            UUID.fromString(eventId)
+            val body = routingContext.bodyAsJson
+            if (body.containsKey(SECONDARY))
+                body.getBoolean(SECONDARY)
+            val query = JsonObject().put(DOCUMENT_ID, eventId)
+            val update = JsonObject().put("\$set", body)
+            MongoClient.createNonShared(vertx, CONFIG).updateCollection(COLLECTION_NAME, query, update) { res ->
+                if (res.succeeded()) {
+                    when {
+                        res.result().docModified == 0L -> response.setStatusCode(NOT_FOUND.code()).end()
+                        else -> response.setStatusCode(OK.code()).end()
+                    }
+                } else {
+                    response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                 }
-            } else {
-                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
             }
+        } catch (exception: Exception) {
+            response.setStatusCode(BAD_REQUEST.code()).end()
         }
     }
 }
