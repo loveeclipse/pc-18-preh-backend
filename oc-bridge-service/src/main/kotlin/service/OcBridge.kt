@@ -1,9 +1,7 @@
 package service
 
 import io.vertx.core.AbstractVerticle
-import io.vertx.core.Handler
 import io.vertx.ext.web.Router
-import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.BodyHandler
 
 class OcBridge : AbstractVerticle() {
@@ -28,6 +26,6 @@ class OcBridge : AbstractVerticle() {
 
     companion object {
         private const val PORT = 10000
-        private val HOST = "localhost"
+        private const val HOST = "localhost"
     }
 }

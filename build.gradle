@@ -31,8 +31,6 @@ subprojects {
         implementation "io.vertx:vertx-lang-kotlin:3.7.0"
         implementation 'io.vertx:vertx-mongo-client:3.7.0'
         implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.3.31'
-
-        implementation "org.yaml:snakeyaml:1.24"
     }
 
     checkstyle {
