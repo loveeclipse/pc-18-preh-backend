@@ -1,10 +1,9 @@
 allprojects {
-    apply plugin: 'idea'
-    apply plugin: 'base'
-    apply plugin: 'com.dorongold.task-tree'
-    apply plugin: 'java'
-    apply plugin: 'kotlin'
-    apply plugin: 'checkstyle'
+    apply plugin: "idea"
+    apply plugin: "base"
+    apply plugin: "com.dorongold.task-tree"
+    apply plugin: "java"
+    apply plugin: "kotlin"
 
     repositories {
         jcenter()
@@ -12,35 +11,19 @@ allprojects {
     }
 }
 
-version '1.0-SNAPSHOT'
+version "1.0-SNAPSHOT"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 subprojects {
-    group 'pc-18-ph'
+    group "pc-18-ph"
 
     repositories {
         mavenCentral()
     }
 
     dependencies {
-        testCompile group: 'junit', name: 'junit', version: '4.12'
-
-        implementation "io.vertx:vertx-web:3.7.0"
-        implementation "io.vertx:vertx-core:3.7.0"
-        implementation "io.vertx:vertx-lang-kotlin:3.7.0"
-        implementation 'io.vertx:vertx-mongo-client:3.7.0'
-        implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.3.31'
-    }
-
-    checkstyle {
-        toolVersion = '8.2'
-        configFile = rootProject.file('config/checkstyle/checkstyle.xml')
-        configProperties = [
-                'checkstyle.cache.file': "${buildDir}/checkstyle.cache",
-        ]
-        ignoreFailures = true
-        showViolations = true
+        testCompile group: "junit", name: "junit", version: "4.12"
     }
     
     compileKotlin {
