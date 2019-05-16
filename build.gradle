@@ -1,4 +1,5 @@
 allprojects {
+    apply plugin: "java"
     apply plugin: "idea"
     apply plugin: "com.dorongold.task-tree"
 
@@ -13,14 +14,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 subprojects {
-    apply plugin: "java"
     apply plugin: "kotlin"
 
     group "pc-18-ph"
-
-    repositories {
-        mavenCentral()
-    }
 
     dependencies {
         testCompile group: "junit", name: "junit", version: "4.12"
