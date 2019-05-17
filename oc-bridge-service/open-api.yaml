@@ -1,0 +1,121 @@
+openapi: 3.0.0
+servers:
+  - url: "https://localhost:10000/v1"
+info:
+  title: Operative Center Bridge Service
+  description: Operative Center Bridge API for PreH
+  version: "1.0"
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+paths:
+  '/events':
+    post:
+      summary: creates a new event returning its id
+      description: |
+        Triggers the creation of a new event and generates a unique id for it. The id will be returned as response.
+      responses:
+        '201':
+          description: the resource creation was successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/parameters/eventId'
+        '500':
+          description: generic server error
+  '/events/{eventId}':
+    get:
+      summary: gets all the event's available information
+      description: |
+        By passing the event's id, you can get all the currently available information about the event.
+      parameters:
+        - $ref: '#/components/parameters/eventId'
+      responses:
+        '200':
+          description: returns the information about the requested event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventInformation'
+        '204':
+          description: the resource is present but without body data
+        '400':
+          description: bad input parameter
+        '404':
+          description: resource not found
+        '500':
+          description: generic server error
+    patch:
+      summary: updates the event's information
+      description: |
+        By passing the event's id and some information, the relative resource will be updated with the new data.
+      parameters:
+        - $ref: '#/components/parameters/eventId'
+        - $ref: '#/components/parameters/eventNotes'
+        - $ref: '#/components/parameters/eventDispatchCode'
+        - $ref: '#/components/parameters/eventSecondary'
+        - $ref: '#/components/parameters/eventDynamic'
+      responses:
+        '200':
+          description: the resource update was successful
+        '400':
+          description: bad input parameter
+        '404':
+          description: resource not found
+        '500':
+          description: generic server error
+components:
+  parameters:
+    eventId:
+      name: eventId
+      in: path
+      description: ID of the event
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+    eventNotes:
+      name: notes
+      in: query
+      description: event's notes
+      schema:
+        type: string
+        example: 'Il paziente passa dallo stato di coscienza ad incoscienza in continuazione'
+    eventDispatchCode:
+      name: dispatchCode
+      in: query
+      description: the event dispatch code for the medical crew 
+      schema:
+        type: string
+        example: 'SC01R'
+    eventSecondary:
+      name: secondary
+      in: query
+      description: determine if the event is secondary
+      schema:
+        type: boolean
+        example: true
+    eventDynamic:
+      name: dynamic
+      in: query
+      description: describes the event dynamic
+      schema:
+        type: string
+        example: "Incidente stradale: pedone investito"
+  schemas:
+    EventInformation:
+      type: object
+      properties:
+        notes:
+          type: string
+          example: 'Il paziente passa dallo stato di coscienza ad incoscienza in continuazione'
+        dispatchCode:
+          type: string
+          example: 'SC01R'
+        secondary:
+          type: boolean
+          example: true
+        dynamic:
+          type: string
+          example: "Incidente stradale: pedone investito"
