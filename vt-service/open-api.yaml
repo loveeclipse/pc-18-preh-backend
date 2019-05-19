@@ -1,0 +1,360 @@
+openapi: 3.0.0
+
+servers:
+  - url: 'https://localhost:10000/v1'
+
+info:
+  description: Vehicle Tracking Service API for PreH
+  title: Vehicle Tracking Service API
+  version: '1.0'
+
+paths:
+  '/events-tracking/{event-id}/':
+    get:
+      summary: Returns all the tracking details about the event
+      description: By passing in the appropriate event-id, you can search for all the currently available tracking details (datetime and place) about all the event's missions.
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+      responses:
+        '200':
+          description: 'ok'
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/eventTracking'
+        '400':
+          description: 'bad input parameter'
+        '404':
+          description: 'resource not found'
+        '500':
+          description: 'generic server error'
+  
+  '/events-tracking/{event-id}/missions/{mission-id}':
+    get:
+      summary: Returns all the tracking details about the mission
+      description: By passing in both the event-id and mission-id, you can search for all the currently available tracking details (datetime and place) about the mission.
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      responses:
+        '200':
+          description: 'ok'
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/eventTracking'
+        '400':
+          description: 'bad input parameter'
+        '404':
+          description: 'resource not found'
+        '500':
+          description: 'generic server error'
+  
+  '/events-tracking/{event-id}/missions/{mission-id}/oc-call':
+    get:
+      summary: Returns the Operational Center call tracking details
+      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the Operational Center call.
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      responses:
+        '200':
+          description: 'ok'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timelineItem'
+        '400':
+          description: 'bad input parameter'
+        '404':
+          description: 'resource not found'
+        '500':
+          description: 'generic server error'
+    post:
+      summary: Adds tracking details about the Operational Center call 
+      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the Operational Center call.
+      responses:
+        '201':
+          description: 'item successfully created'
+        '400':
+          description: 'bad input parameter'
+        '409':
+          description: 'conflict: the item already exists'
+        '500':
+          description: 'generic server error'
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/timelineItem'
+        description: Tracking item to add
+  
+  '/events-tracking/{event-id}/events/{event-id}/crew-departure':
+    get:
+      summary: Returns the crew departure tracking details
+      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the crew departure.
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      responses:
+        '200':
+          description: 'ok'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timelineItem'
+        '400':
+          description: 'bad input parameter'
+        '404':
+          description: 'resource not found'
+        '500':
+          description: 'generic server error'
+    post:
+      summary: Adds tracking details about the crew departure 
+      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the crew departure.
+      responses:
+        '201':
+          description: 'item successfully created'
+        '400':
+          description: 'bad input parameter'
+        '409':
+          description: 'conflict: the item already exists'
+        '500':
+          description: 'generic server error'
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/timelineItem'
+        description: Tracking item to add
+  
+  '/events-tracking/{event-id}/arrival-onsite':
+    get:
+      summary: Returns the arrival onsite tracking details
+      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the arrival onsite.
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      responses:
+        '200':
+          description: 'ok'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timelineItem'
+        '400':
+          description: 'bad input parameter'
+        '404':
+          description: 'resource not found'
+        '500':
+          description: 'generic server error'
+    post:
+      summary: Adds tracking details about the landing onsite 
+      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the landing onsite.
+      responses:
+        '201':
+          description: 'item successfully created'
+        '400':
+          description: 'bad input parameter'
+        '409':
+          description: 'conflict: the item already exists'
+        '500':
+          description: 'generic server error'
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/timelineItem'
+        description: Tracking item to add
+  '/events-tracking/{event-id}/departure-onsite':
+    get:
+      summary: Returns the tracking details about the departure from onsite
+      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the departure from onsite.
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      responses:
+        '200':
+          description: 'ok'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timelineItem'
+        '400':
+          description: 'bad input parameter'
+        '404':
+          description: 'resource not found'
+        '500':
+          description: 'generic server error'
+    post:
+      summary: Adds tracking details about the departure from onsite
+      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the departure from onsite.
+      responses:
+        '201':
+          description: 'item successfully created'
+        '400':
+          description: 'bad input parameter'
+        '409':
+          description: 'conflict: the item already exists'
+        '500':
+          description: 'generic server error'
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/timelineItem'
+        description: Tracking item to add
+  '/events-tracking/{event-id}/landing-helipad':
+    get:
+      summary: Returns the tracking details about the landing on the helipad
+      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the landing on the helipad.
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      responses:
+        '200':
+          description: 'ok'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timelineItem'
+        '400':
+          description: 'bad input parameter'
+        '404':
+          description: 'resource not found'
+        '500':
+          description: 'generic server error'
+    post:
+      summary: Adds tracking details about the landing on the helipad
+      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the landing on the helipad.
+      responses:
+        '201':
+          description: 'item successfully created'
+        '400':
+          description: 'bad input parameter'
+        '409':
+          description: 'conflict: the item already exists'
+        '500':
+          description: 'generic server error'
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/timelineItem'
+        description: Tracking item to add
+  '/events-tracking/{event-id}/arrival-er':
+    get:
+      summary: Returns the tracking details about the arrival at the ER
+      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the actual arrival of the patient at the ER.
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      responses:
+        '200':
+          description: 'ok'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timelineItem'
+        '400':
+          description: 'bad input parameter'
+        '404':
+          description: 'resource not found'
+        '500':
+          description: 'generic server error'
+    post:
+      summary: Adds tracking details about the actual arrival at the ER
+      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the actual arrival of the patient at the ER.
+      responses:
+        '201':
+          description: 'item successfully created'
+        '400':
+          description: 'bad input parameter'
+        '409':
+          description: 'conflict: the item already exists'
+        '500':
+          description: 'generic server error'
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/timelineItem'
+        description: Tracking item to add
+
+components:
+  parameters:
+    event-param:
+      in: path
+      name: event-id
+      description: identifier of the event
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+    mission-param:
+      in: path
+      name: mission-id
+      description: identifier of the mission vehicle
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+
+  schemas:
+    timelineItem:
+      type: object
+      required:
+        - datetime
+        - place
+      properties:
+        datetime:
+          type: string
+          format: date-time
+          example: '1985-04-12T23:20:50.52Z'
+        place:
+          type: string
+          example: 'Via Cervese 123'
+    missionTracking:  
+      type: object
+      properties:
+        ocCall:
+          $ref: '#/components/schemas/timelineItem'
+        crewDeparture:
+          $ref: '#/components/schemas/timelineItem'
+        landingOnsite:
+          $ref: '#/components/schemas/timelineItem'
+        takeoffOnsite:
+          $ref: '#/components/schemas/timelineItem'
+        landingHelipad:
+          $ref: '#/components/schemas/timelineItem'
+        arrivalEr:
+          $ref: '#/components/schemas/timelineItem'
+    eventTracking:
+      type: array
+      items:
+        type: object
+        properties:
+          missionId: 
+            type: string
+          missionTracking:
+            $ref: '#/components/schemas/missionTracking'
