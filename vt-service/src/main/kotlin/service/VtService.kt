@@ -9,6 +9,7 @@ import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.netty.handler.codec.http.HttpResponseStatus.*
 import io.vertx.ext.mongo.FindOptions
+import io.vertx.ext.mongo.UpdateOptions
 
 object VtService {
 
@@ -65,7 +66,6 @@ object VtService {
         log.info("Request get all missions details")
         val response = routingContext.response()
         val params = routingContext.request().params()
-        val im = Json
         val document = json {
             obj(DOCUMENT_IDENTIFIER to params[EVENT_IDENTIFIER],
                     "$MISSIONS.$MISSION_IDENTIFIER" to params[MISSION_IDENTIFIER])
@@ -78,10 +78,8 @@ object VtService {
                             .setFields(json {obj(DOCUMENT_IDENTIFIER to false)})
                             .setLimit(1)
             ) { result ->
-                println(result)
                 when { result.succeeded() ->
                     try {
-                        println(result)
                         val queryResult = result.result().first()
                         val res = queryResult.getJsonArray(MISSIONS).filter { a ->
                             (a as JsonObject).getString(MISSION_IDENTIFIER) == params[MISSION_IDENTIFIER]
@@ -113,23 +111,41 @@ object VtService {
     fun handlerPostOcCall(routingContext: RoutingContext) {
         log.info("Request post OC details")
         val response = routingContext.response()
-        val eventId = routingContext.request().getParam(EVENT_IDENTIFIER)
-        val missionId = routingContext.request().getParam(MISSION_IDENTIFIER)
-        val query = JsonObject()
-                .put(DOCUMENT_IDENTIFIER, eventId)
-                .put(MISSION_IDENTIFIER, missionId)
+        val params = routingContext.request().params()
+        val document = json {
+            obj(DOCUMENT_IDENTIFIER to params[EVENT_IDENTIFIER])
+        }
+        val mission = json {
+            obj(MISSIONS to array(obj(MISSION_IDENTIFIER to params[MISSION_IDENTIFIER],
+                    "missionTracking" to JsonObject())))
+        }
+        val update = json {
+            obj("\$set" to mission)
+        }
 
-        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION).insert(COLLECTION_NAME, query) { result ->
-            if (result.succeeded()) {
-                response
-                        .putHeader("Content-Type", "application/json")
-                        .setStatusCode(CREATED.code())
-                        .end(Json.encodePrettily(query))
-                log.info("Response status ${response.statusCode}")
-            } else {
-                response.setStatusCode(CONFLICT.code()).end()
-                log.info("Response status ${response.statusCode}")
+        try {
+            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION).updateCollectionWithOptions(
+                    COLLECTION_NAME,
+                    document,
+                    update,
+                    UpdateOptions()
+                            .setUpsert(true))
+            { result ->
+                when { result.succeeded() ->
+                    try {
+                        val queryResult = result.result()
+                        println(queryResult)
+                    } catch (e1: Exception) {
+                        response.setStatusCode(BAD_REQUEST.code()).end()
+                        log.info("Response status ${response.statusCode}")
+                    }
+
+                    else -> log.info("not succeeded")
+                }
             }
+        } catch (e: Exception){
+            response.setStatusCode(NOT_FOUND.code()).end()
+            log.info("Response status ${response.statusCode}")
         }
     }
 
