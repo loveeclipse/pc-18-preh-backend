@@ -1,0 +1,4 @@
+package service
+
+object RequestManager {
+}
