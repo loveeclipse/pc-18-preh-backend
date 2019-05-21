@@ -1,3 +1,4 @@
 rootProject.name = 'pc-18-ph'
 include 'oc-bridge-service'
+include 'patient-registry-service'
 
