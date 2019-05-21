@@ -8,6 +8,7 @@ import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.netty.handler.codec.http.HttpResponseStatus.*
+import io.vertx.ext.mongo.FindOptions
 
 object VtService {
 
@@ -38,7 +39,7 @@ object VtService {
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION).find(COLLECTION_NAME, document) { result ->
                 when { result.succeeded() ->
                     try {
-                        val queryResult = result.result()[0]
+                        val queryResult = result.result().first()
                         queryResult.remove(DOCUMENT_IDENTIFIER)
                         when {
                             !queryResult.isEmpty ->
@@ -64,35 +65,33 @@ object VtService {
         log.info("Request get all missions details")
         val response = routingContext.response()
         val params = routingContext.request().params()
-        /*val eventId = JsonObject()
-                .put(DOCUMENT_IDENTIFIER, params[EVENT_IDENTIFIER])*/
-        val missionId = json {
-            obj("$MISSIONS.$MISSION_IDENTIFIER" to params[MISSION_IDENTIFIER])
-        }
-        val missionTracking = json {
-            obj("$MISSIONS.missionTracking" to params[MISSION_IDENTIFIER])
-        }
+        val im = Json
         val document = json {
             obj(DOCUMENT_IDENTIFIER to params[EVENT_IDENTIFIER],
-                    "$MISSIONS.$MISSION_IDENTIFIER" to  params[MISSION_IDENTIFIER])
+                    "$MISSIONS.$MISSION_IDENTIFIER" to params[MISSION_IDENTIFIER])
         }
-
-        println(document)
         try{
-            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION).find(COLLECTION_NAME, document) { result ->
+            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION).findWithOptions(
+                    COLLECTION_NAME,
+                    document,
+                    FindOptions()
+                            .setFields(json {obj(DOCUMENT_IDENTIFIER to false)})
+                            .setLimit(1)
+            ) { result ->
+                println(result)
                 when { result.succeeded() ->
                     try {
-                        val mis = "missionTracking"
-                        val queryResult = result.result()[0]
-                        queryResult.remove(DOCUMENT_IDENTIFIER)
-                        println(queryResult.getJsonObject("$MISSIONS.$MISSION_IDENTIFIER"))
-                        println(queryResult.getJsonObject("$MISSIONS.$MISSION_IDENTIFIER", missionId))
+                        println(result)
+                        val queryResult = result.result().first()
+                        val res = queryResult.getJsonArray(MISSIONS).filter { a ->
+                            (a as JsonObject).getString(MISSION_IDENTIFIER) == params[MISSION_IDENTIFIER]
+                        }
                         when {
                             !queryResult.isEmpty ->
                                 response
                                         .putHeader("Content-Type", "application/json")
                                         .setStatusCode(OK.code())
-                                        .end(Json.encodePrettily(queryResult))
+                                        .end(Json.encodePrettily(res))
                         }
                     } catch (e1: Exception) {
                         response.setStatusCode(BAD_REQUEST.code()).end()
