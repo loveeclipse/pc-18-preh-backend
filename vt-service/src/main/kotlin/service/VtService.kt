@@ -38,22 +38,26 @@ object VtService {
         }
         try{
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION).find(COLLECTION_NAME, document) { result ->
-                when { result.succeeded() ->
+                if (result.succeeded()) {
                     try {
                         val queryResult = result.result().first()
                         queryResult.remove(DOCUMENT_IDENTIFIER)
-                        when {
-                            !queryResult.isEmpty ->
-                                response
-                                        .putHeader("Content-Type", "application/json")
-                                        .setStatusCode(OK.code())
-                                        .end(Json.encodePrettily(queryResult))
+                        if (!queryResult.isEmpty) {
+                            response
+                                    .putHeader("Content-Type", "application/json")
+                                    .setStatusCode(OK.code())
+                                    .end(Json.encodePrettily(queryResult))
+                        } else {
+                            response
+                                    .setStatusCode(NO_CONTENT.code())
+                                    .end()
                         }
                     } catch (e1: Exception) {
                         response.setStatusCode(BAD_REQUEST.code()).end()
                         log.info("Response status ${response.statusCode}")
                     }
-                 else  ->  response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                } else {
+                    response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                 }
             }
         } catch (e: Exception){

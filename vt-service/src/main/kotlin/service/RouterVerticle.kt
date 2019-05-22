@@ -39,21 +39,21 @@ class RouterVerticle : AbstractVerticle() {
     }
 
     companion object {
-        private const val PORT = 5151
+        private const val PORT = 10000
         private const val HOST = "localhost"
-        private const val GET_ALL_EVENT_DETAILS = "/events-tracking/:eventId"
-        private const val GET_ALL_MISSION_DETAILS = "/events-tracking/:eventId/missions/:missionId"
-        private const val GET_OC_CALL = "/events-tracking/:eventId/oc-call/missions/:missionId"
-        private const val POST_OC_CALL = "/events-tracking/:eventId/oc-call/missions/:missionId"
-        private const val GET_CREW_DEPARTURE = "/events-tracking/:eventId/missions/:missionId/crew-departure"
-        private const val POST_CREW_DEPARTURE = "/events-tracking/:eventId/missions/:missionId/crew-departure"
-        private const val GET_LANDING_ONSITE = "/events-tracking/:eventId/missions/:missionId/landing-onsite"
-        private const val POST_LANDING_ONSITE = "/events-tracking/:eventId/missions/:missionId/landing-onsite"
-        private const val GET_TAKEOFF_ONSITE = "/events-tracking/:eventId/missions/:missionId/takeoff-onsite"
-        private const val POST_TAKEOFF_ONSITE = "/events-tracking/:eventId/missions/:missionId/takeoff-onsite"
-        private const val GET_LANDING_HELIPAD = "/events-tracking/:eventId/missions/:missionId/landing-helipad"
-        private const val POST_LANDING_HELIPAD = "/events-tracking/:eventId/missions/:missionId/landing-helipad"
-        private const val GET_ARRIVAL_ER = "/events-tracking/:eventId/missions/:missionId/arrival-er"
-        private const val POST_ARRIVAL_ER  = "/events-tracking/:eventId/missions/:missionId/arrival-er"
+        private const val GET_ALL_EVENT_DETAILS = "/v1/events-tracking/:eventId"
+        private const val GET_ALL_MISSION_DETAILS = "/v1/events-tracking/:eventId/missions/:missionId"
+        private const val GET_OC_CALL = "/v1/events-tracking/:eventId/oc-call/missions/:missionId"
+        private const val POST_OC_CALL = "/v1/events-tracking/:eventId/oc-call/missions/:missionId"
+        private const val GET_CREW_DEPARTURE = "/v1/events-tracking/:eventId/missions/:missionId/crew-departure"
+        private const val POST_CREW_DEPARTURE = "/v1/events-tracking/:eventId/missions/:missionId/crew-departure"
+        private const val GET_LANDING_ONSITE = "/v1/events-tracking/:eventId/missions/:missionId/landing-onsite"
+        private const val POST_LANDING_ONSITE = "/v1/events-tracking/:eventId/missions/:missionId/landing-onsite"
+        private const val GET_TAKEOFF_ONSITE = "/v1/events-tracking/:eventId/missions/:missionId/takeoff-onsite"
+        private const val POST_TAKEOFF_ONSITE = "/v1/events-tracking/:eventId/missions/:missionId/takeoff-onsite"
+        private const val GET_LANDING_HELIPAD = "/v1/events-tracking/:eventId/missions/:missionId/landing-helipad"
+        private const val POST_LANDING_HELIPAD = "/v1/events-tracking/:eventId/missions/:missionId/landing-helipad"
+        private const val GET_ARRIVAL_ER = "/v1/events-tracking/:eventId/missions/:missionId/arrival-er"
+        private const val POST_ARRIVAL_ER  = "/v1/events-tracking/:eventId/missions/:missionId/arrival-er"
     }
 }
