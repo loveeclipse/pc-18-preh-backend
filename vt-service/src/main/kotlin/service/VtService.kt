@@ -160,34 +160,6 @@ object VtService {
 
     fun handlerPostCrewDeparture(routingContext: RoutingContext) {
         log.info("Request post crew departure details")
-        val response = routingContext.response()
-        val eventId = routingContext.request().getParam(EVENT_IDENTIFIER)
-
-        try {
-            //UUID.fromString(eventId)
-            val body = routingContext.bodyAsJson
-            if (body.containsKey(MISSION_IDENTIFIER))
-                body.getString(MISSION_IDENTIFIER)
-            val query = JsonObject().put(DOCUMENT_IDENTIFIER, eventId)
-            val update = JsonObject().put("\$set", body)
-            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION).updateCollection(COLLECTION_NAME, query, update) { res ->
-                if (res.succeeded()) {
-                    if (res.result().docModified == 0L) {
-                        response.setStatusCode(NOT_FOUND.code()).end()
-                        log.info("Response status ${response.statusCode}")
-                    } else {
-                        response.setStatusCode(OK.code()).end()
-                        log.info("Response status ${response.statusCode}")
-                    }
-                } else {
-                    response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                    log.info("Response status ${response.statusCode}")
-                }
-            }
-        } catch (exception: Exception) {
-            response.setStatusCode(BAD_REQUEST.code()).end()
-            log.info("Response status ${response.statusCode}")
-        }
     }
 
     fun handlerGetLandingOnsite(routingContext: RoutingContext) {
