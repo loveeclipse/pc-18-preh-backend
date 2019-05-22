@@ -1,7 +1,7 @@
 openapi: 3.0.0
 
 servers:
-  - url: 'https://localhost:10000/v1'
+  - url: 'http://localhost:10000/v1'
 
 info:
   description: Vehicle Tracking Service API for PreH
@@ -9,10 +9,10 @@ info:
   version: '1.0'
 
 paths:
-  '/events-tracking/{event-id}/':
+  '/events-tracking/{eventId}/':
     get:
       summary: Returns all the tracking details about the event
-      description: By passing in the appropriate event-id, you can search for all the currently available tracking details (datetime and place) about all the event's missions.
+      description: By passing in the appropriate eventId, you can search for all the currently available tracking details (datetime and place) about all the event's missions.
       parameters:
         - $ref: '#/components/parameters/event-param'
       responses:
@@ -29,10 +29,10 @@ paths:
         '500':
           description: 'generic server error'
   
-  '/events-tracking/{event-id}/missions/{mission-id}':
+  '/events-tracking/{eventId}/missions/{missionId}':
     get:
       summary: Returns all the tracking details about the mission
-      description: By passing in both the event-id and mission-id, you can search for all the currently available tracking details (datetime and place) about the mission.
+      description: By passing in both the eventId and missionId, you can search for all the currently available tracking details (datetime and place) about the mission.
       parameters:
         - $ref: '#/components/parameters/event-param'
         - $ref: '#/components/parameters/mission-param'
@@ -50,10 +50,10 @@ paths:
         '500':
           description: 'generic server error'
   
-  '/events-tracking/{event-id}/missions/{mission-id}/oc-call':
+  '/events-tracking/{eventId}/missions/{missionId}/oc-call':
     get:
       summary: Returns the Operational Center call tracking details
-      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the Operational Center call.
+      description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the Operational Center call.
       parameters:
         - $ref: '#/components/parameters/event-param'
         - $ref: '#/components/parameters/mission-param'
@@ -72,7 +72,7 @@ paths:
           description: 'generic server error'
     post:
       summary: Adds tracking details about the Operational Center call 
-      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the Operational Center call.
+      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the Operational Center call.
       responses:
         '201':
           description: 'item successfully created'
@@ -92,10 +92,10 @@ paths:
               $ref: '#/components/schemas/timelineItem'
         description: Tracking item to add
   
-  '/events-tracking/{event-id}/events/{event-id}/crew-departure':
+  '/events-tracking/{eventId}/mission/{missionId}/crew-departure':
     get:
       summary: Returns the crew departure tracking details
-      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the crew departure.
+      description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the crew departure.
       parameters:
         - $ref: '#/components/parameters/event-param'
         - $ref: '#/components/parameters/mission-param'
@@ -114,7 +114,7 @@ paths:
           description: 'generic server error'
     post:
       summary: Adds tracking details about the crew departure 
-      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the crew departure.
+      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the crew departure.
       responses:
         '201':
           description: 'item successfully created'
@@ -134,10 +134,10 @@ paths:
               $ref: '#/components/schemas/timelineItem'
         description: Tracking item to add
   
-  '/events-tracking/{event-id}/arrival-onsite':
+  '/events-tracking/{eventId}/missions/{missionId}/arrival-onsite':
     get:
       summary: Returns the arrival onsite tracking details
-      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the arrival onsite.
+      description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the arrival onsite.
       parameters:
         - $ref: '#/components/parameters/event-param'
         - $ref: '#/components/parameters/mission-param'
@@ -156,7 +156,7 @@ paths:
           description: 'generic server error'
     post:
       summary: Adds tracking details about the landing onsite 
-      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the landing onsite.
+      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the landing onsite.
       responses:
         '201':
           description: 'item successfully created'
@@ -175,10 +175,11 @@ paths:
             schema:
               $ref: '#/components/schemas/timelineItem'
         description: Tracking item to add
-  '/events-tracking/{event-id}/departure-onsite':
+  
+  '/events-tracking/{eventId}/missions/{missionId}/departure-onsite':
     get:
       summary: Returns the tracking details about the departure from onsite
-      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the departure from onsite.
+      description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the departure from onsite.
       parameters:
         - $ref: '#/components/parameters/event-param'
         - $ref: '#/components/parameters/mission-param'
@@ -197,7 +198,7 @@ paths:
           description: 'generic server error'
     post:
       summary: Adds tracking details about the departure from onsite
-      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the departure from onsite.
+      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the departure from onsite.
       responses:
         '201':
           description: 'item successfully created'
@@ -216,10 +217,11 @@ paths:
             schema:
               $ref: '#/components/schemas/timelineItem'
         description: Tracking item to add
-  '/events-tracking/{event-id}/landing-helipad':
+  
+  '/events-tracking/{eventId}/events/{missionId}/landing-helipad':
     get:
       summary: Returns the tracking details about the landing on the helipad
-      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the landing on the helipad.
+      description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the landing on the helipad.
       parameters:
         - $ref: '#/components/parameters/event-param'
         - $ref: '#/components/parameters/mission-param'
@@ -238,7 +240,7 @@ paths:
           description: 'generic server error'
     post:
       summary: Adds tracking details about the landing on the helipad
-      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the landing on the helipad.
+      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the landing on the helipad.
       responses:
         '201':
           description: 'item successfully created'
@@ -257,10 +259,11 @@ paths:
             schema:
               $ref: '#/components/schemas/timelineItem'
         description: Tracking item to add
-  '/events-tracking/{event-id}/arrival-er':
+  
+  '/events-tracking/{eventId}/missions/{missionId}/arrival-er':
     get:
       summary: Returns the tracking details about the arrival at the ER
-      description: By passing in both the event-id and mission-id, you can search for the tracking details (datetime and place) about the actual arrival of the patient at the ER.
+      description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the actual arrival of the patient at the ER.
       parameters:
         - $ref: '#/components/parameters/event-param'
         - $ref: '#/components/parameters/mission-param'
@@ -279,7 +282,7 @@ paths:
           description: 'generic server error'
     post:
       summary: Adds tracking details about the actual arrival at the ER
-      description: By passing in both the event-id and mission-id, you will add the tracking details (datetime and place) about the actual arrival of the patient at the ER.
+      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the actual arrival of the patient at the ER.
       responses:
         '201':
           description: 'item successfully created'
@@ -303,7 +306,7 @@ components:
   parameters:
     event-param:
       in: path
-      name: event-id
+      name: eventId
       description: identifier of the event
       required: true
       schema:
@@ -312,7 +315,7 @@ components:
         example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
     mission-param:
       in: path
-      name: mission-id
+      name: missionId
       description: identifier of the mission vehicle
       required: true
       schema:
