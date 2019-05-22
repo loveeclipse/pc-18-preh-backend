@@ -2,18 +2,17 @@ openapi: 3.0.0
 info:
   version: '1.0'
   title: 'Patient Registry Service'
-  description: 'A service for keeping track of a patient personal data'
+  description: 'A service for keepigng track of a patient personal data'
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 paths:
-  '/patients/{patientId}':
+  '/patients':
     post:
       summary: creates a new event
       description: |
-        Triggers the creation of a new event, with the given id, and entering all available personal data of the patient.
+        Triggers the creation of a new event, generating a patientId, and entering all available personal data of the patient. It returns the patientId in response.
       parameters:
-        - $ref: '#/components/parameters/patientId'
         - $ref: '#/components/parameters/eventId'
         - $ref: '#/components/parameters/patientNameSurname'
         - $ref: '#/components/parameters/patientGender'
@@ -25,8 +24,13 @@ paths:
       responses:
         '201':
           description: the resource creation was successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/parameters/patientId'
         '500':
           description: generic server error
+  '/patients/{patientId}':
     get:
       summary: get the available personal data of a patient
       description: |
