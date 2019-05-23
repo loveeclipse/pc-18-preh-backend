@@ -1,5 +1,6 @@
 rootProject.name = 'pc-18-ph'
-include 'oc-bridge-service'
+include 'oc-bridge-service',
+        'patient-registry-service'
 
 include 'vt-service'
 

@@ -1,5 +1,6 @@
 package service
 
+
 import io.netty.handler.codec.http.HttpResponseStatus.*
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
@@ -13,20 +14,20 @@ object RequestManager {
     private var vertx: Vertx? = null
     private val CONFIG = JsonObject().put("connection_string", "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr")
     private const val DOCUMENT_ID = "_id"
-    private const val EVENT_ID = "eventId"
-    private const val COLLECTION_NAME = "events"
+    private const val PATIENT_ID = "patientId"
+    private const val COLLECTION_NAME = "patients"
     private const val DUPLICATED_KEY_CODE = "E11000"
-    private const val SECONDARY = "secondary"
-
 
     fun initializeRequestManager(vertx: Vertx) {
         RequestManager.vertx = vertx
     }
 
-    fun createEvent(routingContext: RoutingContext) {
+    fun handleNewPatient(routingContext: RoutingContext) {
         val response = routingContext.response()
-        val uuid = UUID.randomUUID().toString()
-        val document = JsonObject().put(DOCUMENT_ID, uuid)
+        val patientUuid = UUID.randomUUID().toString()
+        val document = routingContext.bodyAsJson
+        document.put(DOCUMENT_ID, patientUuid)
+        println(document)
 
         MongoClient.createNonShared(vertx, CONFIG).insert(COLLECTION_NAME, document) { result ->
             when {
@@ -34,20 +35,19 @@ object RequestManager {
                         .putHeader("Content-Type", "application/json")
                         .setStatusCode(CREATED.code())
                         .end(Json.encodePrettily(document))
-                isDuplicateKey(result.cause().message) -> createEvent(routingContext)
+                isDuplicateKey(result.cause().message) -> handleNewPatient(routingContext)
                 else -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
             }
         }
     }
 
-    private fun isDuplicateKey(errorMessage: String?) = errorMessage?.startsWith(DUPLICATED_KEY_CODE) ?: false
-
-    fun retrieveEventById(routingContext: RoutingContext) {
+    fun handleGetPatientData(routingContext: RoutingContext){
         val response = routingContext.response()
-        val eventId = routingContext.request().getParam(EVENT_ID)
+        val patientId = routingContext.request().getParam(PATIENT_ID)
+
         try {
-            UUID.fromString(eventId)
-            val query = JsonObject().put(DOCUMENT_ID, eventId)
+            UUID.fromString(patientId)
+            val query = JsonObject().put(DOCUMENT_ID, patientId)
             MongoClient.createNonShared(vertx, CONFIG).find(COLLECTION_NAME, query) { result ->
                 if (result.succeeded()) {
                     try {
@@ -63,7 +63,6 @@ object RequestManager {
                     } catch (ex: IndexOutOfBoundsException) {
                         response.setStatusCode(BAD_REQUEST.code()).end()
                     }
-
                 } else {
                     response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                 }
@@ -71,18 +70,15 @@ object RequestManager {
         } catch (exception: IllegalArgumentException) {
             response.setStatusCode(NOT_FOUND.code()).end()
         }
-
     }
 
-    fun updateEvent(routingContext: RoutingContext) {
+    fun handleUpdatePatientData(routingContext: RoutingContext) {
         val response = routingContext.response()
-        val eventId = routingContext.request().getParam(EVENT_ID)
+        val patientId = routingContext.request().getParam(PATIENT_ID)
         try {
-            UUID.fromString(eventId)
+            UUID.fromString(patientId)
             val body = routingContext.bodyAsJson
-            if (body.containsKey(SECONDARY))
-                body.getBoolean(SECONDARY)
-            val query = JsonObject().put(DOCUMENT_ID, eventId)
+            val query = JsonObject().put(DOCUMENT_ID, patientId)
             val update = JsonObject().put("\$set", body)
             MongoClient.createNonShared(vertx, CONFIG).updateCollection(COLLECTION_NAME, query, update) { res ->
                 if (res.succeeded()) {
@@ -98,4 +94,7 @@ object RequestManager {
             response.setStatusCode(BAD_REQUEST.code()).end()
         }
     }
+
+    private fun isDuplicateKey(errorMessage: String?) = errorMessage?.startsWith(DUPLICATED_KEY_CODE) ?: false
+
 }

@@ -51,7 +51,7 @@ paths:
         By passing the event's id and some information, the relative resource will be updated with the new data.
       parameters:
         - $ref: '#/components/parameters/eventId'
-        - $ref: '#/components/parameters/eventMedic'
+        - $ref: '#/components/parameters/eventNotes'
         - $ref: '#/components/parameters/eventDispatchCode'
         - $ref: '#/components/parameters/eventSecondary'
         - $ref: '#/components/parameters/eventDynamic'
@@ -75,13 +75,13 @@ components:
         type: string
         format: uuid
         example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
-    eventMedic:
-      name: medic
+    eventNotes:
+      name: notes
       in: query
-      description: name and surname of the medic
+      description: event's notes
       schema:
         type: string
-        example: 'Mario Rossi'
+        example: 'Il paziente passa dallo stato di coscienza ad incoscienza in continuazione'
     eventDispatchCode:
       name: dispatchCode
       in: query
@@ -107,9 +107,9 @@ components:
     EventInformation:
       type: object
       properties:
-        medic:
+        notes:
           type: string
-          example: 'Mario Rossi'
+          example: 'Il paziente passa dallo stato di coscienza ad incoscienza in continuazione'
         dispatchCode:
           type: string
           example: 'SC01R'

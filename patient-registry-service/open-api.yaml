@@ -1,0 +1,177 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: 'Patient Registry Service'
+  description: 'A service for keepigng track of a patient personal data'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+paths:
+  '/patients':
+    post:
+      summary: creates a new event
+      description: |
+        Triggers the creation of a new event, generating a patientId, and entering all available personal data of the patient. It returns the patientId in response.
+      parameters:
+        - $ref: '#/components/parameters/eventId'
+        - $ref: '#/components/parameters/patientNameSurname'
+        - $ref: '#/components/parameters/patientGender'
+        - $ref: '#/components/parameters/patientBDay'
+        - $ref: '#/components/parameters/patientBPlace'
+        - $ref: '#/components/parameters/address'
+        - $ref: '#/components/parameters/anticoagulants'
+        - $ref: '#/components/parameters/antiplatelets'
+      responses:
+        '201':
+          description: the resource creation was successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/parameters/patientId'
+        '500':
+          description: generic server error
+  '/patients/{patientId}':
+    get:
+      summary: get the available personal data of a patient
+      description: |
+        Given a particular patientId get all it's available personal data.
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+      responses:
+        '200':
+          description: returns the information about the requested patient
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientInformation'
+        '204':
+          description: the resource is present but without body data
+        '400':
+          description: bad input parameter
+        '404':
+          description: resource not found
+        '500':
+          description: generic server error
+    patch:
+      summary: updates the event's information
+      description: |
+        By passing the event's id and some information, the relative resource will be updated with the new data.
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+        - $ref: '#/components/parameters/eventId'
+        - $ref: '#/components/parameters/patientNameSurname'
+        - $ref: '#/components/parameters/patientGender'
+        - $ref: '#/components/parameters/patientBDay'
+        - $ref: '#/components/parameters/patientBPlace'
+        - $ref: '#/components/parameters/address'
+        - $ref: '#/components/parameters/anticoagulants'
+        - $ref: '#/components/parameters/antiplatelets'
+      responses:
+        '200':
+          description: the resource update was successful
+        '400':
+          description: bad input parameter
+        '404':
+          description: resource not found
+        '500':
+          description: generic server error
+
+components:
+  parameters:
+    patientId:
+      name: patientId
+      in: path
+      description: ID of the patient
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 'dog3r2h8-sdfo-0iwt-rwg3-ohfew083ff9s'
+    eventId:
+      name: eventId
+      in: query
+      description: ID of the event
+      schema:
+        type: string
+        format: uuid
+        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+    patientNameSurname:
+      name: nameSurname
+      in: query
+      description: name and surname of the patient
+      schema:
+        type: string
+        example: 'Mario Rossi'
+    patientGender:
+      name: gender
+      in: query
+      description: gender of  the patient
+      schema:
+        type: string
+        example: 'M'
+    patientBDay:
+      name: birthday
+      in: query
+      description: the patient's birthday
+      schema:
+        type: string
+        format: date
+        example: 29/07/1992
+    patientBPlace:
+      name: birthplace
+      in: query
+      description: the patient's birthplace
+      schema:
+        type: string
+        example: "Cesena"
+    address:
+      name: address
+      in: query
+      description: the patient's residential address
+      schema:
+        type: string
+        example: "Via della Madonnina 27, Trieste"
+    anticoagulants:
+      name: anticoagulants
+      in: query
+      description: tells if the patient is assuming anticoagulants
+      schema:
+        type: boolean
+        example: true
+    antiplatelets:
+      name: antiplatelets
+      in: query
+      description: tells if the patient is assuming antiplatelets
+      schema:
+        type: boolean
+        example: false
+  schemas:
+    PatientInformation:
+      type: object
+      properties:
+        eventId:
+          type: string
+          format: uuid
+          example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+        patientNameSurname:
+          type: string
+          example: 'Mario Rossi'
+        patientGender:
+          type: string
+          example: 'M'
+        patientBDay:
+          type: string
+          format: date
+          example: 29/07/1992
+        patientBPlace:
+          type: string
+          example: "Cesena"
+        address:
+          type: string
+          example: "Via della Madonnina 27, Trieste"
+        anticoagulants:
+          type: boolean
+          example: true
+        antiplatelets:
+          type: boolean
+          example: false
