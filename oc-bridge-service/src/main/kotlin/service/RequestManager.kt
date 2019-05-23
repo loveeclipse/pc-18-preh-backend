@@ -1,6 +1,11 @@
 package service
 
-import io.netty.handler.codec.http.HttpResponseStatus.*
+import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
+import io.netty.handler.codec.http.HttpResponseStatus.CREATED
+import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
+import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
+import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
+import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
@@ -17,7 +22,6 @@ object RequestManager {
     private const val COLLECTION_NAME = "events"
     private const val DUPLICATED_KEY_CODE = "E11000"
     private const val SECONDARY = "secondary"
-
 
     fun initializeRequestManager(vertx: Vertx) {
         RequestManager.vertx = vertx
@@ -63,7 +67,6 @@ object RequestManager {
                     } catch (ex: IndexOutOfBoundsException) {
                         response.setStatusCode(BAD_REQUEST.code()).end()
                     }
-
                 } else {
                     response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                 }
@@ -71,7 +74,6 @@ object RequestManager {
         } catch (exception: IllegalArgumentException) {
             response.setStatusCode(NOT_FOUND.code()).end()
         }
-
     }
 
     fun updateEvent(routingContext: RoutingContext) {

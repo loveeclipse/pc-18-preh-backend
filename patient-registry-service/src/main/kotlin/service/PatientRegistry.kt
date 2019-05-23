@@ -18,9 +18,9 @@ class PatientRegistry : AbstractVerticle() {
         RequestManager.initializeRequestManager(vertx)
         return Router.router(vertx).apply {
             route().handler(BodyHandler.create())
-            post("/v1/patients").handler {RequestManager.handleNewPatient(it)}
-            get("/v1/patients/:patientId").handler {RequestManager.handleGetPatientData(it)}
-            patch("/v1/patients/:patientId").handler {RequestManager.handleUpdatePatientData(it)}
+            post("/v1/patients").handler { RequestManager.handleNewPatient(it) }
+            get("/v1/patients/:patientId").handler { RequestManager.handleGetPatientData(it) }
+            patch("/v1/patients/:patientId").handler { RequestManager.handleUpdatePatientData(it) }
         }
     }
 
