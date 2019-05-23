@@ -1,4 +1,5 @@
 rootProject.name = 'pc-18-ph'
+include 'oc-bridge-service'
 
 include 'vt-service'
 

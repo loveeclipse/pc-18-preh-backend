@@ -21,8 +21,8 @@ class RouterVerticle : AbstractVerticle() {
         VtService.initializeRequestManager(vertx)
         return Router.router(vertx).apply {
             route().handler(BodyHandler.create())
-            get(GET_ALL_EVENT_DETAILS).handler { VtService.handlerGetAllEventsDetails(it) }
-            get(GET_ALL_MISSION_DETAILS).handler { VtService.handlerGetAllMissions(it)  }
+            get(GET_ALL_EVENT_DETAILS).handler { VtService.retrieveEventTracking(it) }
+            get(GET_ALL_MISSION_DETAILS).handler { VtService.retrieveMissionTracking(it)  }
             get(GET_OC_CALL).handler { VtService.handlerGetOcCall(it) }
             post(POST_OC_CALL).handler { VtService.handlerPostOcCall(it) }
             get(GET_CREW_DEPARTURE).handler { VtService.handlerGetCrewDeparture(it) }

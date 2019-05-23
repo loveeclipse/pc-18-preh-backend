@@ -1,30 +1,23 @@
 allprojects {
-    apply plugin: 'idea'
-    apply plugin: 'com.dorongold.task-tree'
-    apply plugin: 'java'
-    apply plugin: 'kotlin'
-
+    apply plugin: "java"
+    apply plugin: "idea"
+    apply plugin: "com.dorongold.task-tree"
     repositories {
         jcenter()
         mavenCentral()
     }
 }
 
-version '1.0-SNAPSHOT'
+version "1.0-SNAPSHOT"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 subprojects {
-    group 'pc-18-ph'
-
-    repositories {
-        mavenCentral()
-    }
-
+    apply plugin: "kotlin"
+    group "pc-18-ph"
     dependencies {
-        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile group: "junit", name: "junit", version: "4.12"
     }
-
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }

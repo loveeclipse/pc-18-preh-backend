@@ -15,7 +15,8 @@ object VtService {
 
     private val log = LoggerFactory.getLogger("VtService")
 
-    private val MONGODB_CONFIGURATION = JsonObject().put("connection_string",
+    private val MONGODB_CONFIGURATION = JsonObject().put(
+            "connection_string",
             "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr")
     private const val DOCUMENT_IDENTIFIER = "_id"
     private const val EVENT_IDENTIFIER = "eventId"
@@ -24,12 +25,11 @@ object VtService {
     private const val MISSIONS = "missions"
     private var vertx: Vertx? = null
 
-
     fun initializeRequestManager(vertx: Vertx) {
         VtService.vertx = vertx
     }
 
-    fun handlerGetAllEventsDetails(routingContext: RoutingContext) {
+    fun retrieveEventTracking(routingContext: RoutingContext) {
         log.info("Request get all events details")
         val response = routingContext.response()
         val params = routingContext.request().params()
@@ -37,28 +37,30 @@ object VtService {
             obj(DOCUMENT_IDENTIFIER to params[EVENT_IDENTIFIER])
         }
         try{
-            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION).find(COLLECTION_NAME, document) { result ->
-                if (result.succeeded()) {
-                    try {
-                        val queryResult = result.result().first()
-                        queryResult.remove(DOCUMENT_IDENTIFIER)
-                        if (!queryResult.isEmpty) {
-                            response
-                                    .putHeader("Content-Type", "application/json")
-                                    .setStatusCode(OK.code())
-                                    .end(Json.encodePrettily(queryResult))
+            MongoClient
+                    .createNonShared(vertx, MONGODB_CONFIGURATION)
+                    .find(COLLECTION_NAME, document) { result ->
+                        if (result.succeeded()) {
+                            try {
+                                val queryResult = result.result().first()
+                                queryResult.remove(DOCUMENT_IDENTIFIER)
+                                if (!queryResult.isEmpty) {
+                                    response
+                                            .putHeader("Content-Type", "application/json")
+                                            .setStatusCode(OK.code())
+                                            .end(Json.encodePrettily(queryResult))
+                                } else {
+                                    response
+                                            .setStatusCode(NO_CONTENT.code())
+                                            .end()
+                                }
+                            } catch (e1: Exception) {
+                                response.setStatusCode(BAD_REQUEST.code()).end()
+                                log.info("Response status ${response.statusCode}")
+                            }
                         } else {
-                            response
-                                    .setStatusCode(NO_CONTENT.code())
-                                    .end()
+                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                         }
-                    } catch (e1: Exception) {
-                        response.setStatusCode(BAD_REQUEST.code()).end()
-                        log.info("Response status ${response.statusCode}")
-                    }
-                } else {
-                    response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                }
             }
         } catch (e: Exception){
             response.setStatusCode(NOT_FOUND.code()).end()
@@ -66,7 +68,7 @@ object VtService {
         }
     }
 
-    fun handlerGetAllMissions(routingContext: RoutingContext) {
+    fun retrieveMissionTracking(routingContext: RoutingContext) {
         log.info("Request get all missions details")
         val response = routingContext.response()
         val params = routingContext.request().params()
@@ -155,7 +157,6 @@ object VtService {
 
     fun handlerGetCrewDeparture(routingContext: RoutingContext) {
         log.info("Request get crew departure details")
-
     }
 
     fun handlerPostCrewDeparture(routingContext: RoutingContext) {
