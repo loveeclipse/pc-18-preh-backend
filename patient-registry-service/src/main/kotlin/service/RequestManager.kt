@@ -1,7 +1,11 @@
 package service
 
-
-import io.netty.handler.codec.http.HttpResponseStatus.*
+import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
+import io.netty.handler.codec.http.HttpResponseStatus.CREATED
+import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
+import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
+import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
+import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
@@ -41,7 +45,7 @@ object RequestManager {
         }
     }
 
-    fun handleGetPatientData(routingContext: RoutingContext){
+    fun handleGetPatientData(routingContext: RoutingContext) {
         val response = routingContext.response()
         val patientId = routingContext.request().getParam(PATIENT_ID)
 
@@ -96,5 +100,4 @@ object RequestManager {
     }
 
     private fun isDuplicateKey(errorMessage: String?) = errorMessage?.startsWith(DUPLICATED_KEY_CODE) ?: false
-
 }
