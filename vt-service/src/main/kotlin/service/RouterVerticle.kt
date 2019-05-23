@@ -21,39 +21,52 @@ class RouterVerticle : AbstractVerticle() {
         VtService.initializeRequestManager(vertx)
         return Router.router(vertx).apply {
             route().handler(BodyHandler.create())
-            get(GET_ALL_EVENT_DETAILS).handler { VtService.retrieveEventTracking(it) }
-            get(GET_ALL_MISSION_DETAILS).handler { VtService.retrieveMissionTracking(it)  }
-            get(GET_OC_CALL).handler { VtService.handlerGetOcCall(it) }
-            post(POST_OC_CALL).handler { VtService.handlerPostOcCall(it) }
-            get(GET_CREW_DEPARTURE).handler { VtService.handlerGetCrewDeparture(it) }
-            post(POST_CREW_DEPARTURE).handler { VtService.handlerPostCrewDeparture(it) }
-            get(GET_LANDING_ONSITE).handler { VtService.handlerGetLandingOnsite(it) }
-            post(POST_LANDING_ONSITE).handler { VtService.handlerPostLandingOnsite(it) }
-            get(GET_TAKEOFF_ONSITE).handler { VtService.handlerGetTakeoffOnsite(it) }
-            post(POST_TAKEOFF_ONSITE).handler { VtService.handlerPostTakeoffOnsite(it) }
-            get(GET_LANDING_HELIPAD).handler { VtService.handlerGetLandingHelipad(it) }
-            post(POST_LANDING_HELIPAD).handler { VtService.handlerPostLandingHelipad(it) }
-            get(GET_ARRIVAL_ER).handler { VtService.handlerGetArrivalEr(it) }
-            post(POST_ARRIVAL_ER).handler { VtService.handlerPostArrivalEr(it) }
+            get(EVENT_TRACKING_PATH).handler { VtService.retrieveEventTracking(it) }
+            get(MISSION_TRACKING_PATH).handler { VtService.retrieveMissionTracking(it)  }
+
+            get(OC_CALL_PATH).handler { VtService.retrieveSingleTrackingItem(it, OC_CALL_REP) }
+            post(OC_CALL_PATH).handler { VtService.createSingleTrackingItem(it, OC_CALL_REP) }
+
+            get(CREW_DEPARTURE_PATH).handler { VtService.retrieveSingleTrackingItem(it, CREW_DEPARTURE_REP) }
+            post(CREW_DEPARTURE_PATH).handler { VtService.createSingleTrackingItem(it, CREW_DEPARTURE_REP) }
+
+            get(ARRIVAL_ONSITE_PATH).handler { VtService.retrieveSingleTrackingItem(it, ARRIVAL_ONSITE_REP) }
+            post(ARRIVAL_ONSITE_PATH).handler { VtService.createSingleTrackingItem(it, ARRIVAL_ONSITE_REP) }
+
+            get(DEPARTURE_ONSITE_PATH).handler { VtService.retrieveSingleTrackingItem(it, DEPARTURE_ONSITE_REP) }
+            post(DEPARTURE_ONSITE_PATH).handler { VtService.createSingleTrackingItem(it, DEPARTURE_ONSITE_REP) }
+
+            get(LANDING_HELIPAD_PATH).handler { VtService.retrieveSingleTrackingItem(it, LANDING_HELIPAD_REP) }
+            post(LANDING_HELIPAD_PATH).handler { VtService.createSingleTrackingItem(it, LANDING_HELIPAD_REP) }
+
+            get(ARRIVAL_ER_PATH).handler { VtService.retrieveSingleTrackingItem(it, ARRIVAL_ER_REP) }
+            post(ARRIVAL_ER_PATH).handler { VtService.createSingleTrackingItem(it, ARRIVAL_ER_REP) }
         }
     }
 
     companion object {
         private const val PORT = 10000
         private const val HOST = "localhost"
-        private const val GET_ALL_EVENT_DETAILS = "/v1/events-tracking/:eventId"
-        private const val GET_ALL_MISSION_DETAILS = "/v1/events-tracking/:eventId/missions/:missionId"
-        private const val GET_OC_CALL = "/v1/events-tracking/:eventId/oc-call/missions/:missionId"
-        private const val POST_OC_CALL = "/v1/events-tracking/:eventId/oc-call/missions/:missionId"
-        private const val GET_CREW_DEPARTURE = "/v1/events-tracking/:eventId/missions/:missionId/crew-departure"
-        private const val POST_CREW_DEPARTURE = "/v1/events-tracking/:eventId/missions/:missionId/crew-departure"
-        private const val GET_LANDING_ONSITE = "/v1/events-tracking/:eventId/missions/:missionId/landing-onsite"
-        private const val POST_LANDING_ONSITE = "/v1/events-tracking/:eventId/missions/:missionId/landing-onsite"
-        private const val GET_TAKEOFF_ONSITE = "/v1/events-tracking/:eventId/missions/:missionId/takeoff-onsite"
-        private const val POST_TAKEOFF_ONSITE = "/v1/events-tracking/:eventId/missions/:missionId/takeoff-onsite"
-        private const val GET_LANDING_HELIPAD = "/v1/events-tracking/:eventId/missions/:missionId/landing-helipad"
-        private const val POST_LANDING_HELIPAD = "/v1/events-tracking/:eventId/missions/:missionId/landing-helipad"
-        private const val GET_ARRIVAL_ER = "/v1/events-tracking/:eventId/missions/:missionId/arrival-er"
-        private const val POST_ARRIVAL_ER  = "/v1/events-tracking/:eventId/missions/:missionId/arrival-er"
+
+        private const val EVENT_TRACKING_PATH = "/v1/events-tracking/:eventId"
+        private const val MISSION_TRACKING_PATH = "$EVENT_TRACKING_PATH/missions/:missionId"
+
+        private const val OC_CALL_REP = "oc-call"
+        private const val OC_CALL_PATH = "$MISSION_TRACKING_PATH/$OC_CALL_REP"
+
+        private const val CREW_DEPARTURE_REP = "crew-departure"
+        private const val CREW_DEPARTURE_PATH = "$MISSION_TRACKING_PATH/$CREW_DEPARTURE_REP"
+
+        private const val ARRIVAL_ONSITE_REP = "arrival-onsite"
+        private const val ARRIVAL_ONSITE_PATH = "$MISSION_TRACKING_PATH/$ARRIVAL_ONSITE_REP"
+
+        private const val DEPARTURE_ONSITE_REP = "departure-onsite"
+        private const val DEPARTURE_ONSITE_PATH = "$MISSION_TRACKING_PATH/$DEPARTURE_ONSITE_REP"
+
+        private const val LANDING_HELIPAD_REP = "landing-helipad"
+        private const val LANDING_HELIPAD_PATH = "$MISSION_TRACKING_PATH/$LANDING_HELIPAD_REP"
+
+        private const val ARRIVAL_ER_REP = "arrival-er"
+        private const val ARRIVAL_ER_PATH = "$MISSION_TRACKING_PATH/$ARRIVAL_ER_REP"
     }
 }
