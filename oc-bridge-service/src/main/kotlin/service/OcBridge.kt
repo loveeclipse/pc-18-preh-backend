@@ -11,21 +11,23 @@ class OcBridge : AbstractVerticle() {
                 .createHttpServer()
                 .requestHandler(createRouter())
                 .listen(PORT, HOST)
-        println("Service ready.")
+        println("Service ready on port $PORT and host $HOST")
     }
 
     private fun createRouter(): Router {
         RequestManager.initializeRequestManager(vertx)
         return Router.router(vertx).apply {
             route().handler(BodyHandler.create())
-            post("/v1/events").handler { RequestManager.handleCreateEvent(it) }
-            get("/v1/events/:eventId").handler { RequestManager.handleGetEventById(it) }
-            patch("/v1/events/:eventId").handler { RequestManager.handleUpdateEvent(it) }
+            post(EVENTS_PATH).handler { RequestManager.createEvent(it) }
+            get(SINGLE_EVENT_PATH).handler { RequestManager.retrieveEventById(it) }
+            patch(SINGLE_EVENT_PATH).handler { RequestManager.updateEvent(it) }
         }
     }
 
     companion object {
         private const val PORT = 10000
         private const val HOST = "localhost"
+        private const val EVENTS_PATH = "/v1/events"
+        private const val SINGLE_EVENT_PATH = "$EVENTS_PATH/:eventId"
     }
 }

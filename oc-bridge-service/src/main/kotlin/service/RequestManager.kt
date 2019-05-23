@@ -23,7 +23,7 @@ object RequestManager {
         RequestManager.vertx = vertx
     }
 
-    fun handleCreateEvent(routingContext: RoutingContext) {
+    fun createEvent(routingContext: RoutingContext) {
         val response = routingContext.response()
         val uuid = UUID.randomUUID().toString()
         val document = JsonObject().put(DOCUMENT_ID, uuid)
@@ -34,7 +34,7 @@ object RequestManager {
                         .putHeader("Content-Type", "application/json")
                         .setStatusCode(CREATED.code())
                         .end(Json.encodePrettily(document))
-                isDuplicateKey(result.cause().message) -> handleCreateEvent(routingContext)
+                isDuplicateKey(result.cause().message) -> createEvent(routingContext)
                 else -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
             }
         }
@@ -42,7 +42,7 @@ object RequestManager {
 
     private fun isDuplicateKey(errorMessage: String?) = errorMessage?.startsWith(DUPLICATED_KEY_CODE) ?: false
 
-    fun handleGetEventById(routingContext: RoutingContext) {
+    fun retrieveEventById(routingContext: RoutingContext) {
         val response = routingContext.response()
         val eventId = routingContext.request().getParam(EVENT_ID)
         try {
@@ -74,7 +74,7 @@ object RequestManager {
 
     }
 
-    fun handleUpdateEvent(routingContext: RoutingContext) {
+    fun updateEvent(routingContext: RoutingContext) {
         val response = routingContext.response()
         val eventId = routingContext.request().getParam(EVENT_ID)
         try {
