@@ -22,6 +22,7 @@ object VtService {
     private const val DOCUMENT_IDENTIFIER = "_id"
     private const val EVENT_IDENTIFIER = "eventId"
     private const val MISSION_IDENTIFIER = "missionId"
+    private const val MISSION_TRACKING = "missionTracking"
     private const val MISSIONS = "missions"
 
     private const val RESPONSE_PREFIX = "Response status: "
@@ -78,8 +79,10 @@ object VtService {
         val response = context.response()
         val params = context.request().params()
         val document = json {
-            obj(DOCUMENT_IDENTIFIER to params[EVENT_IDENTIFIER],
-                    "$MISSIONS.$MISSION_IDENTIFIER" to params[MISSION_IDENTIFIER])
+            obj(
+                    DOCUMENT_IDENTIFIER to params[EVENT_IDENTIFIER],
+                    "$MISSIONS.$MISSION_IDENTIFIER" to params[MISSION_IDENTIFIER]
+            )
         }
         try {
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
@@ -115,15 +118,55 @@ object VtService {
     }
 
     fun retrieveSingleTrackingItem(context: RoutingContext, itemRep: String) {
+        log.info("Request to retrieve the $itemRep tracking details for a certain mission")
         val response = context.response()
         val params = context.request().params()
-        log.info("Request to retrieve the $itemRep tracking details for a certain mission")
+
+        //TODO
     }
 
+    //TODO: implementarla parametrizzata con itemRep
     fun createSingleTrackingItem(context: RoutingContext, itemRep: String) {
+        log.info("Request to create the $itemRep tracking details for a certain mission")
         val response = context.response()
         val params = context.request().params()
-        log.info("Request to create the $itemRep tracking details for a certain mission")
+        val document = json {
+            obj(DOCUMENT_IDENTIFIER to params[EVENT_IDENTIFIER])
+        }
+        val mission = json {
+            obj(MISSIONS to array(
+                    obj(
+                        MISSION_IDENTIFIER to params[MISSION_IDENTIFIER],
+                        MISSION_TRACKING to JsonObject()
+                    )
+            ))
+        }
+        val update = json {
+            obj("\$set" to mission)
+        }
+
+        try {
+            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                    .updateCollectionWithOptions(
+                        COLLECTION_NAME,
+                        document,
+                        update,
+                        UpdateOptions().setUpsert(true)) { updateOperation ->
+                            if (updateOperation.succeeded()) {
+                                try {
+                                    println(updateOperation.result())
+                                } catch (e1: Exception) {
+                                    response.setStatusCode(BAD_REQUEST.code()).end()
+                                    log.info(RESPONSE_PREFIX + response.statusCode)
+                                }
+                            } else {
+                                log.info("not succeeded")
+                            }
+                        }
+        } catch (e: Exception) {
+            response.setStatusCode(NOT_FOUND.code()).end()
+            log.info(RESPONSE_PREFIX + response.statusCode)
+        }
     }
 
     // Legacy: adapt this code inside the createSingleTrackingItem()
