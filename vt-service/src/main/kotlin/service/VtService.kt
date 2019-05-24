@@ -117,17 +117,17 @@ object VtService {
         }
     }
 
-    fun retrieveSingleTrackingItem(context: RoutingContext, itemRep: String) {
-        log.info("Request to retrieve the $itemRep tracking details for a certain mission")
+    fun retrieveSingleTrackingItem(context: RoutingContext, trackingItem: MissionTrackingItem) {
+        log.info("Request to retrieve the ${trackingItem.fieldName} tracking details for a certain mission")
         val response = context.response()
         val params = context.request().params()
 
-        //TODO
+        // TODO
     }
 
-    //TODO: implementarla parametrizzata con itemRep
-    fun createSingleTrackingItem(context: RoutingContext, itemRep: String) {
-        log.info("Request to create the $itemRep tracking details for a certain mission")
+    // TODO: implementarla parametrizzata con itemRep
+    fun createSingleTrackingItem(context: RoutingContext, trackingItem: MissionTrackingItem) {
+        log.info("Request to create the ${trackingItem.fieldName} tracking details for a certain mission")
         val response = context.response()
         val params = context.request().params()
         val document = json {
