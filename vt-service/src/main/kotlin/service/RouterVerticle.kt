@@ -51,21 +51,27 @@ class RouterVerticle : AbstractVerticle() {
         private const val EVENT_TRACKING_PATH = "/v1/events-tracking/:eventId"
         private const val MISSION_TRACKING_PATH = "$EVENT_TRACKING_PATH/missions/:missionId"
 
+        private const val OC_CALL_FIELD = "ocCall"
         private const val OC_CALL_REP = "oc-call"
         private const val OC_CALL_PATH = "$MISSION_TRACKING_PATH/$OC_CALL_REP"
 
+        private const val CREW_DEPARTURE_FIELD = "crewDeparture"
         private const val CREW_DEPARTURE_REP = "crew-departure"
         private const val CREW_DEPARTURE_PATH = "$MISSION_TRACKING_PATH/$CREW_DEPARTURE_REP"
 
+        private const val ARRIVAL_ONSITE_FIELD = "arrivalOnsite"
         private const val ARRIVAL_ONSITE_REP = "arrival-onsite"
         private const val ARRIVAL_ONSITE_PATH = "$MISSION_TRACKING_PATH/$ARRIVAL_ONSITE_REP"
 
+        private const val DEPARTURE_ONSITE_FIELD = "departureOnsite"
         private const val DEPARTURE_ONSITE_REP = "departure-onsite"
         private const val DEPARTURE_ONSITE_PATH = "$MISSION_TRACKING_PATH/$DEPARTURE_ONSITE_REP"
 
+        private const val LANDING_HELIPAD_FIELD = "landingHelipad"
         private const val LANDING_HELIPAD_REP = "landing-helipad"
         private const val LANDING_HELIPAD_PATH = "$MISSION_TRACKING_PATH/$LANDING_HELIPAD_REP"
 
+        private const val ARRIVAL_ER_FIELD = "arrivalEr"
         private const val ARRIVAL_ER_REP = "arrival-er"
         private const val ARRIVAL_ER_PATH = "$MISSION_TRACKING_PATH/$ARRIVAL_ER_REP"
     }
