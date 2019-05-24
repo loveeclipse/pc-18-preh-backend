@@ -1,15 +1,21 @@
 package service
 
+import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
+import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
+import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
+import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
+import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
-import io.vertx.kotlin.core.json.*
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
-import io.netty.handler.codec.http.HttpResponseStatus.*
 import io.vertx.ext.mongo.FindOptions
 import io.vertx.ext.mongo.UpdateOptions
+import io.vertx.kotlin.core.json.array
+import io.vertx.kotlin.core.json.json
+import io.vertx.kotlin.core.json.obj
 
 object VtService {
 
@@ -59,7 +65,7 @@ object VtService {
                             response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                         }
                     }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             response.setStatusCode(NOT_FOUND.code()).end()
             log.info("Response status ${response.statusCode}")
         }
@@ -73,7 +79,7 @@ object VtService {
             obj(DOCUMENT_IDENTIFIER to params[EVENT_IDENTIFIER],
                     "$MISSIONS.$MISSION_IDENTIFIER" to params[MISSION_IDENTIFIER])
         }
-        try{
+        try {
             MongoClient
                     .createNonShared(vertx, MONGODB_CONFIGURATION)
                     .findWithOptions(
@@ -140,8 +146,7 @@ object VtService {
                     document,
                     update,
                     UpdateOptions()
-                            .setUpsert(true))
-            { result ->
+                            .setUpsert(true)) { result ->
                 when { result.succeeded() ->
                     try {
                         val queryResult = result.result()
@@ -154,9 +159,9 @@ object VtService {
                     else -> log.info("not succeeded")
                 }
             }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             response.setStatusCode(NOT_FOUND.code()).end()
             log.info("Response status ${response.statusCode}")
         }
     }
- }
+}

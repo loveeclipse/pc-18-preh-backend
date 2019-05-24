@@ -1,9 +1,9 @@
 package service
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.core.AbstractVerticle
+import io.vertx.core.logging.LoggerFactory
+import io.vertx.ext.web.Router
+import io.vertx.ext.web.handler.BodyHandler
 
 class RouterVerticle : AbstractVerticle() {
 
@@ -22,7 +22,7 @@ class RouterVerticle : AbstractVerticle() {
         return Router.router(vertx).apply {
             route().handler(BodyHandler.create())
             get(EVENT_TRACKING_PATH).handler { VtService.retrieveEventTracking(it) }
-            get(MISSION_TRACKING_PATH).handler { VtService.retrieveMissionTracking(it)  }
+            get(MISSION_TRACKING_PATH).handler { VtService.retrieveMissionTracking(it) }
 
             get(OC_CALL_PATH).handler { VtService.retrieveSingleTrackingItem(it, OC_CALL_REP) }
             post(OC_CALL_PATH).handler { VtService.createSingleTrackingItem(it, OC_CALL_REP) }
