@@ -30,23 +30,6 @@ class RouterVerticle : AbstractVerticle() {
                 get(path).handler { VtService.retrieveSingleTrackingItem(it, item) }
                 post(path).handler { VtService.createSingleTrackingItem(it, item) }
             }
-//            get(OC_CALL_PATH).handler { VtService.retrieveSingleTrackingItem(it, OC_CALL_REP) }
-//            post(OC_CALL_PATH).handler { VtService.createSingleTrackingItem(it, OC_CALL_REP) }
-//
-//            get(CREW_DEPARTURE_PATH).handler { VtService.retrieveSingleTrackingItem(it, CREW_DEPARTURE_REP) }
-//            post(CREW_DEPARTURE_PATH).handler { VtService.createSingleTrackingItem(it, CREW_DEPARTURE_REP) }
-//
-//            get(ARRIVAL_ONSITE_PATH).handler { VtService.retrieveSingleTrackingItem(it, ARRIVAL_ONSITE_REP) }
-//            post(ARRIVAL_ONSITE_PATH).handler { VtService.createSingleTrackingItem(it, ARRIVAL_ONSITE_REP) }
-//
-//            get(DEPARTURE_ONSITE_PATH).handler { VtService.retrieveSingleTrackingItem(it, DEPARTURE_ONSITE_REP) }
-//            post(DEPARTURE_ONSITE_PATH).handler { VtService.createSingleTrackingItem(it, DEPARTURE_ONSITE_REP) }
-//
-//            get(LANDING_HELIPAD_PATH).handler { VtService.retrieveSingleTrackingItem(it, LANDING_HELIPAD_REP) }
-//            post(LANDING_HELIPAD_PATH).handler { VtService.createSingleTrackingItem(it, LANDING_HELIPAD_REP) }
-//
-//            get(ARRIVAL_ER_PATH).handler { VtService.retrieveSingleTrackingItem(it, ARRIVAL_ER_REP) }
-//            post(ARRIVAL_ER_PATH).handler { VtService.createSingleTrackingItem(it, ARRIVAL_ER_REP) }
         }
     }
 
