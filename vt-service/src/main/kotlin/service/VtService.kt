@@ -14,6 +14,7 @@ import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.mongo.FindOptions
 import io.vertx.ext.mongo.UpdateOptions
 import io.vertx.kotlin.core.json.array
+import io.vertx.kotlin.core.json.get
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 
@@ -55,7 +56,7 @@ object VtService {
                                 if (!queryResult.isEmpty) {
                                     response.putHeader("Content-Type", "application/json")
                                             .setStatusCode(OK.code())
-                                            .end(Json.encodePrettily(queryResult))
+                                            .end(Json.encodePrettily(queryResult.getJsonArray(MISSIONS)))
                                 } else {
                                     response.setStatusCode(NO_CONTENT.code())
                                             .end()
@@ -97,6 +98,8 @@ object VtService {
                                 val queryResult = result.result().first()
                                 val res = queryResult.getJsonArray(MISSIONS).filter { a ->
                                     (a as JsonObject).getString(MISSION_IDENTIFIER) == params[MISSION_IDENTIFIER]
+                                }.map { r ->
+                                    (r as JsonObject).getJsonObject(MISSION_TRACKING)
                                 }
                                 if (!queryResult.isEmpty) {
                                     response.putHeader("Content-Type", "application/json")
