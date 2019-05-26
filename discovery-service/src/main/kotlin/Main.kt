@@ -1,7 +1,7 @@
 import io.vertx.core.Vertx
-import service.Discovery
+import service.DiscoveryVerticle
 
 object Main {
     @JvmStatic
-    fun main(args: Array<String>) { Vertx.vertx().deployVerticle(Discovery()) }
+    fun main(args: Array<String>) { Vertx.vertx().deployVerticle(DiscoveryVerticle()) }
 }
