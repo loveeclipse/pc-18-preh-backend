@@ -10,11 +10,10 @@ import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
-import io.vertx.ext.mongo.UpdateOptions
 import io.vertx.kotlin.core.json.get
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
-import java.util.*
+import java.util.UUID
 
 object VtService {
     private const val COLLECTION_NAME = "tracking"
@@ -90,11 +89,11 @@ object VtService {
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .find(COLLECTION_NAME, query) { findOperation ->
                         if (findOperation.succeeded()) {
-                            val results : List<JsonObject> = findOperation.result()
+                            val results: List<JsonObject> = findOperation.result()
                             if (results.isEmpty()) {
                                 response.setStatusCode(NOT_FOUND.code()).end()
                             } else {
-                                val firstResult  = results.first()
+                                val firstResult = results.first()
                                 response.putHeader("Content-Type", "application/json")
                                         .setStatusCode(OK.code())
                                         .end(Json.encodePrettily(firstResult[MISSION_TRACKING]))
@@ -103,7 +102,6 @@ object VtService {
                             response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                         }
                     }
-
         } catch (_: IllegalArgumentException) {
             response.setStatusCode(BAD_REQUEST.code()).end()
         }
