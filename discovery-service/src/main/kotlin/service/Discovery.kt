@@ -6,16 +6,19 @@ import io.vertx.ext.web.RoutingContext
 import io.vertx.servicediscovery.ServiceDiscovery
 import io.vertx.servicediscovery.ServiceDiscoveryOptions
 
-class Test : AbstractVerticle() {
+class Discovery : AbstractVerticle() {
 
-    private var discovery = ServiceDiscovery.create(vertx)
+    private val discovery = ServiceDiscovery.create(vertx,
+            ServiceDiscoveryOptions()
+                    .setAnnounceAddress("service-announce")
+                    .setName("Discovery-service"))
 
-    override fun start() {
+    /*override fun start() {
         discovery = ServiceDiscovery.create(vertx,
                 ServiceDiscoveryOptions()
                         .setAnnounceAddress("service-announce")
                         .setName("Discovery-service"))
-    }
+    }*/
 
     override fun stop() {
         discovery.close()
