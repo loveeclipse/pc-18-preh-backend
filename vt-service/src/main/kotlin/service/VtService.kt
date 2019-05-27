@@ -8,11 +8,11 @@ import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
-import io.vertx.ext.mongo.MongoClient
-import io.vertx.ext.web.RoutingContext
-import io.vertx.kotlin.core.json.get
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
+import io.vertx.kotlin.core.json.get
+import io.vertx.ext.mongo.MongoClient
+import io.vertx.ext.web.RoutingContext
 import java.util.UUID
 
 object VtService {
@@ -22,9 +22,10 @@ object VtService {
     private const val MISSION_TRACKING = "missionTracking"
 
     private val log = LoggerFactory.getLogger("VtService")
-    private val MONGODB_CONFIGURATION = JsonObject().put(
-            "connection_string",
-            "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr")
+    private val MONGODB_CONFIGURATION = json { obj (
+            "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr")
+    }
+
 
     private var vertx: Vertx? = null
     fun initializeRequestManager(vertx: Vertx) {
@@ -47,14 +48,14 @@ object VtService {
                                 if (results.isEmpty()) {
                                     response.setStatusCode(NOT_FOUND.code()).end()
                                 } else {
-                                    val cleanedResult = results.map { r -> json {
+                                    val cleanedResults: List<JsonObject> = results.map { r -> json {
                                         obj(
                                                 MISSION_ID to r[MISSION_ID],
                                                 MISSION_TRACKING to r[MISSION_TRACKING])
                                     } }
                                     response.putHeader("Content-Type", "application/json")
                                             .setStatusCode(OK.code())
-                                            .end(Json.encodePrettily(cleanedResult))
+                                            .end(Json.encodePrettily(cleanedResults))
                                 }
                             }
                             findOperation.failed() -> {
