@@ -109,8 +109,41 @@ object VtService {
     fun retrieveSingleTrackingItem(context: RoutingContext, trackingItem: MissionTrackingItem) {
         log.info("Request to retrieve the ${trackingItem.fieldName} tracking details for a certain mission")
         val response = context.response()
-        val params = context.request().params()
-        // TODO
+        val request = context.request()
+        val eventId = request.params()[EVENT_ID]
+        val missionId = request.params()[MISSION_ID]
+
+        try {
+            UUID.fromString(eventId)
+            val query = json {
+                obj(
+                        EVENT_ID to eventId,
+                        MISSION_ID to missionId)
+            }
+            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                    .find(COLLECTION_NAME, query) { findOperation ->
+                        when {
+                            findOperation.succeeded() -> {
+                                val results: List<JsonObject> = findOperation.result()
+                                if (results.isNotEmpty()) {
+                                    val firstResult: JsonObject = results.first()
+                                    val missionTracking: JsonObject = firstResult["missionTracking"]
+                                    val itemTracking: JsonObject = missionTracking[trackingItem.fieldName]
+
+                                    response.putHeader("Content-Type", "application/json")
+                                            .setStatusCode(OK.code())
+                                            .end(Json.encodePrettily(itemTracking))
+                                }
+                            }
+                            findOperation.failed() -> {
+                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            }
+                        }
+                    }
+
+        } catch (_: IllegalArgumentException) { // eventId is not an UUID
+            response.setStatusCode(BAD_REQUEST.code()).end()
+        }
     }
 
     fun createSingleTrackingItem(context: RoutingContext, trackingItem: MissionTrackingItem) {
