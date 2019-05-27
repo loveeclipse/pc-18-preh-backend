@@ -21,15 +21,12 @@ object VtService {
     private const val MISSION_ID = "missionId"
     private const val MISSION_TRACKING = "missionTracking"
 
-    private const val RESPONSE_PREFIX = "Response status: "
     private val log = LoggerFactory.getLogger("VtService")
-
     private val MONGODB_CONFIGURATION = JsonObject().put(
             "connection_string",
             "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr")
 
     private var vertx: Vertx? = null
-
     fun initializeRequestManager(vertx: Vertx) {
         VtService.vertx = vertx
     }
@@ -79,7 +76,6 @@ object VtService {
 
         try {
             UUID.fromString(eventId)
-            UUID.fromString(missionId)
         } catch (_: IllegalArgumentException) {
             response.setStatusCode(BAD_REQUEST.code()).end()
         }
@@ -114,51 +110,13 @@ object VtService {
         log.info("Request to retrieve the ${trackingItem.fieldName} tracking details for a certain mission")
         val response = context.response()
         val params = context.request().params()
-
         // TODO
     }
 
-    // TODO: implementarla parametrizzata con itemRep
     fun createSingleTrackingItem(context: RoutingContext, trackingItem: MissionTrackingItem) {
-//        log.info("Request to create the ${trackingItem.fieldName} tracking details for a certain mission")
-//        val response = context.response()
-//        val params = context.request().params()
-//        val document = json {
-//            obj(DOCUMENT_IDENTIFIER to params[EVENT_IDENTIFIER])
-//        }
-//        val mission = json {
-//            obj(MISSIONS to array(
-//                    obj(
-//                        MISSION_IDENTIFIER to params[MISSION_IDENTIFIER],
-//                        MISSION_TRACKING to JsonObject()
-//                    )
-//            ))
-//        }
-//        val update = json {
-//            obj("\$set" to mission)
-//        }
-//
-//        try {
-//            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-//                    .updateCollectionWithOptions(
-//                        COLLECTION_NAME,
-//                        document,
-//                        update,
-//                        UpdateOptions().setUpsert(true)) { updateOperation ->
-//                            if (updateOperation.succeeded()) {
-//                                try {
-//                                    println(updateOperation.result())
-//                                } catch (e1: Exception) {
-//                                    response.setStatusCode(BAD_REQUEST.code()).end()
-//                                    log.info(RESPONSE_PREFIX + response.statusCode)
-//                                }
-//                            } else {
-//                                log.info("not succeeded")
-//                            }
-//                        }
-//        } catch (e: Exception) {
-//            response.setStatusCode(NOT_FOUND.code()).end()
-//            log.info(RESPONSE_PREFIX + response.statusCode)
-//        }
+        log.info("Request to create the ${trackingItem.fieldName} tracking details for a certain mission")
+        val response = context.response()
+        val params = context.request().params()
+        // TODO
     }
 }
