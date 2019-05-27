@@ -3,6 +3,7 @@ package service
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
 import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
+import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
 import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
@@ -126,14 +127,20 @@ object VtService {
                         when {
                             findOperation.succeeded() -> {
                                 val results: List<JsonObject> = findOperation.result()
-                                if (results.isNotEmpty()) {
+                                if (results.isEmpty()) {
+                                    response.setStatusCode(NOT_FOUND.code()).end()
+                                } else {
                                     val firstResult: JsonObject = results.first()
                                     val missionTracking: JsonObject = firstResult["missionTracking"]
-                                    val itemTracking: JsonObject = missionTracking[trackingItem.fieldName]
+                                    val desiredTrackingItem: JsonObject? = missionTracking[trackingItem.fieldName]
 
-                                    response.putHeader("Content-Type", "application/json")
-                                            .setStatusCode(OK.code())
-                                            .end(Json.encodePrettily(itemTracking))
+                                    desiredTrackingItem?.let {
+                                        response.putHeader("Content-Type", "application/json")
+                                                .setStatusCode(OK.code())
+                                                .end(Json.encodePrettily(desiredTrackingItem))
+                                    } ?: run {
+                                        response.setStatusCode(NO_CONTENT.code()).end()
+                                    }
                                 }
                             }
                             findOperation.failed() -> {
