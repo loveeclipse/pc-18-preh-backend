@@ -38,34 +38,34 @@ object VtService {
 
         try {
             UUID.fromString(eventId)
-        } catch (_: IllegalArgumentException) {
-            response.setStatusCode(BAD_REQUEST.code()).end()
-        }
-
-        val query = json { obj(EVENT_ID to eventId) }
-        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-                .find(COLLECTION_NAME, query) { findOperation ->
-                    when {
-                        findOperation.succeeded() -> {
-                            val results: List<JsonObject> = findOperation.result()
-                            if (results.isEmpty()) {
-                                response.setStatusCode(NOT_FOUND.code()).end()
+            val query = json { obj(EVENT_ID to eventId) }
+            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                    .find(COLLECTION_NAME, query) { findOperation ->
+                        when {
+                            findOperation.succeeded() -> {
+                                val results: List<JsonObject> = findOperation.result()
+                                if (results.isEmpty()) {
+                                    response.setStatusCode(NOT_FOUND.code()).end()
+                                } else {
+                                    val cleanedResult = results.map { r -> json {
+                                        obj(
+                                                MISSION_ID to r[MISSION_ID],
+                                                MISSION_TRACKING to r[MISSION_TRACKING])
+                                    } }
+                                    response.putHeader("Content-Type", "application/json")
+                                            .setStatusCode(OK.code())
+                                            .end(Json.encodePrettily(cleanedResult))
+                                }
                             }
-
-                            val cleanedResult = results.map { r -> json {
-                                obj(
-                                        MISSION_ID to r[MISSION_ID],
-                                        MISSION_TRACKING to r[MISSION_TRACKING])
-                            } }
-                            response.putHeader("Content-Type", "application/json")
-                                    .setStatusCode(OK.code())
-                                    .end(Json.encodePrettily(cleanedResult))
-                        }
-                        findOperation.failed() -> {
-                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            findOperation.failed() -> {
+                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            }
                         }
                     }
-                }
+
+        } catch (_: IllegalArgumentException) { // eventId is not an UUID
+            response.setStatusCode(BAD_REQUEST.code()).end()
+        }
     }
 
     fun retrieveMissionTracking(context: RoutingContext) {
@@ -76,34 +76,34 @@ object VtService {
 
         try {
             UUID.fromString(eventId)
-        } catch (_: IllegalArgumentException) {
-            response.setStatusCode(BAD_REQUEST.code()).end()
-        }
-
-        val query = json {
-            obj(
-                    EVENT_ID to eventId,
-                    MISSION_ID to missionId)
-        }
-        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-                .find(COLLECTION_NAME, query) { findOperation ->
-                    when {
-                        findOperation.succeeded() -> {
-                            val results: List<JsonObject> = findOperation.result()
-                            if (results.isEmpty()) {
-                                response.setStatusCode(NOT_FOUND.code()).end()
+            val query = json {
+                obj(
+                        EVENT_ID to eventId,
+                        MISSION_ID to missionId)
+            }
+            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                    .find(COLLECTION_NAME, query) { findOperation ->
+                        when {
+                            findOperation.succeeded() -> {
+                                val results: List<JsonObject> = findOperation.result()
+                                if (results.isEmpty()) {
+                                    response.setStatusCode(NOT_FOUND.code()).end()
+                                } else {
+                                    val firstResult = results.first()
+                                    response.putHeader("Content-Type", "application/json")
+                                            .setStatusCode(OK.code())
+                                            .end(Json.encodePrettily(firstResult[MISSION_TRACKING]))
+                                }
                             }
-
-                            val firstResult = results.first()
-                            response.putHeader("Content-Type", "application/json")
-                                    .setStatusCode(OK.code())
-                                    .end(Json.encodePrettily(firstResult[MISSION_TRACKING]))
-                        }
-                        findOperation.failed() -> {
-                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            findOperation.failed() -> {
+                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            }
                         }
                     }
-                }
+
+        } catch (_: IllegalArgumentException) { // eventId is not an UUID
+            response.setStatusCode(BAD_REQUEST.code()).end()
+        }
     }
 
     fun retrieveSingleTrackingItem(context: RoutingContext, trackingItem: MissionTrackingItem) {
