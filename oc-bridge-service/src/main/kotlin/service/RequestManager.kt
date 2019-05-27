@@ -65,14 +65,14 @@ object RequestManager {
                         else
                             response.setStatusCode(NO_CONTENT.code()).end()
                     } catch (ex: IndexOutOfBoundsException) {
-                        response.setStatusCode(BAD_REQUEST.code()).end()
+                        response.setStatusCode(NOT_FOUND.code()).end()
                     }
                 } else {
                     response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                 }
             }
         } catch (exception: IllegalArgumentException) {
-            response.setStatusCode(NOT_FOUND.code()).end()
+            response.setStatusCode(BAD_REQUEST.code()).end()
         }
     }
 
