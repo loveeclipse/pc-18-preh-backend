@@ -39,63 +39,36 @@ object VtService {
         val response = context.response()
         val eventId = context.request().params()[EVENT_ID]
 
-//        try {
-//            /* Raises an IllegalArgumentException if the ID is not in the UUID format */
-//            UUID.fromString(eventId)
-//
-//            val query = json { obj(EVENT_ID to eventId) }
-//            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-//                    .find(COLLECTION_NAME, query) { findOperation ->
-//                        if (findOperation.succeeded()) {
-//                            val results: List<JsonObject> = findOperation.result()
-//                            if (results.isEmpty()) {
-//                                response.setStatusCode(NOT_FOUND.code()).end()
-//                            } else {
-//                                val  Result = results.first()
-//                                response.putHeader("Content-Type", "application/json")
-//                                        .setStatusCode(OK.code())
-//                                        .end(Json.encodePrettily(firstResult[MISSION_TRACKING]))
-//                            }
-//                        } else {
-//                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-//                        }
-//                    }
-//        } catch (_: IllegalArgumentException) {
-//            response.setStatusCode(BAD_REQUEST.code()).end()
-//        }
+        try {
+            UUID.fromString(eventId)
+        } catch (_: IllegalArgumentException) {
+            response.setStatusCode(BAD_REQUEST.code()).end()
+        }
 
-//        val response = context.response()
-//        val params = context.request().params()
-//        val document = json {
-//            obj(DOCUMENT_IDENTIFIER to params[EVENT_IDENTIFIER])
-//        }
-//        try {
-//            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-//                    .find(COLLECTION_NAME, document) { result ->
-//                        if (result.succeeded()) {
-//                            try {
-//                                val queryResult = result.result().first()
-//                                queryResult.remove(DOCUMENT_IDENTIFIER)
-//                                if (!queryResult.isEmpty) {
-//                                    response.putHeader("Content-Type", "application/json")
-//                                            .setStatusCode(OK.code())
-//                                            .end(Json.encodePrettily(queryResult.getJsonArray(MISSIONS)))
-//                                } else {
-//                                    response.setStatusCode(NO_CONTENT.code())
-//                                            .end()
-//                                }
-//                            } catch (e1: Exception) {
-//                                response.setStatusCode(BAD_REQUEST.code()).end()
-//                                log.info(RESPONSE_PREFIX + response.statusCode)
-//                            }
-//                        } else {
-//                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-//                        }
-//                    }
-//        } catch (e: Exception) {
-//            response.setStatusCode(NOT_FOUND.code()).end()
-//            log.info(RESPONSE_PREFIX + response.statusCode)
-//        }
+        val query = json { obj(EVENT_ID to eventId) }
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .find(COLLECTION_NAME, query) { findOperation ->
+                    when {
+                        findOperation.succeeded() -> {
+                            val results: List<JsonObject> = findOperation.result()
+                            if (results.isEmpty()) {
+                                response.setStatusCode(NOT_FOUND.code()).end()
+                            }
+
+                            val cleanedResult = results.map { r -> json {
+                                obj(
+                                        MISSION_ID to r[MISSION_ID],
+                                        MISSION_TRACKING to r[MISSION_TRACKING])
+                            } }
+                            response.putHeader("Content-Type", "application/json")
+                                    .setStatusCode(OK.code())
+                                    .end(Json.encodePrettily(cleanedResult))
+                        }
+                        findOperation.failed() -> {
+                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                        }
+                    }
+                }
     }
 
     fun retrieveMissionTracking(context: RoutingContext) {
