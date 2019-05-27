@@ -35,7 +35,35 @@ object VtService {
     }
 
     fun retrieveEventTracking(context: RoutingContext) {
-//        log.info("Request to retrieve an event's tracking details")
+        log.info("Request to retrieve an event's tracking details")
+        val response = context.response()
+        val eventId = context.request().params()[EVENT_ID]
+
+//        try {
+//            /* Raises an IllegalArgumentException if the ID is not in the UUID format */
+//            UUID.fromString(eventId)
+//
+//            val query = json { obj(EVENT_ID to eventId) }
+//            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+//                    .find(COLLECTION_NAME, query) { findOperation ->
+//                        if (findOperation.succeeded()) {
+//                            val results: List<JsonObject> = findOperation.result()
+//                            if (results.isEmpty()) {
+//                                response.setStatusCode(NOT_FOUND.code()).end()
+//                            } else {
+//                                val  Result = results.first()
+//                                response.putHeader("Content-Type", "application/json")
+//                                        .setStatusCode(OK.code())
+//                                        .end(Json.encodePrettily(firstResult[MISSION_TRACKING]))
+//                            }
+//                        } else {
+//                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+//                        }
+//                    }
+//        } catch (_: IllegalArgumentException) {
+//            response.setStatusCode(BAD_REQUEST.code()).end()
+//        }
+
 //        val response = context.response()
 //        val params = context.request().params()
 //        val document = json {
@@ -77,34 +105,36 @@ object VtService {
         val missionId = context.request().params()[MISSION_ID]
 
         try {
-            /* Raises an IllegalArgumentException if the IDs are not in the UUID format */
             UUID.fromString(eventId)
             UUID.fromString(missionId)
-
-            val query = json {
-                obj(
-                        EVENT_ID to eventId,
-                        MISSION_ID to missionId)
-            }
-            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-                    .find(COLLECTION_NAME, query) { findOperation ->
-                        if (findOperation.succeeded()) {
-                            val results: List<JsonObject> = findOperation.result()
-                            if (results.isEmpty()) {
-                                response.setStatusCode(NOT_FOUND.code()).end()
-                            } else {
-                                val firstResult = results.first()
-                                response.putHeader("Content-Type", "application/json")
-                                        .setStatusCode(OK.code())
-                                        .end(Json.encodePrettily(firstResult[MISSION_TRACKING]))
-                            }
-                        } else {
-                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                        }
-                    }
         } catch (_: IllegalArgumentException) {
             response.setStatusCode(BAD_REQUEST.code()).end()
         }
+
+        val query = json {
+            obj(
+                    EVENT_ID to eventId,
+                    MISSION_ID to missionId)
+        }
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .find(COLLECTION_NAME, query) { findOperation ->
+                    when {
+                        findOperation.succeeded() -> {
+                            val results: List<JsonObject> = findOperation.result()
+                            if (results.isEmpty()) {
+                                response.setStatusCode(NOT_FOUND.code()).end()
+                            }
+
+                            val firstResult = results.first()
+                            response.putHeader("Content-Type", "application/json")
+                                    .setStatusCode(OK.code())
+                                    .end(Json.encodePrettily(firstResult[MISSION_TRACKING]))
+                        }
+                        findOperation.failed() -> {
+                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                        }
+                    }
+                }
     }
 
     fun retrieveSingleTrackingItem(context: RoutingContext, trackingItem: MissionTrackingItem) {
