@@ -1,0 +1,10 @@
+apply plugin: "application"
+mainClassName = "Main"
+
+dependencies {
+    implementation "io.vertx:vertx-core:3.7.1"
+    implementation "io.vertx:vertx-web:3.7.1"
+    implementation "io.vertx:vertx-lang-kotlin:3.7.1"
+    implementation "io.vertx:vertx-mongo-client:3.7.1"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.31"
+}
