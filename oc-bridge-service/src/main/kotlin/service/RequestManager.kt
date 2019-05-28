@@ -8,7 +8,6 @@ import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
 import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
-import io.vertx.core.json.JsonObject
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
@@ -19,7 +18,7 @@ import java.util.UUID
 object RequestManager {
     private var vertx: Vertx? = null
     private val CONFIG = json {
-        obj (
+        obj(
                 "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr")
     }
     private const val DOCUMENT_ID = "_id"
@@ -36,7 +35,7 @@ object RequestManager {
         val response = routingContext.response()
         val uuid = UUID.randomUUID().toString()
         val document = json {
-            obj (
+            obj(
                     DOCUMENT_ID to uuid)
         }
         MongoClient.createNonShared(vertx, CONFIG).insert(COLLECTION_NAME, document) { result ->
@@ -59,7 +58,7 @@ object RequestManager {
         try {
             UUID.fromString(eventId)
             val query = json {
-                obj (
+                obj(
                         DOCUMENT_ID to eventId)
             }
             MongoClient.createNonShared(vertx, CONFIG).find(COLLECTION_NAME, query) { result ->
@@ -95,11 +94,11 @@ object RequestManager {
             if (body.containsKey(SECONDARY))
                 body.getBoolean(SECONDARY)
             val query = json {
-                obj (
+                obj(
                         DOCUMENT_ID to eventId)
             }
             val update = json {
-                obj (
+                obj(
                         "\$set" to body)
             }
             MongoClient.createNonShared(vertx, CONFIG).updateCollection(COLLECTION_NAME, query, update) { res ->
