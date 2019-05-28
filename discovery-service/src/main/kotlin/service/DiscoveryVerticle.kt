@@ -14,13 +14,12 @@ class DiscoveryVerticle : AbstractVerticle() {
     private var discovery: ServiceDiscovery? = null
 
     override fun start() {
+        initializeDiscovery()
         vertx
                 .createHttpServer()
                 .requestHandler(initializeRouter())
                 .listen(PORT, HOST)
-        initializeDiscovery()
-        log.info("Starting Discovery.")
-        initializeRouter()
+        log.info("Starting Discovery service on port $PORT.")
     }
 
     private fun initializeDiscovery() {
@@ -28,13 +27,13 @@ class DiscoveryVerticle : AbstractVerticle() {
                 ServiceDiscoveryOptions()
                         .setAnnounceAddress("service-announce")
                         .setName("DiscoveryService-service"))
+        log.info("Create Discovery $discovery.")
     }
 
-    /*
+    // importante chiudere il discovery quando non è più necessario? devo capirne di più
     override fun stop() {
-        discovery.close()
+        discovery?.close()
     }
-    */
 
     private fun initializeRouter(): Router {
         return Router.router(vertx).apply {
@@ -46,7 +45,7 @@ class DiscoveryVerticle : AbstractVerticle() {
     }
 
     companion object {
-        private const val PORT = 1000
+        private const val PORT = 5150
         private const val HOST = "localhost"
 
         private const val DISCOVERY_BASE_PATH = "/v1/discovery"

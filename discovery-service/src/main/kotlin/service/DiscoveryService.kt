@@ -14,14 +14,14 @@ object DiscoveryService {
 
     private val log = LoggerFactory.getLogger("DiscoveryService")
 
-    private const val SERVICE_NAME = "service_name"
-    private const val SERVICE_HOST = "service_host"
-    private const val SERVICE_PORT = "service_port"
-    private const val SERVICE_REGISTRATION = "service_registration"
-    private const val ROOT = "/"
+    private const val SERVICE_NAME = "serviceName"
+    private const val SERVICE_HOST = "serviceHost"
+    private const val SERVICE_PORT = "servicePort"
+    private const val SERVICE_REGISTRATION = "serviceRegistration"
+    private const val ROOT = "/v1"
 
     fun publishService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
-        log.debug("Request to publish service")
+        log.info("Request to publish service")
         val response = routingContext.response()
         val serviceName = routingContext.request().params()[SERVICE_NAME]
         val serviceHost = routingContext.request().params()[SERVICE_HOST]
