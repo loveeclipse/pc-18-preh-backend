@@ -64,22 +64,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/timelineItem'
+        '204':
+          description: "no content: the mission exists, but it doesn't contain the desired tracking item"
         '400':
           description: 'bad input parameter'
         '404':
           description: 'resource not found'
         '500':
           description: 'generic server error'
-    post:
-      summary: Adds tracking details about the Operational Center call 
-      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the Operational Center call.
+    put:
+      summary: Adds/updates tracking details about the Operational Center call 
+      description: By passing in both the eventId and missionId, you will add or update the tracking details (datetime and place) about the Operational Center call.
       responses:
-        '201':
-          description: 'item successfully created'
+        '200':
+          description: 'ok'
         '400':
           description: 'bad input parameter'
-        '409':
-          description: 'conflict: the item already exists'
         '500':
           description: 'generic server error'
       parameters:
@@ -106,22 +106,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/timelineItem'
+        '204':
+          description: "no content: the mission exists, but it doesn't contain the desired tracking item"
         '400':
           description: 'bad input parameter'
         '404':
           description: 'resource not found'
         '500':
           description: 'generic server error'
-    post:
-      summary: Adds tracking details about the crew departure 
-      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the crew departure.
+    put:
+      summary: Adds/updates tracking details about the crew departure 
+      description: By passing in both the eventId and missionId, you will add or update the tracking details (datetime and place) about the crew departure.
       responses:
-        '201':
-          description: 'item successfully created'
+        '200':
+          description: 'ok'
         '400':
           description: 'bad input parameter'
-        '409':
-          description: 'conflict: the item already exists'
         '500':
           description: 'generic server error'
       parameters:
@@ -148,22 +148,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/timelineItem'
+        '204':
+          description: "no content: the mission exists, but it doesn't contain the desired tracking item"
         '400':
           description: 'bad input parameter'
         '404':
           description: 'resource not found'
         '500':
           description: 'generic server error'
-    post:
-      summary: Adds tracking details about the landing onsite 
-      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the landing onsite.
+    put:
+      summary: Adds/updates tracking details about the landing onsite 
+      description: By passing in both the eventId and missionId, you will add or update the tracking details (datetime and place) about the landing onsite.
       responses:
-        '201':
-          description: 'item successfully created'
+        '200':
+          description: 'ok'
         '400':
           description: 'bad input parameter'
-        '409':
-          description: 'conflict: the item already exists'
         '500':
           description: 'generic server error'
       parameters:
@@ -190,22 +190,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/timelineItem'
+        '204':
+          description: "no content: the mission exists, but it doesn't contain the desired tracking item"
         '400':
           description: 'bad input parameter'
         '404':
           description: 'resource not found'
         '500':
           description: 'generic server error'
-    post:
-      summary: Adds tracking details about the departure from onsite
-      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the departure from onsite.
+    put:
+      summary: Adds/updates tracking details about the departure from onsite
+      description: By passing in both the eventId and missionId, you will add or update the tracking details (datetime and place) about the departure from onsite.
       responses:
-        '201':
-          description: 'item successfully created'
+        '200':
+          description: 'ok'
         '400':
           description: 'bad input parameter'
-        '409':
-          description: 'conflict: the item already exists'
         '500':
           description: 'generic server error'
       parameters:
@@ -232,22 +232,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/timelineItem'
+        '204':
+          description: "no content: the mission exists, but it doesn't contain the desired tracking item"
         '400':
           description: 'bad input parameter'
         '404':
           description: 'resource not found'
         '500':
           description: 'generic server error'
-    post:
-      summary: Adds tracking details about the landing on the helipad
-      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the landing on the helipad.
+    put:
+      summary: Adds/updates tracking details about the landing on the helipad
+      description: By passing in both the eventId and missionId, you will add or update the tracking details (datetime and place) about the landing on the helipad.
       responses:
-        '201':
-          description: 'item successfully created'
+        '200':
+          description: 'ok'
         '400':
           description: 'bad input parameter'
-        '409':
-          description: 'conflict: the item already exists'
         '500':
           description: 'generic server error'
       parameters:
@@ -274,22 +274,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/timelineItem'
+        '204':
+          description: "no content: the mission exists, but it doesn't contain the desired tracking item"
         '400':
           description: 'bad input parameter'
         '404':
           description: 'resource not found'
         '500':
           description: 'generic server error'
-    post:
-      summary: Adds tracking details about the actual arrival at the ER
-      description: By passing in both the eventId and missionId, you will add the tracking details (datetime and place) about the actual arrival of the patient at the ER.
+    put:
+      summary: Adds/updates tracking details about the actual arrival at the ER
+      description: By passing in both the eventId and missionId, you will add or update the tracking details (datetime and place) about the actual arrival of the patient at the ER.
       responses:
-        '201':
-          description: 'item successfully created'
+        '200':
+          description: 'ok'
         '400':
           description: 'bad input parameter'
-        '409':
-          description: 'conflict: the item already exists'
         '500':
           description: 'generic server error'
       parameters:
