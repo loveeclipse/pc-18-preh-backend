@@ -49,6 +49,48 @@ paths:
           description: 'resource not found'
         '500':
           description: 'generic server error'
+          
+  '/events-tracking/{eventId}/missions/{missionId}/chosen-hospital':
+    get:
+      summary: Returns the chosen hospital
+      description: By passing in both the eventId and missionId, you can search for the chosen hospital to return to.
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      responses:
+        '200':
+          description: 'ok'
+          content:
+            text/plain:
+              schema: 
+                $ref: '#/components/schemas/chosenHospital'
+        '204':
+          description: "no content: the mission exists, but it doesn't contain the desired tracking item"
+        '400':
+          description: 'bad input parameter'
+        '404':
+          description: 'resource not found'
+        '500':
+          description: 'generic server error'
+    put:
+      summary: Adds/updates tracking details about the chosen hospital
+      description: By passing in both the eventId and missionId, you will add or update the chosen hospital to return to.
+      responses:
+        '200':
+          description: 'ok'
+        '400':
+          description: 'bad input parameter'
+        '500':
+          description: 'generic server error'
+      parameters:
+        - $ref: '#/components/parameters/event-param'
+        - $ref: '#/components/parameters/mission-param'
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/chosenHospital'
+        description: Chosen hospital to return to
   
   '/events-tracking/{eventId}/missions/{missionId}/oc-call':
     get:
@@ -324,6 +366,9 @@ components:
         example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
 
   schemas:
+    chosenHospital:
+      type: string
+      example: 'Bufalini di Cesena'
     timelineItem:
       type: object
       required:
