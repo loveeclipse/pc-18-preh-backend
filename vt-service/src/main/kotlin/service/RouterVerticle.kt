@@ -28,7 +28,7 @@ class RouterVerticle : AbstractVerticle() {
             for (item in trackingItems) {
                 val path = MISSION_TRACKING_PATH + "/" + item.pathName
                 get(path).handler { VtService.retrieveSingleTrackingItem(it, item) }
-                post(path).handler { VtService.createSingleTrackingItem(it, item) }
+                put(path).handler { VtService.updateSingleTrackingItem(it, item) }
             }
         }
     }
