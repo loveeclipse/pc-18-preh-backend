@@ -21,7 +21,8 @@ object VtService {
     private const val COLLECTION_NAME = "tracking"
     private const val EVENT_ID = "eventId"
     private const val MISSION_ID = "missionId"
-    private const val MISSION_TRACKING = "missionTracking"
+    private const val TIMELINE = "timeline"
+    private const val CHOSEN_HOSPITAL = "chosenHospital"
 
     private val log = LoggerFactory.getLogger("VtService")
     private val MONGODB_CONFIGURATION = json { obj(
@@ -53,7 +54,7 @@ object VtService {
                                     val cleanedResults: List<JsonObject> = results.map { r -> json {
                                         obj(
                                                 MISSION_ID to r[MISSION_ID],
-                                                MISSION_TRACKING to r[MISSION_TRACKING])
+                                                TIMELINE to r[TIMELINE])
                                     } }
                                     response.putHeader("Content-Type", "application/json")
                                             .setStatusCode(OK.code())
@@ -95,7 +96,7 @@ object VtService {
                                     val firstResult = results.first()
                                     response.putHeader("Content-Type", "application/json")
                                             .setStatusCode(OK.code())
-                                            .end(Json.encodePrettily(firstResult[MISSION_TRACKING]))
+                                            .end(Json.encodePrettily(firstResult[TIMELINE]))
                                 }
                             }
                             findOperation.failed() -> {
@@ -109,7 +110,7 @@ object VtService {
     }
 
     fun retrieveSingleTrackingItem(context: RoutingContext, trackingItem: TimelineItem) {
-        log.info("Request to retrieve the ${trackingItem.fieldName} tracking details for a certain mission")
+        log.info("Request to retrieve the ${trackingItem.fieldName} details for a certain mission")
         val response = context.response()
         val eventId = context.request().params()[EVENT_ID]
         val missionId = context.request().params()[MISSION_ID]
@@ -154,7 +155,7 @@ object VtService {
     }
 
     fun updateSingleTrackingItem(context: RoutingContext, trackingItem: TimelineItem) {
-        log.info("Request to create the ${trackingItem.fieldName} tracking details for a certain mission")
+        log.info("Request to update the ${trackingItem.fieldName} details for a certain mission")
         val response = context.response()
         val eventId = context.request().params()[EVENT_ID]
         val missionId = context.request().params()[MISSION_ID]
@@ -170,7 +171,7 @@ object VtService {
             val update = json {
                 obj(
                         "\$set" to obj(
-                                "$MISSION_TRACKING.${trackingItem.fieldName}" to requestBody)
+                                "$TIMELINE.${trackingItem.fieldName}" to requestBody)
                 )
             }
             val options = UpdateOptions(true)
@@ -185,5 +186,53 @@ object VtService {
         } catch (_: IllegalArgumentException) { // eventId is not an UUID
             response.setStatusCode(BAD_REQUEST.code()).end()
         }
+    }
+
+    fun retrieveChosenHospital(context: RoutingContext) {
+        log.info("Request to retrieve the chosen hospital for a certain mission")
+        val response = context.response()
+        val eventId = context.request().params()[EVENT_ID]
+        val missionId = context.request().params()[MISSION_ID]
+
+        try {
+            UUID.fromString(eventId)
+            val query = json {
+                obj(
+                        EVENT_ID to eventId,
+                        MISSION_ID to missionId)
+            }
+
+            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                    .find(COLLECTION_NAME, query) { findOperation ->
+                        when {
+                            findOperation.succeeded() -> {
+                                val results: List<JsonObject> = findOperation.result()
+                                if (results.isEmpty()) {
+                                    response.setStatusCode(NOT_FOUND.code()).end()
+                                } else {
+                                    val firstResult: JsonObject = results.first()
+                                    val chosenHospital: String? = firstResult[CHOSEN_HOSPITAL]
+
+                                    chosenHospital?.let {
+                                        response.putHeader("Content-Type", "text/plain")
+                                                .setStatusCode(OK.code())
+                                                .end(chosenHospital)
+                                    } ?: run {
+                                        response.setStatusCode(NO_CONTENT.code()).end()
+                                    }
+                                }
+                            }
+                            findOperation.failed() -> {
+                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            }
+                        }
+                    }
+        } catch (_: IllegalArgumentException) { // eventId is not an UUID
+            response.setStatusCode(BAD_REQUEST.code()).end()
+        }
+    }
+
+    fun updateChosenHospital(context: RoutingContext) {
+
     }
 }

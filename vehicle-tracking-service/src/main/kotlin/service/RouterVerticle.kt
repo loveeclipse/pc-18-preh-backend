@@ -26,10 +26,13 @@ class RouterVerticle : AbstractVerticle() {
             get(MISSION_TRACKING_PATH).handler { VtService.retrieveMissionTracking(it) }
 
             for (item in timelineItems) {
-                val path = MISSION_TRACKING_PATH + "/" + item.pathName
+                val path = MISSION_TRACKING_PATH + "/timeline/" + item.pathName
                 get(path).handler { VtService.retrieveSingleTrackingItem(it, item) }
                 put(path).handler { VtService.updateSingleTrackingItem(it, item) }
             }
+
+            get(CHOSEN_HOSPITAL_PATH).handler { VtService.retrieveChosenHospital(it) }
+            put(CHOSEN_HOSPITAL_PATH).handler { VtService.updateChosenHospital(it) }
         }
     }
 
@@ -49,6 +52,6 @@ class RouterVerticle : AbstractVerticle() {
                 TimelineItem(pathName = "arrival-er", fieldName = "arrivalEr")
         )
 
-        private const val CHOSEN_HOSPITAL_PATH = ""
+        private const val CHOSEN_HOSPITAL_PATH = "$MISSION_TRACKING_PATH/chosen-hospital"
     }
 }
