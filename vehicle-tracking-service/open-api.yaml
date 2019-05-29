@@ -92,7 +92,7 @@ paths:
               $ref: '#/components/schemas/chosenHospital'
         description: Chosen hospital to return to
   
-  '/events-tracking/{eventId}/missions/{missionId}/oc-call':
+  '/events-tracking/{eventId}/missions/{missionId}/timeline/oc-call':
     get:
       summary: Returns the Operational Center call tracking details
       description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the Operational Center call.
@@ -134,7 +134,7 @@ paths:
               $ref: '#/components/schemas/timelineItem'
         description: Tracking item to add
   
-  '/events-tracking/{eventId}/mission/{missionId}/crew-departure':
+  '/events-tracking/{eventId}/mission/{missionId}/timeline/crew-departure':
     get:
       summary: Returns the crew departure tracking details
       description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the crew departure.
@@ -176,7 +176,7 @@ paths:
               $ref: '#/components/schemas/timelineItem'
         description: Tracking item to add
   
-  '/events-tracking/{eventId}/missions/{missionId}/arrival-onsite':
+  '/events-tracking/{eventId}/missions/{missionId}/timeline/arrival-onsite':
     get:
       summary: Returns the arrival onsite tracking details
       description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the arrival onsite.
@@ -218,7 +218,7 @@ paths:
               $ref: '#/components/schemas/timelineItem'
         description: Tracking item to add
   
-  '/events-tracking/{eventId}/missions/{missionId}/departure-onsite':
+  '/events-tracking/{eventId}/missions/{missionId}/timeline/departure-onsite':
     get:
       summary: Returns the tracking details about the departure from onsite
       description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the departure from onsite.
@@ -260,7 +260,7 @@ paths:
               $ref: '#/components/schemas/timelineItem'
         description: Tracking item to add
   
-  '/events-tracking/{eventId}/events/{missionId}/landing-helipad':
+  '/events-tracking/{eventId}/events/{missionId}/timeline/landing-helipad':
     get:
       summary: Returns the tracking details about the landing on the helipad
       description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the landing on the helipad.
@@ -302,7 +302,7 @@ paths:
               $ref: '#/components/schemas/timelineItem'
         description: Tracking item to add
   
-  '/events-tracking/{eventId}/missions/{missionId}/arrival-er':
+  '/events-tracking/{eventId}/missions/{missionId}/timeline/arrival-er':
     get:
       summary: Returns the tracking details about the arrival at the ER
       description: By passing in both the eventId and missionId, you can search for the tracking details (datetime and place) about the actual arrival of the patient at the ER.
@@ -369,6 +369,7 @@ components:
     chosenHospital:
       type: string
       example: 'Bufalini di Cesena'
+    
     timelineItem:
       type: object
       required:
@@ -382,21 +383,31 @@ components:
         place:
           type: string
           example: 'Via Cervese 123'
+    
+    timeline:
+      type: object
+      properties:
+          ocCall:
+            $ref: '#/components/schemas/timelineItem'
+          crewDeparture:
+            $ref: '#/components/schemas/timelineItem'
+          landingOnsite:
+            $ref: '#/components/schemas/timelineItem'
+          takeoffOnsite:
+            $ref: '#/components/schemas/timelineItem'
+          landingHelipad:
+            $ref: '#/components/schemas/timelineItem'
+          arrivalEr:
+            $ref: '#/components/schemas/timelineItem'
+    
     missionTracking:  
       type: object
       properties:
-        ocCall:
-          $ref: '#/components/schemas/timelineItem'
-        crewDeparture:
-          $ref: '#/components/schemas/timelineItem'
-        landingOnsite:
-          $ref: '#/components/schemas/timelineItem'
-        takeoffOnsite:
-          $ref: '#/components/schemas/timelineItem'
-        landingHelipad:
-          $ref: '#/components/schemas/timelineItem'
-        arrivalEr:
-          $ref: '#/components/schemas/timelineItem'
+        timeline:
+          $ref: '#/components/schemas/timeline'
+        chosenHospital:
+          $ref: '#/components/schemas/chosenHospital'
+        
     eventTracking:
       type: array
       items:

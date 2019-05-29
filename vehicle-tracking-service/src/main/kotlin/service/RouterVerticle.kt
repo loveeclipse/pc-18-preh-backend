@@ -25,7 +25,7 @@ class RouterVerticle : AbstractVerticle() {
             get(EVENT_TRACKING_PATH).handler { VtService.retrieveEventTracking(it) }
             get(MISSION_TRACKING_PATH).handler { VtService.retrieveMissionTracking(it) }
 
-            for (item in trackingItems) {
+            for (item in timelineItems) {
                 val path = MISSION_TRACKING_PATH + "/" + item.pathName
                 get(path).handler { VtService.retrieveSingleTrackingItem(it, item) }
                 put(path).handler { VtService.updateSingleTrackingItem(it, item) }
@@ -40,13 +40,15 @@ class RouterVerticle : AbstractVerticle() {
         private const val EVENT_TRACKING_PATH = "/v1/events-tracking/:eventId"
         private const val MISSION_TRACKING_PATH = "$EVENT_TRACKING_PATH/missions/:missionId"
 
-        private val trackingItems = listOf(
-                MissionTrackingItem(pathName = "oc-call", fieldName = "ocCall"),
-                MissionTrackingItem(pathName = "crew-departure", fieldName = "crewDeparture"),
-                MissionTrackingItem(pathName = "arrival-onsite", fieldName = "arrivalOnsite"),
-                MissionTrackingItem(pathName = "departure-onsite", fieldName = "departureOnsite"),
-                MissionTrackingItem(pathName = "landing-helipad", fieldName = "landingHelipad"),
-                MissionTrackingItem(pathName = "arrival-er", fieldName = "arrivalEr")
+        private val timelineItems = listOf(
+                TimelineItem(pathName = "oc-call", fieldName = "ocCall"),
+                TimelineItem(pathName = "crew-departure", fieldName = "crewDeparture"),
+                TimelineItem(pathName = "arrival-onsite", fieldName = "arrivalOnsite"),
+                TimelineItem(pathName = "departure-onsite", fieldName = "departureOnsite"),
+                TimelineItem(pathName = "landing-helipad", fieldName = "landingHelipad"),
+                TimelineItem(pathName = "arrival-er", fieldName = "arrivalEr")
         )
+
+        private const val CHOSEN_HOSPITAL_PATH = ""
     }
 }
