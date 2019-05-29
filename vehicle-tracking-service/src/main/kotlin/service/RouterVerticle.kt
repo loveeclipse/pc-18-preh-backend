@@ -27,8 +27,8 @@ class RouterVerticle : AbstractVerticle() {
 
             for (item in timelineItems) {
                 val path = MISSION_TRACKING_PATH + "/timeline/" + item.pathName
-                get(path).handler { VtService.retrieveSingleTrackingItem(it, item) }
-                put(path).handler { VtService.updateSingleTrackingItem(it, item) }
+                get(path).handler { VtService.retrieveTimelineItem(it, item) }
+                put(path).handler { VtService.updateTimelineItem(it, item) }
             }
 
             get(CHOSEN_HOSPITAL_PATH).handler { VtService.retrieveChosenHospital(it) }

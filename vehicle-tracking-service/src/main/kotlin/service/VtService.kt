@@ -109,7 +109,7 @@ object VtService {
         }
     }
 
-    fun retrieveSingleTrackingItem(context: RoutingContext, trackingItem: TimelineItem) {
+    fun retrieveTimelineItem(context: RoutingContext, trackingItem: TimelineItem) {
         log.info("Request to retrieve the ${trackingItem.fieldName} details for a certain mission")
         val response = context.response()
         val eventId = context.request().params()[EVENT_ID]
@@ -154,7 +154,7 @@ object VtService {
         }
     }
 
-    fun updateSingleTrackingItem(context: RoutingContext, trackingItem: TimelineItem) {
+    fun updateTimelineItem(context: RoutingContext, trackingItem: TimelineItem) {
         log.info("Request to update the ${trackingItem.fieldName} details for a certain mission")
         val response = context.response()
         val eventId = context.request().params()[EVENT_ID]
