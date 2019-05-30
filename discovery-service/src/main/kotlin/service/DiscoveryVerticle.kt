@@ -30,10 +30,9 @@ class DiscoveryVerticle : AbstractVerticle() {
         log.info("Create Discovery $discovery.")
     }
 
-    // importante chiudere il discovery quando non è più necessario? devo capirne di più
-    override fun stop() {
+    /*override fun stop() {
         discovery?.close()
-    }
+    }*/
 
     private fun initializeRouter(): Router {
         return Router.router(vertx).apply {
