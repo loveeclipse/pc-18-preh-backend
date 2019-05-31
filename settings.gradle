@@ -1,4 +1,4 @@
-rootProject.name = 'pc-18-ph'
+rootProject.name = 'pc-18-preh-backend'
 include 'oc-bridge-service',
         'patient-registry-service',
         'vehicle-tracking-service'
