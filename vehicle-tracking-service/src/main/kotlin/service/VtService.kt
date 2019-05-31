@@ -26,8 +26,8 @@ object VtService {
 
     private val log = LoggerFactory.getLogger("VtService")
     private val MONGODB_CONFIGURATION = json { obj(
-            "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr")
-    }
+            "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
+    ) }
 
     private var vertx: Vertx? = null
     fun initializeRequestManager(vertx: Vertx) {
@@ -51,11 +51,12 @@ object VtService {
                                 if (results.isEmpty()) {
                                     response.setStatusCode(NOT_FOUND.code()).end()
                                 } else {
-                                    val cleanedResults: List<JsonObject> = results.map { r -> json {
-                                        obj(
+                                    val cleanedResults: List<JsonObject> = results.map { r ->
+                                        json { obj(
                                                 MISSION_ID to r[MISSION_ID],
-                                                TIMELINE to r[TIMELINE])
-                                    } }
+                                                TIMELINE to r[TIMELINE]
+                                        ) }
+                                    }
                                     response.putHeader("Content-Type", "application/json")
                                             .setStatusCode(OK.code())
                                             .end(Json.encodePrettily(cleanedResults))
@@ -79,11 +80,10 @@ object VtService {
 
         try {
             UUID.fromString(eventId)
-            val query = json {
-                obj(
+            val query = json { obj(
                         EVENT_ID to eventId,
-                        MISSION_ID to missionId)
-            }
+                        MISSION_ID to missionId
+            ) }
 
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .find(COLLECTION_NAME, query) { findOperation ->
@@ -117,11 +117,10 @@ object VtService {
 
         try {
             UUID.fromString(eventId)
-            val query = json {
-                obj(
+            val query = json { obj(
                         EVENT_ID to eventId,
-                        MISSION_ID to missionId)
-            }
+                        MISSION_ID to missionId
+            ) }
 
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .find(COLLECTION_NAME, query) { findOperation ->
@@ -163,17 +162,15 @@ object VtService {
 
         try {
             UUID.fromString(eventId)
-            val query = json {
-                obj(
+            val query = json { obj(
                         EVENT_ID to eventId,
-                        MISSION_ID to missionId)
-            }
-            val update = json {
-                obj(
-                        "\$set" to obj(
-                                "$TIMELINE.${trackingItem.fieldName}" to requestBody)
-                )
-            }
+                        MISSION_ID to missionId
+            ) }
+            val update = json { obj(
+                    "\$set" to obj(
+                            "$TIMELINE.${trackingItem.fieldName}" to requestBody
+                    )
+            ) }
             val options = UpdateOptions(true)
 
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
@@ -196,11 +193,10 @@ object VtService {
 
         try {
             UUID.fromString(eventId)
-            val query = json {
-                obj(
+            val query = json { obj(
                         EVENT_ID to eventId,
-                        MISSION_ID to missionId)
-            }
+                        MISSION_ID to missionId
+            ) }
 
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .find(COLLECTION_NAME, query) { findOperation ->
@@ -241,16 +237,14 @@ object VtService {
 
         try {
             UUID.fromString(eventId)
-            val query = json {
-                obj(
+            val query = json { obj(
                         EVENT_ID to eventId,
-                        MISSION_ID to missionId)
-            }
-            val update = json {
-                obj(
+                        MISSION_ID to missionId
+            ) }
+            val update = json { obj(
                         "\$set" to obj(
-                                CHOSEN_HOSPITAL to hospitalName))
-            }
+                                CHOSEN_HOSPITAL to hospitalName)
+            ) }
             val options = UpdateOptions(true)
 
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
