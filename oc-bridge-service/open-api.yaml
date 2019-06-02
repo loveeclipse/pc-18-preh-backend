@@ -18,7 +18,7 @@ paths:
         '201':
           description: the resource creation was successful
           content:
-            application/json:
+            text/plain:
               schema:
                 $ref: '#/components/parameters/eventId'
         '500':
@@ -55,6 +55,7 @@ paths:
         - $ref: '#/components/parameters/eventDispatchCode'
         - $ref: '#/components/parameters/eventSecondary'
         - $ref: '#/components/parameters/eventDynamic'
+        - $ref: '#/components/parameters/eventPatientsNumber'
       responses:
         '200':
           description: the resource update was successful
@@ -103,6 +104,13 @@ components:
       schema:
         type: string
         example: "Incidente stradale: pedone investito"
+    eventPatientsNumber:
+      name: patientsNumber
+      in: query
+      description: the number of patients in the event
+      schema:
+        type: integer
+        example: 1
   schemas:
     EventInformation:
       type: object
@@ -119,3 +127,6 @@ components:
         dynamic:
           type: string
           example: "Incidente stradale: pedone investito"
+        patientsNumber:
+          type: integer
+          example: 1
