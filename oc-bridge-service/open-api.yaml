@@ -16,13 +16,13 @@ paths:
         Triggers the creation of a new event and generates a unique id for it. The id will be returned as response.
       responses:
         '201':
-          description: the resource creation was successful
+          description: The resource creation was successful
           content:
             text/plain:
               schema:
-                $ref: '#/components/parameters/eventId'
+                $ref: '#/components/schemas/EventId'
         '500':
-          description: generic server error
+          description: Generic server error
   '/events/{eventId}':
     get:
       summary: gets all the event's available information
@@ -32,39 +32,40 @@ paths:
         - $ref: '#/components/parameters/eventId'
       responses:
         '200':
-          description: returns the information about the requested event
+          description: Returns the information about the requested event
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventInformation'
         '204':
-          description: the resource is present but without body data
+          description: The resource is present but without body data
         '400':
-          description: bad input parameter
+          description: Bad input parameter
         '404':
-          description: resource not found
+          description: Resource not found
         '500':
-          description: generic server error
+          description: Generic server error
     patch:
       summary: updates the event's information
       description: |
         By passing the event's id and some information, the relative resource will be updated with the new data.
       parameters:
         - $ref: '#/components/parameters/eventId'
-        - $ref: '#/components/parameters/eventNotes'
-        - $ref: '#/components/parameters/eventDispatchCode'
-        - $ref: '#/components/parameters/eventSecondary'
-        - $ref: '#/components/parameters/eventDynamic'
-        - $ref: '#/components/parameters/eventPatientsNumber'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventInformation'
       responses:
         '200':
-          description: the resource update was successful
+          description: The resource update was successful
         '400':
-          description: bad input parameter
+          description: Bad input parameter
         '404':
-          description: resource not found
+          description: Resource not found
         '500':
-          description: generic server error
+          description: Generic server error
 components:
   parameters:
     eventId:
@@ -79,39 +80,44 @@ components:
     eventNotes:
       name: notes
       in: query
-      description: event's notes
+      description: Event's notes
       schema:
         type: string
         example: 'Il paziente passa dallo stato di coscienza ad incoscienza in continuazione'
     eventDispatchCode:
       name: dispatchCode
       in: query
-      description: the event dispatch code for the medical crew 
+      description: The event dispatch code for the medical crew 
       schema:
         type: string
         example: 'SC01R'
     eventSecondary:
       name: secondary
       in: query
-      description: determine if the event is secondary
+      description: Determine if the event is secondary
       schema:
         type: boolean
         example: true
     eventDynamic:
       name: dynamic
       in: query
-      description: describes the event dynamic
+      description: Describes the event dynamic
       schema:
         type: string
         example: "Incidente stradale: pedone investito"
     eventPatientsNumber:
       name: patientsNumber
       in: query
-      description: the number of patients in the event
+      description: The number of patients in the event
       schema:
         type: integer
         example: 1
   schemas:
+    EventId:
+      description: ID of the event
+      type: string
+      format: uuid
+      example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
     EventInformation:
       type: object
       properties:
