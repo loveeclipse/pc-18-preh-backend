@@ -1,0 +1,60 @@
+openapi: 3.0.0
+
+servers:
+  - url: 'http://localhost:10000/v1'
+
+info:
+  description: Discovery Service API for PreH
+  title: Discovery Service API
+  version: '1.0'
+
+paths:
+  '/discovery/publish':
+    post:
+      summary: Creates a new record
+      description: Create a new record and publish an unique service in discovery
+      responses:
+        '201':
+          description: 'created'
+        '400':
+          description: 'bad request'
+  '/discovery/unpublish':
+    delete:
+      summary: Delete a record
+      description: Delete the record related to a service previously published in discovery
+      responses:
+        '200':
+          description: 'ok'
+        '400':
+          description: 'bad input parameter'
+  '/discovery/discover':
+    get:
+      summary: Returns all service details saved in discovery
+      description: You can search for all the currently available service in discovery
+      responses:
+        '200':
+          description: 'ok'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/discoveryInformation'
+        '400':
+          description: 'bad request'
+components:
+  schemas:
+    discoveryInformation:
+      type: object
+      required:
+        - serviceName
+        - serviceHost
+        - servicePort
+      properties:
+        serviceName:
+          type: string
+          example: 'oc-bridge-service'
+        serviceHost:
+          type: string
+          example: '127.0.0.1'
+        servicePort:
+          type: integer
+          example: 1000
