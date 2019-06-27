@@ -1,0 +1,1157 @@
+openapi: "3.0.0"
+
+info:
+  title: "Pre-Hospital"
+  version: "1"
+  description: "A RESTful API to interact with the digital twins of Events and Patients. <br />An Event is composed by several Missions. Every Mission is associated to one Patient and to one or more Vehicles. <br />For every Patient it's possible to update and retrieve its personal data, anagraphics, its current status, its current and previous vital parameters, administered drugs, performed manouvers, performed treatments and the eventual complications that happened in itinere."
+
+paths:
+  '/events':
+    post:
+      tags: 
+        - "Event's digital twin"
+      description: "A new event will be created and its identifier will be returned as plain text."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventFirstData"
+      responses:
+        '201':
+          description: "event successfully created"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: url
+          content:
+            plain/text:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '500':
+          description: "generic server error"
+  
+  '/events/{eventId}/information':
+    post:
+      tags: 
+        - "Event's digital twin"
+      description: ""
+      parameters:
+        - $ref: "#/components/parameters/event-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventInformation"
+      responses:
+        '201':
+          description: "event's information created"
+        '500':
+          description: "generic server error"
+          
+    patch:
+      tags: 
+        - "Event's digital twin"
+      description: ""
+      parameters:
+        - $ref: "#/components/parameters/event-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventInformation"
+      responses:
+        '200':
+          description: "event's information patched"
+        '500':
+          description: "generic server error"
+    
+    # get:
+    #   tags: 
+    #     - "Event's digital twin"
+    #   description: ""
+    #   parameters:
+    #     - $ref: "#/components/parameters/event-id-param"
+    #   responses:
+    #     '200':
+    #       description: "event's information patched"
+    #     '500':
+    #       description: "generic server error"
+          
+  # '/events/{eventId}':
+  #   get:
+  #     tags: 
+  #       - "Event's digital twin"
+  #     description: ""
+  #     responses: 
+        
+  '/patients':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the anagraphic data in the request body, a new patient will be added and its identifier will be returned as plain text."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientFirstData"
+      responses:
+        '201':
+          description: "a new Pre-H patient has been registered"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '500':
+          description: "generic server error"
+        
+  '/patients/{patientId}/anagraphic':
+    put:
+      tags: 
+        - "Patient's digital twin"
+      description: "Updates the anagraphic data for the desired patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Anagraphic"
+      responses:
+        '204':
+          description: "anagraphic data successfully updated"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+    
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the patient's identifier, you can search for its anagraphic information."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Anagraphic"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/status':
+    put:
+      tags: 
+        - "Patient's digital twin"
+      description: "Updates the patient's status."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientStatus"
+      responses:
+        '204':
+          description: "patient's status successfully updated"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+    
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the patient's identifier, you can search for its status."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientStatus"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/vital-parameters':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "Submit a new snapshot of the patient's vital parameters."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VitalParameters"
+      responses:
+        '201':
+          description: "patient's vital parameters successfully uploaded"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+          
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the patient's identifier, you can search for its vital parameters' history."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VitalParameters"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/vital-parameters/{vitalParametersId}':
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the patient's identifier, you can search for its latest vital parameters registered."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/vital-parameters-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VitalParameters"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+    
+  '/patients/{patientId}/vital-parameters/last':
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the patient's identifier, you can search for its latest vital parameters registered."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VitalParameters"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/drugs':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "Submit a new drug administration for the patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Drug"
+      responses:
+        '201':
+          description: "patient's drug administered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieve all the drug administered to the patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Drug"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/manouvers':
+    put:
+      tags: 
+        - "Patient's digital twin"
+      description: "Updates the summary of the manouvers performed on the patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Manouvers"
+      responses:
+        '200':
+          description: "patient's drug administered successfully"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieve the summary of all the manouvers performed on the patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Manouvers"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/treatments/':
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieve all the treatments performed for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  simple:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SimpleTreatment"
+                  timed:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SimpleTreatment"
+                  injection:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/InjectionTreatment"
+                  ippv:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/IppvTreatment"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+  
+  '/patients/{patientId}/treatments/simple':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "Records a new simple treatment (name and time of execution) for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimpleTreatment"
+      responses:
+        '201':
+          description: "patient's treatment registered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+          
+  '/patients/{patientId}/treatments/simple/{treatmentId}':
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieve a particular simple treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "generic server error"
+    
+    delete:
+      tags: 
+        - "Patient's digital twin"
+      description: "Deletes a particular simple treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/treatments/timed':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "Records a new timed treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TimedTreatment"
+      responses:
+        '201':
+          description: "patient's treatment registered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/treatments/timed/{treatmentId}':
+    patch:
+      tags: 
+        - "Patient's digital twin"
+      description: "Updates a timed treatment for a patient; especially useful to specify the ending time of the treatment."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TimedTreatment"
+      responses:
+        '200':
+          description: "patient's treatment updated successfully"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+    
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieve a particular timed treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimedTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "generic server error"
+    
+    delete:
+      tags: 
+        - "Patient's digital twin"
+      description: "Deletes a particular timed treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimedTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/treatments/injection':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "Records a new injection treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InjectionTreatment"
+      responses:
+        '201':
+          description: "patient's treatment registered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/treatments/injection/{treatmentId}':
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieve a particular injection treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InjectionTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "generic server error"
+    
+    delete:
+      tags: 
+        - "Patient's digital twin"
+      description: "Deletes a particular injection treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InjectionTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "generic server error"
+    
+  '/patients/{patientId}/treatments/ippv':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "Records a new ippv treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IppvTreatment"
+      responses:
+        '201':
+          description: "patient's treatment registered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+    
+  '/patients/{patientId}/treatments/ippv/{treatmentId}':
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieve a particular ippv treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IppvTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "generic server error"
+    
+    delete:
+      tags: 
+        - "Patient's digital twin"
+      description: "Deletes a particular ippv treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IppvTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "generic server error"  
+  
+  '/patients/{patientId}/notes':
+    put:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the patient's identifier, you can update the textual notes associated with him/her."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        '204':
+          description: "patient's textual notes successfully updated"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+      
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the patient's identifier, you can retrieve the textual notes associated with him/her."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+  '/patients/{patientId}/{multimedia}':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the patient's identifier, you can add a multimedia note associated with him/her between: images, audio, video."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/multimedia-param"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              $ref: "#/components/schemas/MultimediaContent"
+      responses:
+        '201':
+          description: "multimedia successfully uploaded"
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+    
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the patient's identifier, you can retrieve all the multimedia notes choosing between: images, audio, video"
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/multimedia-param"
+      responses:
+        '201':
+          description: "multimedia note successfully uploaded"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      $ref: "#/components/schemas/Identifier"
+                    content:
+                      $ref: "#/components/schemas/MultimediaContent"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+          
+  '/patients/{patientId}/{multimedia}/{multimediaId}':
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the identifiers of the patient and the multimedia note, you can retrieve the desired note."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/multimedia-param"
+        - $ref: "#/components/parameters/multimedia-id-param"
+
+      responses:
+        '201':
+          description: "multimedia note successfully retrieved"
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/MultimediaContent"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+    
+    delete:
+      tags: 
+        - "Patient's digital twin"
+      description: "By passing in the identifiers of the patient and the multimedia note, you can remove the desired note."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/multimedia-param"
+        - $ref: "#/components/parameters/multimedia-id-param"
+
+      responses:
+        '204':
+          description: "multimedia note successfully removed"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+
+components:
+  parameters:
+    event-id-param:
+      in: path
+      name: "eventId"
+      description: "identifier of the event"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+    
+    mission-id-param:
+      in: path
+      name: "missionId"
+      description: "identifier of the mission"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+    
+    patient-id-param:
+      in: path
+      name: "patientId"
+      description: "identifier of the patient"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+        
+    vital-parameters-id-param:
+      in: path
+      name: "vitalParametersId"
+      description: "identifier of a certain snapshot of the vital parameters"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+        
+    treatment-id-param:
+      in: path
+      name: "treatmentId"
+      description: "identifier of a certain treatment"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+    
+    multimedia-id-param:
+      in: path
+      name: "multimediaId"
+      description: "identifier of the multimedia file"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+        
+    multimedia-param:
+      in: path
+      name: "multimedia"
+      description: "multimedia types"
+      required: true
+      schema:
+        type: string
+        enum:
+          - "images"
+          - "audio"
+          - "video"
+
+  schemas:
+    Identifier:
+      type: string
+      format: UUID
+      example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+    
+    EventFirstData:
+      type: object
+      properties:
+        callTime:
+          type: string
+          format: date-time
+        address:
+          type: string
+     
+    EventInformation:
+      type: object
+      properties:
+        notes:
+          type: string
+          example: "Il paziente passa dallo stato di coscienza ad incoscienza in continuazione"
+        dispatchCode:
+          type: string
+          example: 'SC01R'
+        secondary:
+          type: boolean
+        dynamic:
+          type: string
+          example: "Incidente stradale: pedone investito"
+        patientsNumber:
+          type: integer
+          example: 1
+      
+    PatientFirstData:
+      type: object
+      properties:
+        assignedEvent:
+          $ref: "#/components/schemas/Identifier"
+        assignedMission:
+          $ref: "#/components/schemas/Identifier"
+        anagraphic:
+          $ref: "#/components/schemas/Anagraphic"
+    
+    Anagraphic:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "John"
+        surname:
+          type: string
+          example: "Doe"
+        residency:
+          type: string
+          example: "Via della Madonnina 123, Arezzo"
+        birthPlace:
+          type: string
+          example: "Cesena"
+        birthDate:
+          type: string
+          format: date
+          example: "1985-04-12"
+        gender:
+          type: string
+          example: "M"
+        anticoagulants:
+          type: boolean
+        antiplatelets:
+          type: boolean
+    
+    PatientStatus:
+      type: object
+      properties:
+        closedTrauma:
+          type: boolean
+        penetratingTrauma:
+          type: boolean
+        helmetSeatbelt:
+          type: boolean
+        externalHaemorrhage:
+          type: boolean
+        respiratoryTract:
+          type: boolean
+        tachypneaDyspnoea:
+          type: boolean
+        thoraxDeformities:
+          type: boolean
+        ecofast:
+          type: boolean
+        deformedPelvis:
+          type: boolean
+        amputation:
+          type: boolean
+        sunkenSkullFracture:
+          type: boolean
+        otorrhagia:
+          type: boolean
+        paraparesis:
+          type: boolean
+        tetraparesis:
+          type: boolean
+        paraesthesia:
+          type: boolean
+        lastUpdateTime:
+          type: string
+          format: date-time
+          
+    VitalParameters:
+      type: object
+      properties:
+        respiratoryTract:
+          type: integer
+        breathingRate:
+          type: integer
+        outlyingSaturation:
+          type: integer
+        heartbeatRate:
+          type: integer
+        heartbeatType:
+          type: integer
+        bloodPressure:
+          type: integer
+        capRefillTime:
+          type: integer
+        skinColor:
+          type: integer
+        eyeOpening:
+          type: integer
+        verbalResponse:
+          type: integer
+        motorResponse:
+          type: integer
+        leftPupil:
+          type: integer
+        rightPupil:
+          type: integer
+        leftPhotoReactive:
+          type: boolean
+        rightPhotoReactive:
+          type: boolean
+        temperatureInCelsius:
+          type: number
+        time:
+          type: string
+          format: date-time
+    
+    Drug:
+      type: object
+      properties:
+        name:
+          type: string
+          enum:
+            - CRISTALLOIDI
+            - MANNITOLO
+            - SOLUZIONE_IPERTONICA_NACL
+            - EMAZIE_CONCENTRATE
+            - FIBRINOGENO
+            - SUCCINILCOLINA
+            - MIDAZOLAM
+            - FENTANIL
+            - KETAMINA
+            - CURARO
+            - ACIDO_TRANEXAMICO
+        quantity:
+          type: number
+          example: 500
+        measurementUnit:
+          type: string
+          example: "ml" 
+        time:
+          type: string
+          format: date-time
+
+    Manouvers:
+      type: object
+      properties:
+        cervicalCollar:
+          type: boolean
+        immobilisation:
+          type: boolean
+        electricalCardioversion:
+          type: boolean
+        feedingTube:
+          type: boolean
+        vesicalCatheter:
+          type: boolean
+        transcutaneousPacer:
+          type: array
+          items:
+            type: object
+            properties:
+              captureRate:
+                type: integer
+              amperageInMilliAmps:
+                type: number
+              time:
+                type: string
+                format: date-time
+    
+    SimpleTreatment:
+      type: object
+      properties:
+        name:
+          type: string
+          enum:
+            - "adrenalin"
+            - "shock"
+            - "jaw-subluxation"
+            - "guedel"
+            - "cricothyrotomy"
+            - "tracheal-tube"
+            - "oxygen-therapy"
+            - "ambu"
+            - "mini-thoracotomy-left"
+            - "mini-thoracotomy-right"
+            - "ippv"
+            - "haemostasis"
+            - "pelvic-binder"
+            - "neuroprotection"
+            - "thermal-protection"
+        time:
+          type: string
+          format: date-time
+    
+    TimedTreatment:
+      type: object
+      properties:
+        name:
+          type: string
+          enum:
+            - "reanimation"
+            - "tourniquet"
+            - "reboa-zone-1"
+            - "reboa-zone-3"
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+    
+    InjectionTreatment:
+      type: object
+      properties:
+        name:
+          type: string
+          enum:
+            - "peripheral"
+            - "central"
+            - "intreosseus"
+        caliber:
+          type: string
+        time:
+          type: string
+          format: date-time
+    
+    IppvTreatment:
+      type: object
+      properties:
+        vt:
+          type: number
+        fr:
+          type: integer
+        peep:
+          type: integer
+        fio2:
+          type: number
+        time:
+          type: string
+          format: date-time
+          
+    MultimediaContent:
+      type: string
+      format: base64
+      example: "SW5kaWEgVGVhbSB3aWxsIHdpbiB0aGUgQ3Vw3aWxsIHdpbiB05kaWEgVGVh"
