@@ -6,7 +6,7 @@ info:
   description: "A RESTful API to interact with the digital twins of Events and Patients. <br />An Event is composed by several Missions. Every Mission is associated to one Patient and to one or more Vehicles. <br />For every Patient it's possible to update and retrieve its personal data, anagraphics, its current status, its current and previous vital parameters, administered drugs, performed manouvers, performed treatments and the eventual complications that happened in itinere."
 
 paths:
-  '/events':
+  '/v1/events':
     post:
       tags: 
         - "Event's digital twin"
@@ -31,7 +31,7 @@ paths:
         '500':
           description: "generic server error"
   
-  '/events/{eventId}/information':
+  '/v1/events/{eventId}/information':
     post:
       tags: 
         - "Event's digital twin"
@@ -85,7 +85,7 @@ paths:
   #     description: ""
   #     responses: 
         
-  '/patients':
+  '/v1/patients':
     post:
       tags: 
         - "Patient's digital twin"
@@ -110,7 +110,7 @@ paths:
         '500':
           description: "generic server error"
         
-  '/patients/{patientId}/anagraphic':
+  '/v1/patients/{patientId}/anagraphic':
     put:
       tags: 
         - "Patient's digital twin"
@@ -148,7 +148,7 @@ paths:
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/status':
+  '/v1/patients/{patientId}/status':
     put:
       tags: 
         - "Patient's digital twin"
@@ -186,7 +186,7 @@ paths:
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/vital-parameters':
+  '/v1/patients/{patientId}/vital-parameters':
     post:
       tags: 
         - "Patient's digital twin"
@@ -235,7 +235,7 @@ paths:
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/vital-parameters/{vitalParametersId}':
+  '/v1/patients/{patientId}/vital-parameters/{vitalParametersId}':
     get:
       tags: 
         - "Patient's digital twin"
@@ -255,7 +255,7 @@ paths:
         '500':
           description: "generic server error"
     
-  '/patients/{patientId}/vital-parameters/last':
+  '/v1/patients/{patientId}/vital-parameters/last':
     get:
       tags: 
         - "Patient's digital twin"
@@ -274,7 +274,7 @@ paths:
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/drugs':
+  '/v1/patients/{patientId}/drugs':
     post:
       tags: 
         - "Patient's digital twin"
@@ -302,11 +302,11 @@ paths:
           description: "patient not found"
         '500':
           description: "generic server error"
-  
+    
     get:
       tags: 
         - "Patient's digital twin"
-      description: "Retrieve all the drug administered to the patient."
+      description: "Retrieve all the drugs administered to the patient."
       parameters:
         - $ref: "#/components/parameters/patient-id-param"
       responses:
@@ -323,30 +323,46 @@ paths:
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/manouvers':
-    put:
+  '/v1/patients/{patientId}/drugs/{drugId}':  
+    get:
       tags: 
         - "Patient's digital twin"
-      description: "Updates the summary of the manouvers performed on the patient."
+      description: "Retrieve the requested drug administered to the patient."
       parameters:
         - $ref: "#/components/parameters/patient-id-param"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Manouvers"
+        - $ref: "#/components/parameters/drug-id-param"
       responses:
         '200':
-          description: "patient's drug administered successfully"
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Drug"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+    
+    delete:
+      tags: 
+        - "Patient's digital twin"
+      description: "Removes the requested drug."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/drug-id-param"
+      responses:
+        '204':
+          description: "deletion successful"
         '404':
           description: "patient not found"
         '500':
           description: "generic server error"
   
+  '/v1/patients/{patientId}/manouvers':
     get:
       tags: 
         - "Patient's digital twin"
-      description: "Retrieve the summary of all the manouvers performed on the patient."
+      description: "Retrieves the summary of all the manouvers performed on the patient."
       parameters:
         - $ref: "#/components/parameters/patient-id-param"
       responses:
@@ -355,13 +371,170 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Manouvers"
+                type: object
+                properties:
+                  simple:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SimpleManouver"
+                  pacing:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PacingManouver"
+        '204':
+          description: "no content: no manouvers executed on the requested patient"
         '404':
           description: "patient not found"
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/treatments/':
+  '/v1/patients/{patientId}/manouvers/simple/{simpleManouver}':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "Registers a manouver's execution time"
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/simple-manouver-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              format: date-time
+      responses:
+        '201':
+          description: "patient's manouver execution registered successfully"
+        '404':
+          description: "patient not found"
+        '409':
+          description: "conflict: manouver already executed"
+        '500':
+          description: "generic server error"
+  
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieves the manouver's execution time."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/simple-manouver-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: string
+                format: date-time
+        '404':
+          description: "not found"
+        '500':
+          description: "generic server error"
+    
+    delete:
+      tags: 
+        - "Patient's digital twin"
+      description: "Cancels the manouver execution"
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/simple-manouver-param"
+      responses:
+        '204':
+          description: "deletion completed"
+        '404':
+          description: "not found"
+        '500':
+          description: "generic server error"
+  
+  '/v1/patients/{patientId}/manouvers/pacing':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "Registers a transcutaneous pacing execution"
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PacingManouver"
+      responses:
+        '201':
+          description: "patient's manouver executed successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieves a specific transcutaneous pacing execution."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/pacing-manouver-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PacingManouver"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+  
+  '/v1/patients/{patientId}/manouvers/pacing/{pacingManouverId}':
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieves a specific transcutaneous pacing execution."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/pacing-manouver-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PacingManouver"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+    
+    delete:
+      tags: 
+        - "Patient's digital twin"
+      description: "Deletes a specific transcutaneous pacing execution."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/pacing-manouver-id-param"
+      responses:
+        '204':
+          description: "deletion successful"
+        '404':
+          description: "not found"
+        '500':
+          description: "generic server error"
+  
+  '/v1/patients/{patientId}/treatments/':
     get:
       tags: 
         - "Patient's digital twin"
@@ -398,7 +571,7 @@ paths:
           description: "generic server error"
   
   
-  '/patients/{patientId}/treatments/simple':
+  '/v1/patients/{patientId}/treatments/simple':
     post:
       tags: 
         - "Patient's digital twin"
@@ -427,7 +600,7 @@ paths:
         '500':
           description: "generic server error"
           
-  '/patients/{patientId}/treatments/simple/{treatmentId}':
+  '/v1/patients/{patientId}/treatments/simple/{treatmentId}':
     get:
       tags: 
         - "Patient's digital twin"
@@ -455,18 +628,14 @@ paths:
         - $ref: "#/components/parameters/patient-id-param"
         - $ref: "#/components/parameters/treatment-id-param"
       responses:
-        '200':
-          description: "ok"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SimpleTreatment"
+        '204':
+          description: "deletion successful"
         '404':
           description: "treatment not found"
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/treatments/timed':
+  '/v1/patients/{patientId}/treatments/timed':
     post:
       tags: 
         - "Patient's digital twin"
@@ -495,7 +664,7 @@ paths:
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/treatments/timed/{treatmentId}':
+  '/v1/patients/{patientId}/treatments/timed/{treatmentId}':
     patch:
       tags: 
         - "Patient's digital twin"
@@ -543,18 +712,14 @@ paths:
         - $ref: "#/components/parameters/patient-id-param"
         - $ref: "#/components/parameters/treatment-id-param"
       responses:
-        '200':
-          description: "ok"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TimedTreatment"
+        '204':
+          description: "deletion successful"
         '404':
           description: "treatment not found"
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/treatments/injection':
+  '/v1/patients/{patientId}/treatments/injection':
     post:
       tags: 
         - "Patient's digital twin"
@@ -583,7 +748,7 @@ paths:
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/treatments/injection/{treatmentId}':
+  '/v1/patients/{patientId}/treatments/injection/{treatmentId}':
     get:
       tags: 
         - "Patient's digital twin"
@@ -611,18 +776,14 @@ paths:
         - $ref: "#/components/parameters/patient-id-param"
         - $ref: "#/components/parameters/treatment-id-param"
       responses:
-        '200':
-          description: "ok"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InjectionTreatment"
+        '204':
+          description: "deletion successful"
         '404':
           description: "treatment not found"
         '500':
           description: "generic server error"
     
-  '/patients/{patientId}/treatments/ippv':
+  '/v1/patients/{patientId}/treatments/ippv':
     post:
       tags: 
         - "Patient's digital twin"
@@ -651,7 +812,7 @@ paths:
         '500':
           description: "generic server error"
     
-  '/patients/{patientId}/treatments/ippv/{treatmentId}':
+  '/v1/patients/{patientId}/treatments/ippv/{treatmentId}':
     get:
       tags: 
         - "Patient's digital twin"
@@ -679,18 +840,93 @@ paths:
         - $ref: "#/components/parameters/patient-id-param"
         - $ref: "#/components/parameters/treatment-id-param"
       responses:
-        '200':
-          description: "ok"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/IppvTreatment"
+        '204':
+          description: "deletion successful"
         '404':
           description: "treatment not found"
         '500':
           description: "generic server error"  
   
-  '/patients/{patientId}/notes':
+  '/v1/patients/{patientId}/complications':
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieve all the complicaitons happened for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Complication"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "generic server error"
+  
+  '/v1/patients/{patientId}/complications/{complication}':
+    post:
+      tags: 
+        - "Patient's digital twin"
+      description: "Adds a complication that happened in itinere, specifying at what time it happened."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/complication-param"
+      responses:
+        '201':
+          description: "patient's complication registered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+        '409':
+          description: "conflict: complication already registered"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "generic server error"
+    
+    get:
+      tags: 
+        - "Patient's digital twin"
+      description: "Retrieve the specific complication time if it happened for the patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/complication-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            text/plain:
+             schema:
+               type: string
+               format: plain/text
+        '404':
+          description: "not found"
+        '500':
+          description: "generic server error"
+          
+    delete:
+      tags: 
+        - "Patient's digital twin"
+      description: "Removes the specified complication in itinere"
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/complication-param"
+      responses:
+        '204':
+          description: "deletion successful"
+        '404':
+          description: "not found"
+        '500':
+          description: "generic server error"
+  
+  '/v1/patients/{patientId}/notes':
     put:
       tags: 
         - "Patient's digital twin"
@@ -728,7 +964,7 @@ paths:
         '500':
           description: "generic server error"
   
-  '/patients/{patientId}/{multimedia}':
+  '/v1/patients/{patientId}/{multimedia}':
     post:
       tags: 
         - "Patient's digital twin"
@@ -779,7 +1015,7 @@ paths:
         '500':
           description: "generic server error"
           
-  '/patients/{patientId}/{multimedia}/{multimediaId}':
+  '/v1/patients/{patientId}/{multimedia}/{multimediaId}':
     get:
       tags: 
         - "Patient's digital twin"
@@ -852,13 +1088,45 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
         
-    treatment-id-param:
+    drug-id-param:
       in: path
-      name: "treatmentId"
-      description: "identifier of a certain treatment"
+      name: "drugId"
+      description: "identifier of a certain drug admnistration"
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
+        
+    simple-manouver-param:
+      in: path
+      name: "simpleManouver"
+      description: "name of the desired manouver"
+      required: true
+      schema:
+        $ref: "#/components/schemas/SimpleManouverName"
+        
+    pacing-manouver-id-param:
+      in: path
+      name: "pacingManouverId"
+      description: "identifier of the pacing manouver execution"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+    
+    treatment-id-param:
+      in: path
+      name: "treatmentId"
+      description: "identifier of a certain treatment administration"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+        
+    complication-param:
+      in: path
+      name: "complication"
+      description: "name of the desired complication"
+      required: true
+      schema:
+        $ref: "#/components/schemas/ComplicationName"
     
     multimedia-id-param:
       in: path
@@ -1053,31 +1321,33 @@ components:
           type: string
           format: date-time
 
-    Manouvers:
+    SimpleManouver:
       type: object
       properties:
-        cervicalCollar:
-          type: boolean
-        immobilisation:
-          type: boolean
-        electricalCardioversion:
-          type: boolean
-        feedingTube:
-          type: boolean
-        vesicalCatheter:
-          type: boolean
-        transcutaneousPacer:
-          type: array
-          items:
-            type: object
-            properties:
-              captureRate:
-                type: integer
-              amperageInMilliAmps:
-                type: number
-              time:
-                type: string
-                format: date-time
+        name:
+          $ref: "#/components/schemas/SimpleManouverName"
+        time:
+          type: string
+          format: date-time
+    SimpleManouverName:
+      type: string
+      enum:
+        - "cervical-collar"
+        - "immobilisation"
+        - "electrical-cardioversion"
+        - "feeding-tube"
+        - "vesical-catheter"
+
+    PacingManouver:
+      type: object
+      properties:
+        captureRateInBpm:
+          type: integer
+        amperageInMilliAmps:
+          type: number
+        time:
+          type: string
+          format: date-time
     
     SimpleTreatment:
       type: object
@@ -1150,6 +1420,26 @@ components:
         time:
           type: string
           format: date-time
+    
+    Complication:
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/ComplicationName"
+        time:
+          type: string
+          format: date-time
+    ComplicationName:
+      type: string
+      enum:
+        - "cardio-circulatory-arrest"
+        - "impaired consciousness"
+        - "anisocoria-mydriasis"
+        - "respiratory-failure"
+        - "cardiovascular-shock"
+        - "landing-in-itinere"
+        - "demise-in-itinere"
+        - "demise-in-ps"
           
     MultimediaContent:
       type: string
