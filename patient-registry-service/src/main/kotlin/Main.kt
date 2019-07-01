@@ -7,7 +7,7 @@ import service.PatientRegistry
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        val log = LoggerFactory.getLogger("Oc-bridgeService")
+        val log = LoggerFactory.getLogger("PatientRegistry")
 
         val vertx = Vertx.vertx()
         vertx.deployVerticle((PatientRegistry())) { startService ->

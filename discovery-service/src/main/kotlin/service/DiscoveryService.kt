@@ -3,10 +3,10 @@ package service
 import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
-import io.vertx.core.json.JsonObject
+import io.vertx.core.json.Json
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.RoutingContext
-import io.vertx.servicediscovery.Record
+import io.vertx.kotlin.core.json.get
 import io.vertx.servicediscovery.ServiceDiscovery
 import io.vertx.servicediscovery.types.HttpEndpoint
 
@@ -18,7 +18,7 @@ object DiscoveryService {
     private const val SERVICE_HOST = "serviceHost"
     private const val SERVICE_PORT = "servicePort"
     private const val SERVICE_REGISTRATION = "serviceRegistration"
-    private const val ROOT = "/v1"
+    private const val SERVICE_URL = "serviceUrl"
 
     fun publishService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
         log.info("Request to publish service")
@@ -26,7 +26,8 @@ object DiscoveryService {
         val serviceName = routingContext.request().params()[SERVICE_NAME]
         val serviceHost = routingContext.request().params()[SERVICE_HOST]
         val servicePort = routingContext.request().params()[SERVICE_PORT]
-        val record = HttpEndpoint.createRecord(serviceName, serviceHost, servicePort.toInt(), ROOT)
+        val serviceUrl = routingContext.request().params()[SERVICE_URL]
+        val record = HttpEndpoint.createRecord(serviceName, serviceHost, servicePort.toInt(), serviceUrl)
         discovery?.publish(record) { ar ->
             if (ar.succeeded()) {
                 response
@@ -42,14 +43,12 @@ object DiscoveryService {
     fun unpublishService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
         log.debug("Request to unpublish service")
         val response = routingContext.response()
-        val recordRegistration = JsonObject(routingContext.request().params()[SERVICE_REGISTRATION])
-        // TODO: record with SERVICE_REGISTRATION value
-        val record = Record()
-        discovery?.unpublish(record.registration) { ar ->
+        val recordRegistration = routingContext.request().params()[SERVICE_REGISTRATION]
+        discovery?.unpublish(recordRegistration) { ar ->
             if (ar.succeeded()) {
                 response
                         .setStatusCode(OK.code()).end()
-                log.info("Service ${record.name} successfully unpublished.")
+                log.info("Service $recordRegistration successfully unpublished.")
             } else {
                 response.setStatusCode(BAD_REQUEST.code()).end()
             }
@@ -57,18 +56,21 @@ object DiscoveryService {
     }
 
     fun getService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
-        log.debug("Request to get all service list")
+        log.debug("Request to get service list")
         val response = routingContext.response()
         val record = routingContext.request().params()[SERVICE_NAME]
         discovery?.getRecord({ r ->
             r.name == record
-        }, { ar ->
-            if (ar.succeeded() && ar.result() != null) {
-                // prendere location service
-                val reference = discovery.getReference(ar.result())
+        }, { findService ->
+            if (findService.succeeded() && findService.result() != null) {
+                // Retrieve the service reference
+                val reference = discovery.getReference(findService.result())
                 // Retrieve the service object
-                response.setStatusCode(OK.code()).end()
+                //  val location = reference(HttpClient.`class`)
+                val location = reference.record().location.first()
+                response.setStatusCode(OK.code()).end(Json.encodePrettily(location))
                 log.info("Service $record successfully found.")
+                reference.release()
             } else {
                 response.setStatusCode(BAD_REQUEST.code()).end()
             }
