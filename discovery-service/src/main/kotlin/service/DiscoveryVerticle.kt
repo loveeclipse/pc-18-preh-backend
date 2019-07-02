@@ -27,7 +27,7 @@ class DiscoveryVerticle : AbstractVerticle() {
                 ServiceDiscoveryOptions()
                         .setAnnounceAddress("service-announce")
                         .setName("DiscoveryService-service"))
-        log.info("Create Discovery $discovery.")
+        log.debug("Create Discovery $discovery.")
     }
 
     /*override fun stop() {

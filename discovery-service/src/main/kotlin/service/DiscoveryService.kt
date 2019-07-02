@@ -6,7 +6,6 @@ import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.vertx.core.json.Json
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.RoutingContext
-import io.vertx.kotlin.core.json.get
 import io.vertx.servicediscovery.ServiceDiscovery
 import io.vertx.servicediscovery.types.HttpEndpoint
 
@@ -30,6 +29,7 @@ object DiscoveryService {
         val record = HttpEndpoint.createRecord(serviceName, serviceHost, servicePort.toInt(), serviceUrl)
         discovery?.publish(record) { ar ->
             if (ar.succeeded()) {
+                println("--------------------- ${record.registration}")
                 response
                         .setStatusCode(CREATED.code())
                         .end()
@@ -56,17 +56,14 @@ object DiscoveryService {
     }
 
     fun getService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
-        log.debug("Request to get service list")
+        log.debug("Request to get service location")
         val response = routingContext.response()
         val record = routingContext.request().params()[SERVICE_NAME]
         discovery?.getRecord({ r ->
             r.name == record
         }, { findService ->
             if (findService.succeeded() && findService.result() != null) {
-                // Retrieve the service reference
                 val reference = discovery.getReference(findService.result())
-                // Retrieve the service object
-                //  val location = reference(HttpClient.`class`)
                 val location = reference.record().location.first()
                 response.setStatusCode(OK.code()).end(Json.encodePrettily(location))
                 log.info("Service $record successfully found.")
