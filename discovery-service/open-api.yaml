@@ -1,48 +1,70 @@
 openapi: 3.0.0
 
-servers:
-  - url: 'http://localhost:10000/v1'
-
 info:
-  description: Discovery Service API for PreH
-  title: Discovery Service API
-  version: '1.0'
+  title: "Discovery Service API"
+  version: "1"
+  description: |
+    A RESTful API to interact with Discovery serivce.
 
 paths:
   '/discovery/publish':
     post:
-      summary: Creates a new record
+      summary: Publish service
       description: Create a new record and publish an unique service in discovery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceInformation"
       responses:
         '201':
-          description: 'created'
+          description: 'record successfully created'
         '400':
           description: 'bad request'
   '/discovery/unpublish':
     delete:
-      summary: Delete a record
+      summary: Unpublish service
       description: Delete the record related to a service previously published in discovery
+      parameters:
+        - $ref: '#/components/parameters/service-registration-id-param'
       responses:
         '200':
           description: 'ok'
         '400':
-          description: 'bad input parameter'
+          description: 'bad request'
   '/discovery/discover':
     get:
-      summary: Returns all service details saved in discovery
+      summary: Returns service details saved in discovery
       description: You can search for all the currently available service in discovery
+      parameters:
+        - $ref: '#/components/parameters/service-name-param'
       responses:
         '200':
           description: 'ok'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/discoveryInformation'
+                $ref: '#/components/schemas/ServiceLocation'
         '400':
           description: 'bad request'
 components:
+  parameters:
+    service-name-param:
+      in: query
+      name: "serviceName"
+      description: "Service name"
+      required: true
+      schema:
+        $ref: "#/components/schemas/ServiceName"
+    service-registration-id-param:
+      in: query
+      name: "serviceRegistrationIdentifier"
+      description: "Service registration identifier"
+      required: true
+      schema:
+        $ref: "#/components/schemas/ServiceRegistrationIdentifier"
   schemas:
-    discoveryInformation:
+    ServiceInformation:
       type: object
       required:
         - serviceName
@@ -51,10 +73,36 @@ components:
       properties:
         serviceName:
           type: string
-          example: 'oc-bridge-service'
+          example: 'mission-service'
         serviceHost:
           type: string
           example: '127.0.0.1'
         servicePort:
           type: integer
-          example: 1000
+          example: 10000
+    ServiceName:
+      type: object
+      required:
+        - serviceName
+      properties:
+        serviceName:
+          type: string
+          example: 'mission-service'
+    ServiceLocation:
+      type: object
+      required:
+        - serviceLocation
+      properties:
+        serviceLocation:
+          type: string
+          format: url
+          example: 'http://localhost:10000/mission'
+    ServiceRegistrationIdentifier:
+      type: object
+      required:
+        - serviceLocation
+      properties:
+        serviceLocation:
+          type: string
+          format: uuid
+          example: 'fb37c79f-5820-45d4-8eb1-c9f9f3eebf2c'
