@@ -4,7 +4,7 @@ import io.vertx.core.AbstractVerticle
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
 
-class OcBridge : AbstractVerticle() {
+class EventsService : AbstractVerticle() {
 
     override fun start() {
         vertx
