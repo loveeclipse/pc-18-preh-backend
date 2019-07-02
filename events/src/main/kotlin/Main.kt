@@ -1,7 +1,7 @@
 import io.vertx.core.Vertx
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.client.WebClient
-import service.OcBridge
+import service.EventsService
 import service.Data.DISCOVERY_PORT
 import service.Data.DISCOVERY_HOST
 import service.Data.DISCOVERY_PUBLISH_SERVICE
@@ -18,7 +18,7 @@ object Main {
         val log = LoggerFactory.getLogger("Oc-bridgeService")
 
         val vertx = Vertx.vertx()
-        vertx.deployVerticle((OcBridge())) { startService ->
+        vertx.deployVerticle((EventsService())) { startService ->
             when { startService.succeeded() ->
                 WebClient.create(vertx).post(DISCOVERY_PORT, DISCOVERY_HOST, DISCOVERY_PUBLISH_SERVICE)
                         .addQueryParam(SERVICE_NAME, NAME)
