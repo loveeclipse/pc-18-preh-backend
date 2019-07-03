@@ -24,7 +24,7 @@ class RouterVerticle : AbstractVerticle() {
             post(PATIENTS_PATH).handler { PatientsService.createPatient(it) }
             put(ANAGRAPHIC_PATH).handler { AnagraphicService.updateAnagraphic(it) }
             get(ANAGRAPHIC_PATH).handler { AnagraphicService.retrieveAnagraphic(it) }
-            post(STATUS_PATH).handler { StatusService.createStatus(it) }
+            put(STATUS_PATH).handler { StatusService.updateStatus(it) }
             post(VITAL_PARAMETERS_PATH).handler { VitalParametersService.createVitalParameters(it) }
             post(DRUGS_PATH).handler { DrugsService.createDrug(it) }
             post(MANEUVERS_SIMPLE_PATH).handler { ManouversService.createSimpleManeuver(it) }
