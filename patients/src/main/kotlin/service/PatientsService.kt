@@ -10,9 +10,12 @@ import java.util.UUID
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
+import io.vertx.core.logging.LoggerFactory
 import io.vertx.kotlin.core.json.get
 
 object PatientsService {
+
+    private val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
     private const val DOCUMENT_ID = "_id"
     private const val ANAGRAPHIC = "anagraphic"
@@ -29,24 +32,28 @@ object PatientsService {
     ) }
 
     fun createPatient(routingContext: RoutingContext) {
+        log.info("Request to create a new patients")
         val response = routingContext.response()
-        val uuid = UUID.randomUUID().toString()
-        val body = routingContext.bodyAsJson
-        val checkPatientSchema = checkSchema(body, PATIENT_REQUIRED_SCHEMA, PATIENT_SCHEMA)
-        val checkAnagraphicSchema = body.containsKey(ANAGRAPHIC) &&
-                checkSchema(body[ANAGRAPHIC], emptyList(), ANAGRAPHIC_SCHEMA)
+        val patientId = UUID.randomUUID().toString()
+        val patientData = routingContext.bodyAsJson
+        val checkPatientSchema = checkSchema(patientData, PATIENT_REQUIRED_SCHEMA, PATIENT_SCHEMA)
+        val checkAnagraphicSchema = patientData.containsKey(ANAGRAPHIC) &&
+                checkSchema(patientData[ANAGRAPHIC], emptyList(), ANAGRAPHIC_SCHEMA)
 
-        if (checkPatientSchema && (!body.containsKey(ANAGRAPHIC) || checkAnagraphicSchema)) {
-            val document = body.put(DOCUMENT_ID, uuid)
-            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION).insert(COLLECTION_NAME, document) { insertOperation ->
+        if (checkPatientSchema && (!patientData.containsKey(ANAGRAPHIC) || checkAnagraphicSchema)) {
+            val document = patientData.put(DOCUMENT_ID, patientId)
+            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                    .insert(COLLECTION_NAME, document) { insertOperation ->
                 when {
                     insertOperation.succeeded() ->
                         response
                             .putHeader("Content-Type", "text/plain")
                             .setStatusCode(CREATED.code())
-                            .end(uuid)
-                    isDuplicateKey(insertOperation.cause().message) -> createPatient(routingContext)
-                    else -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            .end(patientId)
+                    isDuplicateKey(insertOperation.cause().message) ->
+                        createPatient(routingContext)
+                    else ->
+                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                 }
             }
         } else {
