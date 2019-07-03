@@ -1,10 +1,12 @@
 package service
 
+import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
 import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
 import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
 import io.vertx.core.Vertx
+import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.mongo.MongoClient
@@ -19,6 +21,7 @@ object AnagraphicService {
     private const val DOCUMENT_ID = "_id"
     private const val PATIENT_ID = "patientId"
     private const val COLLECTION_NAME = "patients"
+    private const val ANAGRAPHIC = "anagraphic"
     private val ANAGRAPHIC_SCHEMA = listOf("name", "surname", "residency", "birthPlace", "birthDate", "gender",
             "anticoagulants", "antiplatelets")
 
@@ -34,7 +37,7 @@ object AnagraphicService {
         val anagraphicData = routingContext.bodyAsJson
         if (checkSchema(anagraphicData, ANAGRAPHIC_SCHEMA, ANAGRAPHIC_SCHEMA)) {
             val query = json { obj(DOCUMENT_ID to patientId) }
-            val update = json { obj("\$set" to anagraphicData) }
+            val update = json { obj("\$set" to obj(ANAGRAPHIC to anagraphicData)) }
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .updateCollection(COLLECTION_NAME, query, update) { updateOperation ->
                         when {
@@ -52,6 +55,27 @@ object AnagraphicService {
     }
 
     fun retrieveAnagraphic(routingContext: RoutingContext) {
+        log.info("Request to retrieve the anagraphic data")
+        val response = routingContext.response()
+        val patientId = routingContext.request().params()[PATIENT_ID]
+        val anagraphicData = json { obj(DOCUMENT_ID to patientId) }
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .find(COLLECTION_NAME, anagraphicData) { findOperation ->
+                    when {
+                        findOperation.succeeded() && findOperation.result().isNotEmpty() -> {
+                            val foundEntry = findOperation.result().first()
+                            foundEntry.remove(DOCUMENT_ID)
+                            response
+                                    .putHeader("Content-Type", "application/json")
+                                    .setStatusCode(OK.code())
+                                    .end(Json.encodePrettily(foundEntry))
+                        }
+                        findOperation.succeeded() ->
+                            response.setStatusCode(NOT_FOUND.code()).end()
+                        else ->
+                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                    }
+        }
     }
 
     private fun checkSchema(json: JsonObject, required: List<String>?, parameters: List<String>): Boolean {
