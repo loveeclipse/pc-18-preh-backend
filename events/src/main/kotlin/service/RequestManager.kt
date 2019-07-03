@@ -25,14 +25,14 @@ object RequestManager {
     private const val EVENT_ID = "eventId"
     private const val COLLECTION_NAME = "events"
     private const val DUPLICATED_KEY_CODE = "E11000"
-    private val EVENT_INFORMATION_SCHEMA = listOf("callTime", "address", "notes", "dispatchCode", "secondary", "dynamic", "patientsNumber", "ongoing")
-    private val EVENT_REQUIRED_INFORMATION_SCHEMA = listOf("callTime", "address")
+    private val EVENT_SCHEMA = listOf("callTime", "address", "notes", "dispatchCode", "secondary", "dynamic", "patientsNumber", "ongoing")
+    private val EVENT_REQUIRED_SCHEMA = listOf("callTime", "address")
 
     fun createEvent(routingContext: RoutingContext) {
         val response = routingContext.response()
         val uuid = UUID.randomUUID().toString()
         val body = routingContext.bodyAsJson
-        if (checkSchema(body, EVENT_REQUIRED_INFORMATION_SCHEMA, EVENT_INFORMATION_SCHEMA)) {
+        if (checkSchema(body, EVENT_REQUIRED_SCHEMA, EVENT_SCHEMA)) {
             val document = body.put(DOCUMENT_ID, uuid)
             MongoClient.createNonShared(vertx, CONFIG).insert(COLLECTION_NAME, document) { insertOperation ->
                 when {
@@ -75,7 +75,7 @@ object RequestManager {
         val response = routingContext.response()
         val eventId = routingContext.request().getParam(EVENT_ID)
         val body = routingContext.bodyAsJson
-        if (checkSchema(body, emptyList(), EVENT_INFORMATION_SCHEMA)) {
+        if (checkSchema(body, emptyList(), EVENT_SCHEMA)) {
             val query = json { obj(DOCUMENT_ID to eventId) }
             val update = json { obj("\$set" to body) }
             MongoClient.createNonShared(vertx, CONFIG).updateCollection(COLLECTION_NAME, query, update) { updateOperation ->
