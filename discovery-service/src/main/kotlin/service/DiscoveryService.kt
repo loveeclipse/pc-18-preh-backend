@@ -29,7 +29,6 @@ object DiscoveryService {
         val record = HttpEndpoint.createRecord(serviceName, serviceHost, servicePort.toInt(), serviceUrl)
         discovery?.publish(record) { ar ->
             if (ar.succeeded()) {
-                println("--------------------- ${record.registration}")
                 response
                         .setStatusCode(CREATED.code())
                         .end()
