@@ -15,7 +15,7 @@ class EventsService : AbstractVerticle() {
     }
 
     private fun createRouter(): Router {
-        RequestManager.initializeRequestManager(vertx)
+        RequestManager.vertx = vertx
         return Router.router(vertx).apply {
             route().handler(BodyHandler.create())
             post(EVENTS_PATH).handler { RequestManager.createEvent(it) }

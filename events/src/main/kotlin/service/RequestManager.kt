@@ -17,7 +17,7 @@ import io.vertx.kotlin.core.json.obj
 import java.util.UUID
 
 object RequestManager {
-    private var vertx: Vertx? = null
+    var vertx: Vertx? = null
     private val CONFIG = json { obj(
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
     ) }
@@ -27,10 +27,6 @@ object RequestManager {
     private const val DUPLICATED_KEY_CODE = "E11000"
     private val EVENT_INFORMATION_SCHEMA = listOf("callTime", "address", "notes", "dispatchCode", "secondary", "dynamic", "patientsNumber", "ongoing")
     private val EVENT_REQUIRED_INFORMATION_SCHEMA = listOf("callTime", "address")
-
-    fun initializeRequestManager(vertx: Vertx) {
-        RequestManager.vertx = vertx
-    }
 
     fun createEvent(routingContext: RoutingContext) {
         val response = routingContext.response()
