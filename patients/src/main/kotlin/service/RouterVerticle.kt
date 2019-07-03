@@ -21,6 +21,19 @@ class RouterVerticle : AbstractVerticle() {
         initializationService()
         return Router.router(vertx).apply {
             route().handler(BodyHandler.create())
+            post(PATIENTS_PATH).handler { PatientsService.createPatient(it) }
+            put(ANAGRAPHIC_PATH).handler { AnagraphicService.updateAnagraphic(it) }
+            get(ANAGRAPHIC_PATH).handler { AnagraphicService.retrieveAnagraphic(it) }
+            post(STATUS_PATH).handler { StatusService.createStatus(it) }
+            post(VITAL_PARAMETERS_PATH).handler { VitalParametersService.createVitalParameters(it) }
+            post(DRUGS_PATH).handler { DrugsService.createDrug(it) }
+            post(MANEUVERS_SIMPLE_PATH).handler { ManouversService.createSimpleManeuver(it) }
+            delete(MANEUVERS_SIMPLE_PATH).handler { ManouversService.deleteSimpleManeuver(it) }
+            post(TREATMENTS_SIMPLE_PATH).handler { TreatmentsService.createSimpleTreatment(it) }
+            post(TREATMENTS_INJECTION_PATH).handler { TreatmentsService.createInjectionTreatment(it) }
+            post(TREATMENTS_IPPV_PATH).handler { TreatmentsService.createIppvTreatment(it) }
+            post(COMPLICATIONS_PATH).handler { ComplicationsService.createComplication(it) }
+            delete(COMPLICATIONS_PATH).handler { ComplicationsService.deleteComplication(it) }
         }
     }
 
@@ -36,12 +49,14 @@ class RouterVerticle : AbstractVerticle() {
         private const val PORT = 10000
         private const val HOST = "localhost"
 
-        private const val PATIENT_PATH = "/patients/:patientId"
+        private const val PATIENTS_PATH = "/patients"
+        private const val PATIENT_PATH = "$PATIENTS_PATH/:patientId"
         private const val ANAGRAPHIC_PATH = "$PATIENT_PATH/anagraphic"
         private const val STATUS_PATH = "$PATIENT_PATH/status"
         private const val VITAL_PARAMETERS_PATH = "$PATIENT_PATH/vital-parameters"
         private const val DRUGS_PATH = "$PATIENT_PATH/drugs"
-        private const val MANEUVERS_PATH = "$PATIENT_PATH/maneuvers/simple/:simpleManeuver"
+        private const val MANEUVERS_PATH = "$PATIENT_PATH/maneuvers"
+        private const val MANEUVERS_SIMPLE_PATH = "$MANEUVERS_PATH/simple/:simpleManeuver"
         private const val TREATMENTS_PATH = "$PATIENT_PATH/treatments"
         private const val TREATMENTS_SIMPLE_PATH = "$TREATMENTS_PATH/simple"
         private const val TREATMENTS_INJECTION_PATH = "$TREATMENTS_PATH/injection"

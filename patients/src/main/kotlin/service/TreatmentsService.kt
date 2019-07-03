@@ -5,16 +5,19 @@ import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 
-object AnagraphicService {
+object TreatmentsService {
 
     var vertx: Vertx? = null
     private val MONGODB_CONFIGURATION = json { obj(
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
     ) }
 
-    fun updateAnagraphic(routingContext: RoutingContext) {
+    fun createSimpleTreatment(it: RoutingContext?) {
     }
 
-    fun retrieveAnagraphic(routingContext: RoutingContext) {
+    fun createInjectionTreatment(it: RoutingContext?) {
+    }
+
+    fun createIppvTreatment(it: RoutingContext?) {
     }
 }
