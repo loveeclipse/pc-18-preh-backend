@@ -25,23 +25,27 @@ object RequestManager {
     private const val EVENT_ID = "eventId"
     private const val COLLECTION_NAME = "events"
     private const val DUPLICATED_KEY_CODE = "E11000"
-    private val EVENT_SCHEMA = listOf("callTime", "address", "notes", "dispatchCode", "secondary", "dynamic", "patientsNumber", "ongoing")
+    private val EVENT_SCHEMA = listOf("callTime", "address", "notes", "dispatchCode", "secondary", "dynamic",
+            "patientsNumber", "ongoing")
     private val EVENT_REQUIRED_SCHEMA = listOf("callTime", "address")
 
     fun createEvent(routingContext: RoutingContext) {
         val response = routingContext.response()
-        val uuid = UUID.randomUUID().toString()
-        val body = routingContext.bodyAsJson
-        if (checkSchema(body, EVENT_REQUIRED_SCHEMA, EVENT_SCHEMA)) {
-            val document = body.put(DOCUMENT_ID, uuid)
+        val eventId = UUID.randomUUID().toString()
+        val eventData = routingContext.bodyAsJson
+        if (checkSchema(eventData, EVENT_REQUIRED_SCHEMA, EVENT_SCHEMA)) {
+            val document = eventData.put(DOCUMENT_ID, eventId)
             MongoClient.createNonShared(vertx, CONFIG).insert(COLLECTION_NAME, document) { insertOperation ->
                 when {
-                    insertOperation.succeeded() -> response
+                    insertOperation.succeeded() ->
+                        response
                             .putHeader("Content-Type", "text/plain")
                             .setStatusCode(CREATED.code())
-                            .end(uuid)
-                    isDuplicateKey(insertOperation.cause().message) -> createEvent(routingContext)
-                    else -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            .end(eventId)
+                    isDuplicateKey(insertOperation.cause().message) ->
+                        createEvent(routingContext)
+                    else ->
+                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                 }
             }
         } else {
@@ -58,15 +62,17 @@ object RequestManager {
         MongoClient.createNonShared(vertx, CONFIG).find(COLLECTION_NAME, query) { findOperation ->
             when {
                 findOperation.succeeded() && findOperation.result().isNotEmpty() -> {
-                    val foundItem = findOperation.result()[0]
+                    val foundItem = findOperation.result().first()
                     foundItem.remove(DOCUMENT_ID)
                     response
                             .putHeader("Content-Type", "application/json")
                             .setStatusCode(OK.code())
                             .end(Json.encodePrettily(foundItem))
                 }
-                findOperation.succeeded() -> response.setStatusCode(NOT_FOUND.code()).end()
-                else -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                findOperation.succeeded() ->
+                    response.setStatusCode(NOT_FOUND.code()).end()
+                else ->
+                    response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
             }
         }
     }
@@ -74,10 +80,10 @@ object RequestManager {
     fun updateEvent(routingContext: RoutingContext) {
         val response = routingContext.response()
         val eventId = routingContext.request().getParam(EVENT_ID)
-        val body = routingContext.bodyAsJson
-        if (checkSchema(body, emptyList(), EVENT_SCHEMA)) {
+        val eventData = routingContext.bodyAsJson
+        if (checkSchema(eventData, emptyList(), EVENT_SCHEMA)) {
             val query = json { obj(DOCUMENT_ID to eventId) }
-            val update = json { obj("\$set" to body) }
+            val update = json { obj("\$set" to eventData) }
             MongoClient.createNonShared(vertx, CONFIG).updateCollection(COLLECTION_NAME, query, update) { updateOperation ->
                 when {
                     updateOperation.succeeded() && updateOperation.result().docModified != 0L ->
