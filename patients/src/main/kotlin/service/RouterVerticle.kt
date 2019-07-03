@@ -38,10 +38,12 @@ class RouterVerticle : AbstractVerticle() {
     }
 
     private fun initializationService() {
+        PatientsService.vertx = vertx
         AnagraphicService.vertx = vertx
         ComplicationsService.vertx = vertx
         DrugsService.vertx = vertx
         ManouversService.vertx = vertx
+        TreatmentsService.vertx = vertx
         StatusService.vertx = vertx
         VitalParametersService.vertx
     }
