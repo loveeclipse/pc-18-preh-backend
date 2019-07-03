@@ -54,19 +54,17 @@ object ManeuversService {
                 }
     }
 
-    private fun isDuplicateKey(errorMessage: String?) = errorMessage?.startsWith(DUPLICATED_KEY_CODE) ?: false
-
     fun deleteSimpleManeuver(routingContext: RoutingContext) {
         log.info("Request to create a new patients")
         val response = routingContext.response()
         val maneuverId = routingContext.request().params()[MANEUVER_ID]
         val patientId = routingContext.request().params()[PATIENT_ID]
-        val queryManeuvers = json { obj(
+        val document = json { obj(
                 DOCUMENT_ID to maneuverId,
                 PATIENT_ID to patientId
         ) }
         MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-                .removeDocument(COLLECTION_NAME, queryManeuvers) { deleteOperation ->
+                .removeDocument(COLLECTION_NAME, document) { deleteOperation ->
             when {
                 deleteOperation.succeeded() && deleteOperation.result().removedCount != 0L ->
                     response.setStatusCode(NO_CONTENT.code()).end()
@@ -77,4 +75,6 @@ object ManeuversService {
             }
         }
     }
+
+    private fun isDuplicateKey(errorMessage: String?) = errorMessage?.startsWith(DUPLICATED_KEY_CODE) ?: false
 }
