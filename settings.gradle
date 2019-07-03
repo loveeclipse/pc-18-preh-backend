@@ -2,4 +2,5 @@ rootProject.name = 'pc-18-preh-backend'
 include 'events',
         'patient-registry-service',
         'vehicle-tracking-service',
-        'discovery-service'
+        'discovery-service',
+        'patients'
