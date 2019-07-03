@@ -27,8 +27,8 @@ class RouterVerticle : AbstractVerticle() {
             put(STATUS_PATH).handler { StatusService.updateStatus(it) }
             post(VITAL_PARAMETERS_PATH).handler { VitalParametersService.createVitalParameters(it) }
             post(DRUGS_PATH).handler { DrugsService.createDrug(it) }
-            post(MANEUVERS_SIMPLE_PATH).handler { ManouversService.createSimpleManeuver(it) }
-            delete(MANEUVERS_SIMPLE_PATH).handler { ManouversService.deleteSimpleManeuver(it) }
+            post(MANEUVERS_SIMPLE_PATH).handler { ManeuversService.createSimpleManeuver(it) }
+            delete(MANEUVERS_SIMPLE_PATH).handler { ManeuversService.deleteSimpleManeuver(it) }
             post(TREATMENTS_SIMPLE_PATH).handler { TreatmentsService.createSimpleTreatment(it) }
             post(TREATMENTS_INJECTION_PATH).handler { TreatmentsService.createInjectionTreatment(it) }
             post(TREATMENTS_IPPV_PATH).handler { TreatmentsService.createIppvTreatment(it) }
@@ -42,7 +42,7 @@ class RouterVerticle : AbstractVerticle() {
         AnagraphicService.vertx = vertx
         ComplicationsService.vertx = vertx
         DrugsService.vertx = vertx
-        ManouversService.vertx = vertx
+        ManeuversService.vertx = vertx
         TreatmentsService.vertx = vertx
         StatusService.vertx = vertx
         VitalParametersService.vertx
