@@ -28,7 +28,7 @@ object SimpleTreatmentsService {
     ) }
 
     fun createSimpleTreatment(routingContext: RoutingContext) {
-        log.info("Request to create a simple treatments")
+        log.info("Request to create a simple treatment")
         val response = routingContext.response()
         val simpleTreatmentData = routingContext.bodyAsJson
         val patientId = routingContext.request().params()[PATIENT_ID]

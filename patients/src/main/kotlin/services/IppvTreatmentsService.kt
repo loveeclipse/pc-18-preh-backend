@@ -27,7 +27,7 @@ object IppvTreatmentsService {
     ) }
 
     fun createIppvTreatment(routingContext: RoutingContext) {
-        log.info("Request to create a ippv treatments")
+        log.info("Request to create a ippv treatment")
         val response = routingContext.response()
         val ippvTreatmentData = routingContext.bodyAsJson
         val patientId = routingContext.request().params()[PATIENT_ID]

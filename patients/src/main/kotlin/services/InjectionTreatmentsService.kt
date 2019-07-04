@@ -28,7 +28,7 @@ object InjectionTreatmentsService {
     ) }
 
     fun createInjectionTreatment(routingContext: RoutingContext) {
-        log.info("Request to create a injection treatments")
+        log.info("Request to create a injection treatment")
         val response = routingContext.response()
         val injectionTreatmentData = routingContext.bodyAsJson
         val patientId = routingContext.request().params()[PATIENT_ID]

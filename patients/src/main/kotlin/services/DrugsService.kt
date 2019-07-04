@@ -28,7 +28,7 @@ object DrugsService {
     ) }
 
     fun createDrug(routingContext: RoutingContext) {
-        log.info("Request to create a new patients")
+        log.info("Request to create a drug")
         val response = routingContext.response()
         val drugData = routingContext.bodyAsJson
         val patientId = routingContext.request().params()[PATIENT_ID]

@@ -29,7 +29,7 @@ object ManeuversService {
     ) }
 
     fun createSimpleManeuver(routingContext: RoutingContext) {
-        log.info("Request to create a new patients")
+        log.info("Request to create a simple maneuver")
         val response = routingContext.response()
         val maneuverId = routingContext.request().params()[MANEUVER_ID]
         val patientId = routingContext.request().params()[PATIENT_ID]
@@ -55,7 +55,7 @@ object ManeuversService {
     }
 
     fun deleteSimpleManeuver(routingContext: RoutingContext) {
-        log.info("Request to create a new patients")
+        log.info("Request to delete a simple maneuver")
         val response = routingContext.response()
         val maneuverId = routingContext.request().params()[MANEUVER_ID]
         val patientId = routingContext.request().params()[PATIENT_ID]

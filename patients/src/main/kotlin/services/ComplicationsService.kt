@@ -29,7 +29,7 @@ object ComplicationsService {
     ) }
 
     fun createComplication(routingContext: RoutingContext) {
-        log.info("Request to create a new patients")
+        log.info("Request to create a complication")
         val response = routingContext.response()
         val complicationId = routingContext.request().params()[COMPLICATION_ID]
         val patientId = routingContext.request().params()[PATIENT_ID]
@@ -55,7 +55,7 @@ object ComplicationsService {
     }
 
     fun deleteComplication(routingContext: RoutingContext) {
-        log.info("Request to create a new patients")
+        log.info("Request to delete a complication")
         val response = routingContext.response()
         val complicationId = routingContext.request().params()[COMPLICATION_ID]
         val patientId = routingContext.request().params()[PATIENT_ID]
