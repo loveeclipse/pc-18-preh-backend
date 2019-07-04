@@ -45,7 +45,7 @@ class RouterVerticle : AbstractVerticle() {
         ManeuversService.vertx = vertx
         TreatmentsService.vertx = vertx
         StatusService.vertx = vertx
-        VitalParametersService.vertx
+        VitalParametersService.vertx = vertx
     }
     companion object {
         private const val PORT = 10000

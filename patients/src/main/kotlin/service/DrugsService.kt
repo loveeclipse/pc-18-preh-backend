@@ -34,7 +34,8 @@ object DrugsService {
         val patientId = routingContext.request().params()[PATIENT_ID]
         val drugId = UUID.randomUUID().toString()
         if (checkSchema(drugData, DRUGS_SCHEMA, DRUGS_SCHEMA)) {
-            val document = drugData.put(DOCUMENT_ID, drugId)
+            val document = drugData
+                    .put(DOCUMENT_ID, drugId)
                     .put(PATIENT_ID, patientId)
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .insert(COLLECTION_NAME, document) { insertOperation ->
@@ -54,6 +55,7 @@ object DrugsService {
     }
 
     private fun isDuplicateKey(errorMessage: String?) = errorMessage?.startsWith(DUPLICATED_KEY_CODE) ?: false
+
     private fun checkSchema(json: JsonObject, required: List<String>?, parameters: List<String>): Boolean {
         required?.forEach { key -> if (!json.containsKey(key)) return false }
         return parameters.containsAll(json.fieldNames())
