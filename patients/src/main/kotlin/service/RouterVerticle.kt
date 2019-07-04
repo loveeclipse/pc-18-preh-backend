@@ -31,7 +31,7 @@ class RouterVerticle : AbstractVerticle() {
             delete(MANEUVERS_SIMPLE_PATH).handler { ManeuversService.deleteSimpleManeuver(it) }
             post(TREATMENTS_SIMPLE_PATH).handler { SimpleTreatmentsService.createSimpleTreatment(it) }
             post(TREATMENTS_INJECTION_PATH).handler { InjectionTreatmentsService.createInjectionTreatment(it) }
-            post(TREATMENTS_IPPV_PATH).handler { SimpleTreatmentsService.createIppvTreatment(it) }
+            post(TREATMENTS_IPPV_PATH).handler { IppvTreatmentsService.createIppvTreatment(it) }
             post(COMPLICATIONS_PATH).handler { ComplicationsService.createComplication(it) }
             delete(COMPLICATIONS_PATH).handler { ComplicationsService.deleteComplication(it) }
         }
@@ -45,6 +45,7 @@ class RouterVerticle : AbstractVerticle() {
         ManeuversService.vertx = vertx
         SimpleTreatmentsService.vertx = vertx
         InjectionTreatmentsService.vertx = vertx
+        IppvTreatmentsService.vertx = vertx
         StatusService.vertx = vertx
         VitalParametersService.vertx = vertx
     }
