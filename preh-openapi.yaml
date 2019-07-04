@@ -180,7 +180,7 @@ paths:
     get:
       tags: 
         - "Missions"
-      description: "Returns two lists: one with all the missions' identifiers and one with all the missions' URI. Query parameters 'ongoing' and 'vehicle' can be used to narrow down the results."
+      description: "Returns two lists: one with all the missions' identifiers and one with all the missions' URI. Query parameters \"ongoing\", \"vehicle\" and \"eventId\" can be used to narrow down the results."
       parameters:
         - in: query
           name: "ongoing"
@@ -195,6 +195,12 @@ paths:
           schema:
             type: string
             example: "chopper-bravo1"
+        - in: query
+          name: "eventId"
+          description: "the identifier of the mission's event."
+          required: false
+          schema:
+            $ref: "#/components/schemas/Identifier"
       responses:
         '200':
           description: "missions successfully retrieved"
@@ -485,7 +491,7 @@ paths:
     get:
       tags: 
         - "Patients"
-      description: "Retrieve all the patients. The query parameter 'after' and 'before' can be used to filter the results."
+      description: "Retrieve all the patients. The query parameter \"after\", \"before\", \"missionId\" and \"eventId\" can be used to filter the results."
       parameters:
         - in: query
           name: "after"
@@ -504,6 +510,12 @@ paths:
         - in: query
           name: "missionId"
           description: "the identifier of the mission relative to the patient"
+          schema:
+            $ref: "#/components/schemas/Identifier"
+        - in: query
+          name: "eventId"
+          description: "the identifier of the event that involves the patient."
+          required: false
           schema:
             $ref: "#/components/schemas/Identifier"
       responses:
