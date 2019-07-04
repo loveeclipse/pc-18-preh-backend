@@ -15,7 +15,7 @@ import utils.PatientsData.PORT
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        val log = LoggerFactory.getLogger("patients")
+        val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
         val vertx = Vertx.vertx()
         vertx.deployVerticle((RouterVerticle())) { startService ->

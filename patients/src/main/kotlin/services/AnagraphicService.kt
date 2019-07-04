@@ -7,12 +7,13 @@ import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
 import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
-import io.vertx.core.json.JsonObject
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
+
+import services.utils.CheckSchema.checkSchema
 
 object AnagraphicService {
 
@@ -76,10 +77,5 @@ object AnagraphicService {
                             response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                     }
         }
-    }
-
-    private fun checkSchema(json: JsonObject, required: List<String>?, parameters: List<String>): Boolean {
-        required?.forEach { key -> if (!json.containsKey(key)) return false }
-        return parameters.containsAll(json.fieldNames())
     }
 }

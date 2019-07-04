@@ -19,7 +19,7 @@ import utils.PatientsData.PORT
 
 class RouterVerticle : AbstractVerticle() {
 
-    val log = LoggerFactory.getLogger("RouterVerticle")
+    val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
     override fun start() {
         vertx

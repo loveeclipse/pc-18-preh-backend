@@ -1,7 +1,6 @@
 package services
 
 import io.vertx.core.Vertx
-import io.vertx.core.json.JsonObject
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
@@ -13,6 +12,9 @@ import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.kotlin.core.json.get
 
+import services.utils.CheckSchema.checkSchema
+import services.utils.DuplicatedKey.isDuplicateKey
+
 object PatientsService {
 
     private val log = LoggerFactory.getLogger(this.javaClass.simpleName)
@@ -20,7 +22,6 @@ object PatientsService {
     private const val DOCUMENT_ID = "_id"
     private const val ANAGRAPHIC = "anagraphic"
     private const val COLLECTION_NAME = "patients"
-    private const val DUPLICATED_KEY_CODE = "E11000"
     private val PATIENT_SCHEMA = listOf("assignedEvent", "assignedMission", "anagraphic")
     private val PATIENT_REQUIRED_SCHEMA = listOf("assignedEvent", "assignedMission")
     private val ANAGRAPHIC_SCHEMA = listOf("name", "surname", "residency", "birthPlace", "birthDate", "gender",
@@ -60,12 +61,5 @@ object PatientsService {
         } else {
             response.setStatusCode(BAD_REQUEST.code()).end()
         }
-    }
-
-    private fun isDuplicateKey(errorMessage: String?) = errorMessage?.startsWith(DUPLICATED_KEY_CODE) ?: false
-
-    private fun checkSchema(json: JsonObject, required: List<String>?, parameters: List<String>): Boolean {
-        required?.forEach { key -> if (!json.containsKey(key)) return false }
-        return parameters.containsAll(json.fieldNames())
     }
 }
