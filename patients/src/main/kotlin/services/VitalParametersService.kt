@@ -36,6 +36,7 @@ object VitalParametersService {
         val patientId = routingContext.request().params()[PATIENT_ID]
         val vitalParameterId = UUID.randomUUID().toString()
         val vitalParametersData = routingContext.bodyAsJson
+        val uri = routingContext.request().absoluteURI().plus("/$vitalParameterId")
         if (checkSchema(vitalParametersData, VITAL_PARAMETERS_SCHEMA, VITAL_PARAMETERS_SCHEMA)) {
             val document = vitalParametersData
                     .put(DOCUMENT_ID, vitalParameterId)
@@ -46,6 +47,7 @@ object VitalParametersService {
                             insertOperation.succeeded() ->
                                 response
                                         .putHeader("Content-Type", "text/plain")
+                                        .putHeader("Location", uri)
                                         .setStatusCode(CREATED.code())
                                         .end(vitalParameterId)
                             isDuplicateKey(insertOperation.cause().message) ->

@@ -33,6 +33,7 @@ object SimpleTreatmentsService {
         val simpleTreatmentData = routingContext.bodyAsJson
         val patientId = routingContext.request().params()[PATIENT_ID]
         val simpleTreatmentId = UUID.randomUUID().toString()
+        val uri = routingContext.request().absoluteURI().plus("/$simpleTreatmentId")
         if (checkSchema(simpleTreatmentData, SIMPLE_TREATMENT_SCHEMA, SIMPLE_TREATMENT_SCHEMA)) {
             val document = simpleTreatmentData
                     .put(DOCUMENT_ID, simpleTreatmentId)
@@ -43,6 +44,7 @@ object SimpleTreatmentsService {
                             insertOperation.succeeded() ->
                                 response
                                         .putHeader("Content-Type", "text/plain")
+                                        .putHeader("Location", uri)
                                         .setStatusCode(CREATED.code())
                                         .end(simpleTreatmentId)
                             isDuplicateKey(insertOperation.cause().message) ->

@@ -32,6 +32,7 @@ object IppvTreatmentsService {
         val ippvTreatmentData = routingContext.bodyAsJson
         val patientId = routingContext.request().params()[PATIENT_ID]
         val ippvTreatmentId = UUID.randomUUID().toString()
+        val uri = routingContext.request().absoluteURI().plus("/$ippvTreatmentId")
         if (checkSchema(ippvTreatmentData, IPPV_TREATMENT_SCHEMA, IPPV_TREATMENT_SCHEMA)) {
             val document = ippvTreatmentData
                     .put(DOCUMENT_ID, ippvTreatmentId)
@@ -42,6 +43,7 @@ object IppvTreatmentsService {
                             insertOperation.succeeded() ->
                                 response
                                         .putHeader("Content-Type", "text/plain")
+                                        .putHeader("Location", uri)
                                         .setStatusCode(CREATED.code())
                                         .end(ippvTreatmentId)
                             isDuplicateKey(insertOperation.cause().message) ->

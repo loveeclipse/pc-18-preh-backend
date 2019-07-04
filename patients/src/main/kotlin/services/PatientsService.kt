@@ -36,10 +36,10 @@ object PatientsService {
         val response = routingContext.response()
         val patientId = UUID.randomUUID().toString()
         val patientData = routingContext.bodyAsJson
+        val uri = routingContext.request().absoluteURI().plus("/$patientId")
         val checkPatientSchema = checkSchema(patientData, PATIENT_REQUIRED_SCHEMA, PATIENT_SCHEMA)
         val checkAnagraphicSchema = patientData.containsKey(ANAGRAPHIC) &&
                 checkSchema(patientData[ANAGRAPHIC], emptyList(), ANAGRAPHIC_SCHEMA)
-
         if (checkPatientSchema && (!patientData.containsKey(ANAGRAPHIC) || checkAnagraphicSchema)) {
             val document = patientData.put(DOCUMENT_ID, patientId)
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
@@ -48,6 +48,7 @@ object PatientsService {
                     insertOperation.succeeded() ->
                         response
                             .putHeader("Content-Type", "text/plain")
+                            .putHeader("Location", uri)
                             .setStatusCode(CREATED.code())
                             .end(patientId)
                     isDuplicateKey(insertOperation.cause().message) ->
