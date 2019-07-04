@@ -18,7 +18,7 @@ object VitalParametersService {
 
     private const val COLLECTION_NAME = "vitalparameters"
     private const val PATIENT_ID = "patientId"
-    private const val VITAL_PARAMETERS_ID = "vitalParametersId"
+    private const val DOCUMENT_ID = "_id"
     private const val DUPLICATED_KEY_CODE = "E11000"
     private val VITAL_PARAMETERS_SCHEMA = listOf("respiratoryTract", "breathingRate", "outlyingSaturationPercentage",
             "heartbeatRate", "heartbeatType", "bloodPressure", "capRefillTime", "skinColor", "eyeOpening",
@@ -38,7 +38,7 @@ object VitalParametersService {
         val vitalParametersData = routingContext.bodyAsJson
         if (checkSchema(vitalParametersData, VITAL_PARAMETERS_SCHEMA, VITAL_PARAMETERS_SCHEMA)) {
             val document = vitalParametersData
-                    .put(VITAL_PARAMETERS_ID, vitalParameterId)
+                    .put(DOCUMENT_ID, vitalParameterId)
                     .put(PATIENT_ID, patientId)
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .insert(COLLECTION_NAME, document) { insertOperation ->
