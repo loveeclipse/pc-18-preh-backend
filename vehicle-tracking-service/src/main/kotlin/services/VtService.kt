@@ -1,4 +1,4 @@
-package service
+package services
 
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR

@@ -1,4 +1,4 @@
-package service
+package services
 
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
@@ -12,33 +12,29 @@ import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 import java.util.UUID
 
-object VitalParametersService {
-
+object IppvTreatmentsService {
     private val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
-    private const val COLLECTION_NAME = "vitalparameters"
+    private const val COLLECTION_NAME = "ippvtreatments"
     private const val PATIENT_ID = "patientId"
     private const val DOCUMENT_ID = "_id"
     private const val DUPLICATED_KEY_CODE = "E11000"
-    private val VITAL_PARAMETERS_SCHEMA = listOf("respiratoryTract", "breathingRate", "outlyingSaturationPercentage",
-            "heartbeatRate", "heartbeatType", "bloodPressure", "capRefillTime", "skinColor", "eyeOpening",
-            "verbalResponse", "motorResponse", "leftPupil", "rightPupil", "leftPhotoReactive", "rightPhotoReactive",
-            "temperatureInCelsius", "time")
+    private val IPPV_TREATMENT_SCHEMA = listOf("vt", "fr", "peep", "fio2", "time")
 
     var vertx: Vertx? = null
     private val MONGODB_CONFIGURATION = json { obj(
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
     ) }
 
-    fun createVitalParameters(routingContext: RoutingContext) {
-        log.info("Request to create vital parameters snapshot")
+    fun createIppvTreatment(routingContext: RoutingContext) {
+        log.info("Request to create a ippv treatments")
         val response = routingContext.response()
+        val ippvTreatmentData = routingContext.bodyAsJson
         val patientId = routingContext.request().params()[PATIENT_ID]
-        val vitalParameterId = UUID.randomUUID().toString()
-        val vitalParametersData = routingContext.bodyAsJson
-        if (checkSchema(vitalParametersData, VITAL_PARAMETERS_SCHEMA, VITAL_PARAMETERS_SCHEMA)) {
-            val document = vitalParametersData
-                    .put(DOCUMENT_ID, vitalParameterId)
+        val ippvTreatmentId = UUID.randomUUID().toString()
+        if (checkSchema(ippvTreatmentData, IPPV_TREATMENT_SCHEMA, IPPV_TREATMENT_SCHEMA)) {
+            val document = ippvTreatmentData
+                    .put(DOCUMENT_ID, ippvTreatmentId)
                     .put(PATIENT_ID, patientId)
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .insert(COLLECTION_NAME, document) { insertOperation ->
@@ -47,15 +43,14 @@ object VitalParametersService {
                                 response
                                         .putHeader("Content-Type", "text/plain")
                                         .setStatusCode(CREATED.code())
-                                        .end(vitalParameterId)
+                                        .end(ippvTreatmentId)
                             isDuplicateKey(insertOperation.cause().message) ->
-                                createVitalParameters(routingContext)
+                                createIppvTreatment(routingContext)
                             else ->
                                 response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                         }
                     }
-        } else
-            response.setStatusCode(BAD_REQUEST.code()).end()
+        } else response.setStatusCode(BAD_REQUEST.code()).end()
     }
 
     private fun isDuplicateKey(errorMessage: String?) = errorMessage?.startsWith(DUPLICATED_KEY_CODE) ?: false

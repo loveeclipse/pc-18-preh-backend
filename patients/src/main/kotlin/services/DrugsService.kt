@@ -1,4 +1,4 @@
-package service
+package services
 
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
@@ -12,29 +12,30 @@ import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 import java.util.UUID
 
-object IppvTreatmentsService {
+object DrugsService {
+
     private val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
-    private const val COLLECTION_NAME = "ippvtreatments"
+    private const val COLLECTION_NAME = "drugs"
     private const val PATIENT_ID = "patientId"
     private const val DOCUMENT_ID = "_id"
     private const val DUPLICATED_KEY_CODE = "E11000"
-    private val IPPV_TREATMENT_SCHEMA = listOf("vt", "fr", "peep", "fio2", "time")
+    private val DRUGS_SCHEMA = listOf("name", "quantity", "measurementUnit", "time")
 
     var vertx: Vertx? = null
     private val MONGODB_CONFIGURATION = json { obj(
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
     ) }
 
-    fun createIppvTreatment(routingContext: RoutingContext) {
-        log.info("Request to create a ippv treatments")
+    fun createDrug(routingContext: RoutingContext) {
+        log.info("Request to create a new patients")
         val response = routingContext.response()
-        val ippvTreatmentData = routingContext.bodyAsJson
+        val drugData = routingContext.bodyAsJson
         val patientId = routingContext.request().params()[PATIENT_ID]
-        val ippvTreatmentId = UUID.randomUUID().toString()
-        if (checkSchema(ippvTreatmentData, IPPV_TREATMENT_SCHEMA, IPPV_TREATMENT_SCHEMA)) {
-            val document = ippvTreatmentData
-                    .put(DOCUMENT_ID, ippvTreatmentId)
+        val drugId = UUID.randomUUID().toString()
+        if (checkSchema(drugData, DRUGS_SCHEMA, DRUGS_SCHEMA)) {
+            val document = drugData
+                    .put(DOCUMENT_ID, drugId)
                     .put(PATIENT_ID, patientId)
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .insert(COLLECTION_NAME, document) { insertOperation ->
@@ -43,9 +44,9 @@ object IppvTreatmentsService {
                                 response
                                         .putHeader("Content-Type", "text/plain")
                                         .setStatusCode(CREATED.code())
-                                        .end(ippvTreatmentId)
+                                        .end(drugId)
                             isDuplicateKey(insertOperation.cause().message) ->
-                                createIppvTreatment(routingContext)
+                                createDrug(routingContext)
                             else ->
                                 response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                         }

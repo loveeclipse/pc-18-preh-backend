@@ -1,16 +1,16 @@
 import io.vertx.core.Vertx
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.client.WebClient
-import service.RouterVerticle
-import service.Data.DISCOVERY_PORT
-import service.Data.DISCOVERY_HOST
-import service.Data.DISCOVERY_PUBLISH_SERVICE
-import service.Data.SERVICE_NAME
-import service.Data.NAME
-import service.Data.SERVICE_HOST
-import service.Data.HOST
-import service.Data.SERVICE_PORT
-import service.Data.PORT
+import verticle.RouterVerticle
+import utils.DiscoveryData.DISCOVERY_PORT
+import utils.DiscoveryData.DISCOVERY_HOST
+import utils.DiscoveryData.DISCOVERY_PUBLISH_SERVICE
+import utils.DiscoveryData.SERVICE_NAME
+import utils.PatientsData.NAME
+import utils.DiscoveryData.SERVICE_HOST
+import utils.PatientsData.HOST
+import utils.DiscoveryData.SERVICE_PORT
+import utils.PatientsData.PORT
 
 object Main {
     @JvmStatic

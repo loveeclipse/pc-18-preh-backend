@@ -1,4 +1,4 @@
-package service
+package services
 
 object Data {
     const val DISCOVERY_HOST = "localhost"

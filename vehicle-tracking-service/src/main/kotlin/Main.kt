@@ -1,8 +1,8 @@
 import io.vertx.core.Vertx
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.client.WebClient
-import service.Data
-import service.RouterVerticle
+import services.Data
+import services.RouterVerticle
 
 object Main {
     @JvmStatic

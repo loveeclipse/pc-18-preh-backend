@@ -1,4 +1,4 @@
-package service
+package services
 
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject

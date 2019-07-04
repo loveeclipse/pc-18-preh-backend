@@ -1,9 +1,21 @@
-package service
+package verticle
 
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
+import services.AnagraphicService
+import services.ComplicationsService
+import services.DrugsService
+import services.InjectionTreatmentsService
+import services.IppvTreatmentsService
+import services.ManeuversService
+import services.PatientsService
+import services.SimpleTreatmentsService
+import services.StatusService
+import services.VitalParametersService
+import utils.PatientsData.HOST
+import utils.PatientsData.PORT
 
 class RouterVerticle : AbstractVerticle() {
 
@@ -50,9 +62,6 @@ class RouterVerticle : AbstractVerticle() {
         VitalParametersService.vertx = vertx
     }
     companion object {
-        private const val PORT = 10000
-        private const val HOST = "localhost"
-
         private const val PATIENTS_PATH = "/patients"
         private const val PATIENT_PATH = "$PATIENTS_PATH/:patientId"
         private const val ANAGRAPHIC_PATH = "$PATIENT_PATH/anagraphic"

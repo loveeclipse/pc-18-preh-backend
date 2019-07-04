@@ -1,4 +1,4 @@
-package service
+package services
 
 import io.vertx.core.AbstractVerticle
 import io.vertx.ext.web.Router

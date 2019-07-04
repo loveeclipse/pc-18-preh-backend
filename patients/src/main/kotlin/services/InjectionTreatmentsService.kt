@@ -1,4 +1,4 @@
-package service
+package services
 
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST

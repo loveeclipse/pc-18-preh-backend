@@ -1,4 +1,4 @@
-package service
+package services
 
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
@@ -12,30 +12,33 @@ import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 import java.util.UUID
 
-object DrugsService {
+object VitalParametersService {
 
     private val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
-    private const val COLLECTION_NAME = "drugs"
+    private const val COLLECTION_NAME = "vitalparameters"
     private const val PATIENT_ID = "patientId"
     private const val DOCUMENT_ID = "_id"
     private const val DUPLICATED_KEY_CODE = "E11000"
-    private val DRUGS_SCHEMA = listOf("name", "quantity", "measurementUnit", "time")
+    private val VITAL_PARAMETERS_SCHEMA = listOf("respiratoryTract", "breathingRate", "outlyingSaturationPercentage",
+            "heartbeatRate", "heartbeatType", "bloodPressure", "capRefillTime", "skinColor", "eyeOpening",
+            "verbalResponse", "motorResponse", "leftPupil", "rightPupil", "leftPhotoReactive", "rightPhotoReactive",
+            "temperatureInCelsius", "time")
 
     var vertx: Vertx? = null
     private val MONGODB_CONFIGURATION = json { obj(
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
     ) }
 
-    fun createDrug(routingContext: RoutingContext) {
-        log.info("Request to create a new patients")
+    fun createVitalParameters(routingContext: RoutingContext) {
+        log.info("Request to create vital parameters snapshot")
         val response = routingContext.response()
-        val drugData = routingContext.bodyAsJson
         val patientId = routingContext.request().params()[PATIENT_ID]
-        val drugId = UUID.randomUUID().toString()
-        if (checkSchema(drugData, DRUGS_SCHEMA, DRUGS_SCHEMA)) {
-            val document = drugData
-                    .put(DOCUMENT_ID, drugId)
+        val vitalParameterId = UUID.randomUUID().toString()
+        val vitalParametersData = routingContext.bodyAsJson
+        if (checkSchema(vitalParametersData, VITAL_PARAMETERS_SCHEMA, VITAL_PARAMETERS_SCHEMA)) {
+            val document = vitalParametersData
+                    .put(DOCUMENT_ID, vitalParameterId)
                     .put(PATIENT_ID, patientId)
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .insert(COLLECTION_NAME, document) { insertOperation ->
@@ -44,14 +47,15 @@ object DrugsService {
                                 response
                                         .putHeader("Content-Type", "text/plain")
                                         .setStatusCode(CREATED.code())
-                                        .end(drugId)
+                                        .end(vitalParameterId)
                             isDuplicateKey(insertOperation.cause().message) ->
-                                createDrug(routingContext)
+                                createVitalParameters(routingContext)
                             else ->
                                 response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                         }
                     }
-        } else response.setStatusCode(BAD_REQUEST.code()).end()
+        } else
+            response.setStatusCode(BAD_REQUEST.code()).end()
     }
 
     private fun isDuplicateKey(errorMessage: String?) = errorMessage?.startsWith(DUPLICATED_KEY_CODE) ?: false
