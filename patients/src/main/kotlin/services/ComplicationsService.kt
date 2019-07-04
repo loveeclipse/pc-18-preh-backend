@@ -20,7 +20,6 @@ object ComplicationsService {
     private const val PATIENT_ID = "patientId"
     private const val COMPLICATION_ID = "complication"
     private const val TIME = "time"
-    private const val DOCUMENT_ID = "_id"
     private const val DUPLICATED_KEY_CODE = "E11000"
 
     var vertx: Vertx? = null
@@ -35,7 +34,7 @@ object ComplicationsService {
         val patientId = routingContext.request().params()[PATIENT_ID]
         val time = routingContext.bodyAsString
         val document = json { obj(
-                DOCUMENT_ID to complicationId,
+                COMPLICATION_ID to complicationId,
                 PATIENT_ID to patientId,
                 TIME to time
         ) }
@@ -60,7 +59,7 @@ object ComplicationsService {
         val complicationId = routingContext.request().params()[COMPLICATION_ID]
         val patientId = routingContext.request().params()[PATIENT_ID]
         val document = json { obj(
-                DOCUMENT_ID to complicationId,
+                COMPLICATION_ID to complicationId,
                 PATIENT_ID to patientId
         ) }
         MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)

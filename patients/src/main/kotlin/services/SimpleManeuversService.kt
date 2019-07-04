@@ -12,15 +12,14 @@ import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 
-object ManeuversService {
+object SimpleManeuversService {
 
     private val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
-    private const val COLLECTION_NAME = "maneuvers"
+    private const val COLLECTION_NAME = "simplemaneuvers"
     private const val PATIENT_ID = "patientId"
     private const val MANEUVER_ID = "simpleManeuver"
     private const val TIME = "time"
-    private const val DOCUMENT_ID = "_id"
     private const val DUPLICATED_KEY_CODE = "E11000"
 
     var vertx: Vertx? = null
@@ -35,7 +34,7 @@ object ManeuversService {
         val patientId = routingContext.request().params()[PATIENT_ID]
         val time = routingContext.bodyAsString
         val document = json { obj(
-                DOCUMENT_ID to maneuverId,
+                MANEUVER_ID to maneuverId,
                 PATIENT_ID to patientId,
                 TIME to time
         ) }
@@ -60,7 +59,7 @@ object ManeuversService {
         val maneuverId = routingContext.request().params()[MANEUVER_ID]
         val patientId = routingContext.request().params()[PATIENT_ID]
         val document = json { obj(
-                DOCUMENT_ID to maneuverId,
+                MANEUVER_ID to maneuverId,
                 PATIENT_ID to patientId
         ) }
         MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)

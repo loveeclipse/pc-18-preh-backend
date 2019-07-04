@@ -9,7 +9,7 @@ import services.ComplicationsService
 import services.DrugsService
 import services.InjectionTreatmentsService
 import services.IppvTreatmentsService
-import services.ManeuversService
+import services.SimpleManeuversService
 import services.PatientsService
 import services.SimpleTreatmentsService
 import services.StatusService
@@ -39,8 +39,8 @@ class RouterVerticle : AbstractVerticle() {
             put(STATUS_PATH).handler { StatusService.updateStatus(it) }
             post(VITAL_PARAMETERS_PATH).handler { VitalParametersService.createVitalParameters(it) }
             post(DRUGS_PATH).handler { DrugsService.createDrug(it) }
-            post(MANEUVERS_SIMPLE_PATH).handler { ManeuversService.createSimpleManeuver(it) }
-            delete(MANEUVERS_SIMPLE_PATH).handler { ManeuversService.deleteSimpleManeuver(it) }
+            post(MANEUVERS_SIMPLE_PATH).handler { SimpleManeuversService.createSimpleManeuver(it) }
+            delete(MANEUVERS_SIMPLE_PATH).handler { SimpleManeuversService.deleteSimpleManeuver(it) }
             post(TREATMENTS_SIMPLE_PATH).handler { SimpleTreatmentsService.createSimpleTreatment(it) }
             post(TREATMENTS_INJECTION_PATH).handler { InjectionTreatmentsService.createInjectionTreatment(it) }
             post(TREATMENTS_IPPV_PATH).handler { IppvTreatmentsService.createIppvTreatment(it) }
@@ -54,7 +54,7 @@ class RouterVerticle : AbstractVerticle() {
         AnagraphicService.vertx = vertx
         ComplicationsService.vertx = vertx
         DrugsService.vertx = vertx
-        ManeuversService.vertx = vertx
+        SimpleManeuversService.vertx = vertx
         SimpleTreatmentsService.vertx = vertx
         InjectionTreatmentsService.vertx = vertx
         IppvTreatmentsService.vertx = vertx
