@@ -7,5 +7,7 @@ enum class Complications(private val complicationName: String) {
     RESPIRATORY_DEFICIENCY("insufficienza respiratoria"),
     LANDING_ONGOING("atterraggio in itinere per manovra terapeutica"),
     DEATH_ONGOING("decesso in itinere"),
-    DEATH_IN_ER("decesso all'arrivo in ps")
+    DEATH_IN_ER("decesso all'arrivo in ps");
+
+    override fun toString() = complicationName
 }

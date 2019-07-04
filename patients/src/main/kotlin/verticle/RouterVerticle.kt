@@ -14,8 +14,11 @@ import services.PatientsService
 import services.SimpleTreatmentsService
 import services.StatusService
 import services.VitalParametersService
+import services.utils.CheckSchema.getAndCheckName
 import utils.PatientsData.HOST
 import utils.PatientsData.PORT
+import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
+import services.utils.data.Complications
 
 class RouterVerticle : AbstractVerticle() {
 
@@ -44,7 +47,14 @@ class RouterVerticle : AbstractVerticle() {
             post(TREATMENTS_SIMPLE_PATH).handler { SimpleTreatmentsService.createSimpleTreatment(it) }
             post(TREATMENTS_INJECTION_PATH).handler { InjectionTreatmentsService.createInjectionTreatment(it) }
             post(TREATMENTS_IPPV_PATH).handler { IppvTreatmentsService.createIppvTreatment(it) }
-            post(COMPLICATIONS_PATH).handler { ComplicationsService.createComplication(it) }
+            post(COMPLICATIONS_PATH).handler {
+                when {
+                    getAndCheckName<Complications>(it, "complication") ->
+                        ComplicationsService.createComplication(it)
+                    else ->
+                        it.response().setStatusCode(NOT_FOUND.code()).end()
+                }
+            }
             delete(COMPLICATIONS_PATH).handler { ComplicationsService.deleteComplication(it) }
         }
     }
