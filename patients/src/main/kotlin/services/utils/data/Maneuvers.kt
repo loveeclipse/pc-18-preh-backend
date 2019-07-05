@@ -5,5 +5,7 @@ enum class Maneuvers(private val maneuversName: String) {
     IMMOBILIZATION("immobilizzazione"),
     SYNCHRONIZED_ELECTRICAL_CARDIOVERSION("cardioversione elettrica sincronizzata"),
     GASTRIC_PROBE("sonda gastrica"),
-    BLADDER_PROBE("Sonda vescicale")
+    BLADDER_PROBE("Sonda vescicale");
+
+    override fun toString() = maneuversName
 }

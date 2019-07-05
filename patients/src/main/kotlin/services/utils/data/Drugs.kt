@@ -11,5 +11,7 @@ enum class Drugs(private val drugName: String) {
     FENTANYL("fentanil"),
     KETAMINE("ketamina"),
     CURARE("curaro"),
-    TRENEXAMIC_ACID("acidotranexamico")
+    TRENEXAMIC_ACID("acidotranexamico");
+
+    override fun toString() = drugName
 }
