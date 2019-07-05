@@ -49,7 +49,8 @@ object VtService {
             val newMission = json { obj(
                     "_id" to missionId.toString(),
                     "eventId" to eventId,
-                    "vehicle" to vehicle
+                    "vehicle" to vehicle,
+                    "ongoing" to true
             ) }
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .save("missions", newMission) { saveOperation ->
@@ -67,45 +68,27 @@ object VtService {
     fun retrieveMissions(context: RoutingContext) {
         val response = context.response()
         val params = context.request().params()
-        val requestBody = context.bodyAsJson
 
+        val query = json { obj() }
+        params["ongoing"]?.toBoolean()?.let { query.put("ongoing", it) }
+        params["vehicle"]?.let { query.put("vehicle", it) }
+        params["eventId"]?.let { query.put("eventId", it) }
 
-
-        println("params[hello]: "+params["hello"])
-        println("params[ciao]: "+params["ciao"])
-        response.setStatusCode(OK.code()).end()
-//
-//        try {
-//            UUID.fromString(eventId)
-//            val query = json { obj(EVENT_ID to eventId) }
-//
-//            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-//                    .find(COLLECTION_NAME, query) { findOperation ->
-//                        when {
-//                            findOperation.succeeded() -> {
-//                                val results: List<JsonObject> = findOperation.result()
-//                                if (results.isEmpty()) {
-//                                    response.setStatusCode(NOT_FOUND.code()).end()
-//                                } else {
-//                                    val cleanedResults: List<JsonObject> = results.map { r ->
-//                                        json { obj(
-//                                                MISSION_ID to r[MISSION_ID],
-//                                                TIMELINE to r[TIMELINE]
-//                                        ) }
-//                                    }
-//                                    response.putHeader("Content-Type", "application/json")
-//                                            .setStatusCode(OK.code())
-//                                            .end(Json.encodePrettily(cleanedResults))
-//                                }
-//                            }
-//                            findOperation.failed() -> {
-//                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-//                            }
-//                        }
-//                    }
-//        } catch (_: IllegalArgumentException) { // eventId is not an UUID
-//            response.setStatusCode(BAD_REQUEST.code()).end()
-//        }
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .find("missions", query) { findOperation ->
+                    if (findOperation.succeeded()) {
+                        val results: List<JsonObject> = findOperation.result()
+                        if (results.isEmpty()) {
+                            response.setStatusCode(NO_CONTENT.code()).end()
+                        } else {
+                            response.putHeader("Content-Type", "application/json")
+                                    .setStatusCode(OK.code())
+                                    .end(Json.encodePrettily(results))
+                        }
+                    } else {
+                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                    }
+                }
     }
 
     fun retrieveMissionTracking(context: RoutingContext) {
