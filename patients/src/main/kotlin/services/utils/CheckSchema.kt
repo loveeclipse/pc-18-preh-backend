@@ -17,4 +17,8 @@ object CheckSchema {
         val name = routingContext.request().getParam(string)
         return enumContains<T>(name)
     }
+
+    fun getLastItemFromUrl(url: String): String {
+        return url.replaceFirst(".*/([^/?]+).*".toRegex(), "$1")
+    }
 }

@@ -45,7 +45,6 @@ class RouterVerticle : AbstractVerticle() {
             post(DRUGS_PATH).handler { DrugsService.createDrug(it) }
             for (item in maneuversItems) {
                 val path = MANEUVERS_SIMPLE_PATH + item.fieldName
-                println("--------- $path")
                 post(path).handler { SimpleManeuversService.createSimpleManeuver(it) }
                 delete(path).handler { SimpleManeuversService.deleteSimpleManeuver(it) }
             }

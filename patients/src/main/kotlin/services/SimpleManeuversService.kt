@@ -13,6 +13,7 @@ import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 
 import services.utils.DuplicatedKey.isDuplicateKey
+import services.utils.CheckSchema.getLastItemFromUrl
 
 object SimpleManeuversService {
 
@@ -31,7 +32,7 @@ object SimpleManeuversService {
     fun createSimpleManeuver(routingContext: RoutingContext) {
         log.info("Request to create a simple maneuver")
         val response = routingContext.response()
-        val maneuverId = routingContext.request().params()[MANEUVER_ID]
+        val maneuverId = getLastItemFromUrl(routingContext.request().uri())
         val patientId = routingContext.request().params()[PATIENT_ID]
         val time = routingContext.bodyAsString
         val document = json { obj(
@@ -57,7 +58,7 @@ object SimpleManeuversService {
     fun deleteSimpleManeuver(routingContext: RoutingContext) {
         log.info("Request to delete a simple maneuver")
         val response = routingContext.response()
-        val maneuverId = routingContext.request().params()[MANEUVER_ID]
+        val maneuverId = getLastItemFromUrl(routingContext.request().uri())
         val patientId = routingContext.request().params()[PATIENT_ID]
         val document = json { obj(
                 MANEUVER_ID to maneuverId,
