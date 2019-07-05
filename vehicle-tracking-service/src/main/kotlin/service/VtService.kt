@@ -1,6 +1,7 @@
 package service
 
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
+import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
 import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
 import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
@@ -8,7 +9,6 @@ import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
-import io.vertx.core.logging.LoggerFactory
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 import io.vertx.kotlin.core.json.get
@@ -24,7 +24,6 @@ object VtService {
     private const val TIMELINE = "timeline"
     private const val CHOSEN_HOSPITAL = "chosenHospital"
 
-    private val log = LoggerFactory.getLogger("VtService")
     private val MONGODB_CONFIGURATION = json { obj(
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
     ) }
@@ -34,46 +33,82 @@ object VtService {
         VtService.vertx = vertx
     }
 
-    fun retrieveEventTracking(context: RoutingContext) {
-        log.info("Request to retrieve an event's tracking details")
+    fun createMission(context: RoutingContext) {
         val response = context.response()
-        val eventId = context.request().params()[EVENT_ID]
+        val requestBody = context.bodyAsJson
+        val eventId: String? = requestBody["eventId"]
+        val vehicle: String? = requestBody["vehicle"]
 
-        try {
-            UUID.fromString(eventId)
-            val query = json { obj(EVENT_ID to eventId) }
+        if (eventId.isNullOrEmpty() || vehicle.isNullOrEmpty()) {
+            response.putHeader("Content-Type", "text/plain")
+                    .setStatusCode(BAD_REQUEST.code())
+                    .end("Please insert \"eventId\" and \"vehicle\" fields in your request JSON body.")
 
+        } else {
+            val missionId = UUID.randomUUID()
+            val newMission = json { obj(
+                    "_id" to missionId.toString(),
+                    "eventId" to eventId,
+                    "vehicle" to vehicle
+            ) }
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-                    .find(COLLECTION_NAME, query) { findOperation ->
-                        when {
-                            findOperation.succeeded() -> {
-                                val results: List<JsonObject> = findOperation.result()
-                                if (results.isEmpty()) {
-                                    response.setStatusCode(NOT_FOUND.code()).end()
-                                } else {
-                                    val cleanedResults: List<JsonObject> = results.map { r ->
-                                        json { obj(
-                                                MISSION_ID to r[MISSION_ID],
-                                                TIMELINE to r[TIMELINE]
-                                        ) }
-                                    }
-                                    response.putHeader("Content-Type", "application/json")
-                                            .setStatusCode(OK.code())
-                                            .end(Json.encodePrettily(cleanedResults))
-                                }
-                            }
-                            findOperation.failed() -> {
-                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                            }
+                    .save("missions", newMission) { saveOperation ->
+                        if (saveOperation.succeeded()) {
+                            response.putHeader("Content-Type", "text/plain")
+                                    .setStatusCode(CREATED.code())
+                                    .end(missionId.toString())
+                        } else {
+                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                         }
                     }
-        } catch (_: IllegalArgumentException) { // eventId is not an UUID
-            response.setStatusCode(BAD_REQUEST.code()).end()
         }
     }
 
+    fun retrieveMissions(context: RoutingContext) {
+        val response = context.response()
+        val params = context.request().params()
+        val requestBody = context.bodyAsJson
+
+
+
+        println("params[hello]: "+params["hello"])
+        println("params[ciao]: "+params["ciao"])
+        response.setStatusCode(OK.code()).end()
+//
+//        try {
+//            UUID.fromString(eventId)
+//            val query = json { obj(EVENT_ID to eventId) }
+//
+//            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+//                    .find(COLLECTION_NAME, query) { findOperation ->
+//                        when {
+//                            findOperation.succeeded() -> {
+//                                val results: List<JsonObject> = findOperation.result()
+//                                if (results.isEmpty()) {
+//                                    response.setStatusCode(NOT_FOUND.code()).end()
+//                                } else {
+//                                    val cleanedResults: List<JsonObject> = results.map { r ->
+//                                        json { obj(
+//                                                MISSION_ID to r[MISSION_ID],
+//                                                TIMELINE to r[TIMELINE]
+//                                        ) }
+//                                    }
+//                                    response.putHeader("Content-Type", "application/json")
+//                                            .setStatusCode(OK.code())
+//                                            .end(Json.encodePrettily(cleanedResults))
+//                                }
+//                            }
+//                            findOperation.failed() -> {
+//                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+//                            }
+//                        }
+//                    }
+//        } catch (_: IllegalArgumentException) { // eventId is not an UUID
+//            response.setStatusCode(BAD_REQUEST.code()).end()
+//        }
+    }
+
     fun retrieveMissionTracking(context: RoutingContext) {
-        log.info("Request to retrieve a mission's tracking details")
         val response = context.response()
         val eventId = context.request().params()[EVENT_ID]
         val missionId = context.request().params()[MISSION_ID]
@@ -109,8 +144,7 @@ object VtService {
         }
     }
 
-    fun retrieveTimelineItem(context: RoutingContext, trackingItem: TimelineItem) {
-        log.info("Request to retrieve the ${trackingItem.fieldName} details for a certain mission")
+    fun retrieveTimelineItem(context: RoutingContext, trackingItem: TrackingStep) {
         val response = context.response()
         val eventId = context.request().params()[EVENT_ID]
         val missionId = context.request().params()[MISSION_ID]
@@ -153,8 +187,7 @@ object VtService {
         }
     }
 
-    fun updateTimelineItem(context: RoutingContext, trackingItem: TimelineItem) {
-        log.info("Request to update the ${trackingItem.fieldName} details for a certain mission")
+    fun updateTimelineItem(context: RoutingContext, trackingItem: TrackingStep) {
         val response = context.response()
         val eventId = context.request().params()[EVENT_ID]
         val missionId = context.request().params()[MISSION_ID]
@@ -186,7 +219,6 @@ object VtService {
     }
 
     fun retrieveChosenHospital(context: RoutingContext) {
-        log.info("Request to retrieve the chosen hospital for a certain mission")
         val response = context.response()
         val eventId = context.request().params()[EVENT_ID]
         val missionId = context.request().params()[MISSION_ID]
@@ -229,7 +261,6 @@ object VtService {
     }
 
     fun updateChosenHospital(context: RoutingContext) {
-        log.info("Request to update the chosen hospital for a certain mission")
         val response = context.response()
         val eventId = context.request().params()[EVENT_ID]
         val missionId = context.request().params()[MISSION_ID]

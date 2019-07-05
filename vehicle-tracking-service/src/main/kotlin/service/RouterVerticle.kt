@@ -22,17 +22,17 @@ class RouterVerticle : AbstractVerticle() {
         return Router.router(vertx).apply {
             route().handler(BodyHandler.create())
 
-            get(EVENT_TRACKING_PATH).handler { VtService.retrieveEventTracking(it) }
-            get(MISSION_TRACKING_PATH).handler { VtService.retrieveMissionTracking(it) }
+            post(MISSIONS_PATH).handler {VtService.createMission(it)}
+            get(MISSIONS_PATH).handler { VtService.retrieveMissions(it) }
 
-            for (item in timelineItems) {
-                val path = MISSION_TRACKING_PATH + "/timeline/" + item.pathName
-                get(path).handler { VtService.retrieveTimelineItem(it, item) }
-                put(path).handler { VtService.updateTimelineItem(it, item) }
-            }
-
-            get(CHOSEN_HOSPITAL_PATH).handler { VtService.retrieveChosenHospital(it) }
-            put(CHOSEN_HOSPITAL_PATH).handler { VtService.updateChosenHospital(it) }
+//            for (item in trackingSteps) {
+//                val path = MISSION_TRACKING_PATH + "/timeline/" + item.pathName
+//                get(path).handler { VtService.retrieveTimelineItem(it, item) }
+//                put(path).handler { VtService.updateTimelineItem(it, item) }
+//            }
+//
+//            get(CHOSEN_HOSPITAL_PATH).handler { VtService.retrieveChosenHospital(it) }
+//            put(CHOSEN_HOSPITAL_PATH).handler { VtService.updateChosenHospital(it) }
         }
     }
 
@@ -40,18 +40,19 @@ class RouterVerticle : AbstractVerticle() {
         private const val PORT = 10000
         private const val HOST = "localhost"
 
-        private const val EVENT_TRACKING_PATH = "/v1/events-tracking/:eventId"
-        private const val MISSION_TRACKING_PATH = "$EVENT_TRACKING_PATH/missions/:missionId"
+        private const val MISSIONS_PATH = "/missions"
+        private const val MISSION_PATH = "/missions/:missionId"
+        private const val RETURN_INFORMATION_PATH = "$MISSION_PATH/return-information"
+        private const val TRACKING_PATH = "$MISSION_PATH/tracking"
+        private const val ONGOING_PATH = "$MISSION_PATH/ongoing"
 
-        private val timelineItems = listOf(
-                TimelineItem(pathName = "oc-call", fieldName = "ocCall"),
-                TimelineItem(pathName = "crew-departure", fieldName = "crewDeparture"),
-                TimelineItem(pathName = "arrival-onsite", fieldName = "arrivalOnsite"),
-                TimelineItem(pathName = "departure-onsite", fieldName = "departureOnsite"),
-                TimelineItem(pathName = "landing-helipad", fieldName = "landingHelipad"),
-                TimelineItem(pathName = "arrival-er", fieldName = "arrivalEr")
+        private val trackingSteps = listOf(
+                TrackingStep(pathName = "oc-call", fieldName = "ocCall"),
+                TrackingStep(pathName = "crew-departure", fieldName = "crewDeparture"),
+                TrackingStep(pathName = "arrival-onsite", fieldName = "arrivalOnsite"),
+                TrackingStep(pathName = "departure-onsite", fieldName = "departureOnsite"),
+                TrackingStep(pathName = "landing-helipad", fieldName = "landingHelipad"),
+                TrackingStep(pathName = "arrival-er", fieldName = "arrivalEr")
         )
-
-        private const val CHOSEN_HOSPITAL_PATH = "$MISSION_TRACKING_PATH/chosen-hospital"
     }
 }
