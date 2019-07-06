@@ -1,9 +1,10 @@
-package service
+package services
 
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
+import service.TrackingStep
 
 class RouterVerticle : AbstractVerticle() {
 

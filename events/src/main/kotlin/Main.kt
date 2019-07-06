@@ -1,16 +1,16 @@
 import io.vertx.core.Vertx
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.client.WebClient
-import service.EventsService
-import service.Data.DISCOVERY_PORT
-import service.Data.DISCOVERY_HOST
-import service.Data.DISCOVERY_PUBLISH_SERVICE
-import service.Data.SERVICE_NAME
-import service.Data.NAME
-import service.Data.SERVICE_HOST
-import service.Data.HOST
-import service.Data.SERVICE_PORT
-import service.Data.PORT
+import services.EventsService
+import services.Data.DISCOVERY_PORT
+import services.Data.DISCOVERY_HOST
+import services.Data.DISCOVERY_PUBLISH_SERVICE
+import services.Data.SERVICE_NAME
+import services.Data.NAME
+import services.Data.SERVICE_HOST
+import services.Data.HOST
+import services.Data.SERVICE_PORT
+import services.Data.PORT
 
 object Main {
     @JvmStatic
