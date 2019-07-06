@@ -27,7 +27,7 @@ class EventsService : AbstractVerticle() {
     companion object {
         private const val PORT = 10000
         private const val HOST = "localhost"
-        private const val EVENTS_PATH = "/v1/events"
+        const val EVENTS_PATH = "/events"
         private const val SINGLE_EVENT_PATH = "$EVENTS_PATH/:eventId"
     }
 }
