@@ -18,7 +18,7 @@ import utils.EventsData.PORT
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        val log = LoggerFactory.getLogger("Oc-bridgeService")
+        val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
         val vertx = Vertx.vertx()
         vertx.deployVerticle((EventsService())) { startService ->

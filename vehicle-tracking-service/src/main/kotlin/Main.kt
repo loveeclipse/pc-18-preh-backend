@@ -1,22 +1,35 @@
 import io.vertx.core.Vertx
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.client.WebClient
-import services.Data
+
+import services.DiscoveryData.DISCOVERY_PORT
+import services.DiscoveryData.DISCOVERY_HOST
+import services.DiscoveryData.DISCOVERY_PUBLISH_SERVICE
+import services.DiscoveryData.SERVICE_NAME
+import services.DiscoveryData.SERVICE_HOST
+import services.DiscoveryData.SERVICE_PORT
+import services.DiscoveryData.NAME
+import services.DiscoveryData.HOST
+import services.DiscoveryData.PORT
+import services.DiscoveryData.SERVICE_URI
+import services.RouterVerticle.Companion.MISSIONS_PATH
+
 import services.RouterVerticle
 
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        val log = LoggerFactory.getLogger("Oc-bridgeService")
+        val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
         val vertx = Vertx.vertx()
         vertx.deployVerticle((RouterVerticle())) { startService ->
             when {
                 startService.succeeded() ->
-                    WebClient.create(vertx).post(Data.DISCOVERY_PORT, Data.DISCOVERY_HOST, Data.DISCOVERY_PUBLISH_SERVICE)
-                            .addQueryParam(Data.SERVICE_NAME, Data.NAME)
-                            .addQueryParam(Data.SERVICE_HOST, Data.HOST)
-                            .addQueryParam(Data.SERVICE_PORT, Data.PORT.toString())
+                    WebClient.create(vertx).post(DISCOVERY_PORT, DISCOVERY_HOST, DISCOVERY_PUBLISH_SERVICE)
+                            .addQueryParam(SERVICE_NAME, NAME)
+                            .addQueryParam(SERVICE_HOST, HOST)
+                            .addQueryParam(SERVICE_PORT, PORT.toString())
+                            .addQueryParam(SERVICE_URI, MISSIONS_PATH)
                             .send { publishResult ->
                                 if (publishResult.succeeded()) {
                                     log.info("Received response with status code ${publishResult.result().statusCode()}")
