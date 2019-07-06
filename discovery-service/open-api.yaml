@@ -10,18 +10,18 @@ paths:
   '/discovery/publish':
     post:
       description: 'Create a new record and publish an unique service in discovery.'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ServiceInformation'
+      parameters:
+        - $ref: '#/components/parameters/service-name-param-post'
+        - $ref: '#/components/parameters/service-host-param'
+        - $ref: '#/components/parameters/service-port-param'
+        - $ref: '#/components/parameters/service-root-param'
       responses:
         '201':
           description: 'record successfully created'
           content: 
             text/plain:
               schema:
-                $ref: "#/components/schemas/Identifier"
+                $ref: "#/components/schemas/Registration"
         '400':
           description: 'bad request'
   '/discovery/unpublish/{serviceRegistration}':
@@ -54,6 +54,34 @@ paths:
           description: 'bad request'
 components:
   parameters:
+    service-name-param-post:
+      in: query
+      name: "serviceName"
+      description: "Service name"
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServiceName'
+    service-host-param:
+      in: query
+      name: "serviceHost"
+      description: "Service host"
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServiceHost'
+    service-port-param:
+      in: query
+      name: "servicePort"
+      description: "Service port"
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServicePort'
+    service-root-param:
+      in: query
+      name: "serviceRoot"
+      description: "Service root"
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServiceRoot'
     service-name-param:
       in: path
       name: "serviceName"
@@ -67,35 +95,24 @@ components:
       description: "Service registration identifier"
       required: true
       schema:
-        $ref: "#/components/schemas/Identifier"
+        $ref: "#/components/schemas/Registration"
   schemas:
-    ServiceInformation:
-      type: object
-      required:
-        - serviceName
-        - serviceHost
-        - servicePort
-        - serviceRoot
-      properties:
-        serviceName:
-          type: string
-          example: 'missions-service'
-        serviceHost:
-          type: string
-          example: '127.0.0.1'
-        servicePort:
-          type: integer
-          example: 10000
-        serviceRoot: 
-          type: string
-          example: '/missions'
-    Identifier:
-      type: string
-      format: UUID
-      example: "fb37c79f-5820-45d4-8eb1-c9f9f3eebf2c"
     ServiceName:
       type: string
       example: 'missions-service'
+    ServiceHost:
+          type: string
+          example: '127.0.0.1'
+    ServicePort:
+          type: integer
+          example: 10000
+    ServiceRoot: 
+        type: string
+        example: '/missions'
+    Registration:
+      type: string
+      format: UUID
+      example: "fb37c79f-5820-45d4-8eb1-c9f9f3eebf2c"
     ServiceLocation:
       type: string
       format: url
