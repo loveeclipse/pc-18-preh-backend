@@ -1,6 +1,7 @@
 import io.vertx.core.Vertx
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.client.WebClient
+
 import verticle.RouterVerticle
 import utils.DiscoveryData.DISCOVERY_PORT
 import utils.DiscoveryData.DISCOVERY_HOST
@@ -10,7 +11,9 @@ import utils.PatientsData.NAME
 import utils.DiscoveryData.SERVICE_HOST
 import utils.PatientsData.HOST
 import utils.DiscoveryData.SERVICE_PORT
+import utils.DiscoveryData.SERVICE_URI
 import utils.PatientsData.PORT
+import verticle.RouterVerticle.Companion.PATIENTS_PATH
 
 object Main {
     @JvmStatic
@@ -25,6 +28,7 @@ object Main {
                             .addQueryParam(SERVICE_NAME, NAME)
                             .addQueryParam(SERVICE_HOST, HOST)
                             .addQueryParam(SERVICE_PORT, PORT.toString())
+                            .addQueryParam(SERVICE_URI, PATIENTS_PATH)
                             .send { publishResult ->
                                 if (publishResult.succeeded()) {
                                     log.info("Received response with status code ${publishResult.result().statusCode()}")
