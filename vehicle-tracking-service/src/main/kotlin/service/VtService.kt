@@ -13,6 +13,7 @@ import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 import io.vertx.kotlin.core.json.get
 import io.vertx.ext.mongo.MongoClient
+import io.vertx.ext.mongo.UpdateOptions
 import io.vertx.ext.web.RoutingContext
 import java.util.UUID
 
@@ -122,6 +123,27 @@ object VtService {
                         } else {
                             response.setStatusCode(NOT_FOUND.code()).end()
                         }
+                    } else {
+                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                    }
+                }
+    }
+
+    fun updateReturnInformation(context: RoutingContext) {
+        val response = context.response()
+        val missionId: String? = context.request().getParam("missionId")
+        val requestBody = context.bodyAsJson
+
+        val query = json { obj("_id" to missionId) }
+        val update = json { obj(
+                "\$set" to obj("returnInformation" to requestBody)
+        ) }
+        val options = UpdateOptions(true)
+
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .updateCollectionWithOptions(MISSIONS_COLLECTION, query, update, options) { updateOperation ->
+                    if (updateOperation.succeeded()) {
+                        response.setStatusCode(NO_CONTENT.code()).end()
                     } else {
                         response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                     }
@@ -273,36 +295,6 @@ object VtService {
 //                            findOperation.failed() -> {
 //                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
 //                            }
-//                        }
-//                    }
-//        } catch (_: IllegalArgumentException) { // eventId is not an UUID
-//            response.setStatusCode(BAD_REQUEST.code()).end()
-//        }
-    }
-
-    fun updateChosenHospital(context: RoutingContext) {
-//        val response = context.response()
-//        val eventId = context.request().params()[EVENT_ID]
-//        val missionId = context.request().params()[MISSION_ID]
-//        val hospitalName = context.bodyAsString
-//
-//        try {
-//            UUID.fromString(eventId)
-//            val query = json { obj(
-//                        EVENT_ID to eventId,
-//                        MISSION_ID to missionId
-//            ) }
-//            val update = json { obj(
-//                        "\$set" to obj(
-//                                CHOSEN_HOSPITAL to hospitalName)
-//            ) }
-//            val options = UpdateOptions(true)
-//
-//            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-//                    .updateCollectionWithOptions(COLLECTION_NAME, query, update, options) { updateOperation ->
-//                        when {
-//                            updateOperation.succeeded() -> response.setStatusCode(OK.code()).end()
-//                            updateOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
 //                        }
 //                    }
 //        } catch (_: IllegalArgumentException) { // eventId is not an UUID
