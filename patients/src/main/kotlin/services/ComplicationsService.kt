@@ -11,9 +11,8 @@ import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
-import services.utils.UriParser.getLastItemFromUrl
 
-import services.utils.DuplicatedKey.isDuplicateKey
+import utils.MongoUtils.isDuplicateKey
 
 object ComplicationsService {
 
@@ -29,10 +28,9 @@ object ComplicationsService {
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
     ) }
 
-    fun createComplication(routingContext: RoutingContext) {
+    fun createComplication(routingContext: RoutingContext, complicationId: String) {
         log.info("Request to create a complication")
         val response = routingContext.response()
-        val complicationId = getLastItemFromUrl(routingContext.request().uri())
         val patientId = routingContext.request().params()[PATIENT_ID]
         val time = routingContext.bodyAsString
         val document = json { obj(
@@ -55,10 +53,9 @@ object ComplicationsService {
                 }
     }
 
-    fun deleteComplication(routingContext: RoutingContext) {
+    fun deleteComplication(routingContext: RoutingContext, complicationId: String) {
         log.info("Request to delete a complication")
         val response = routingContext.response()
-        val complicationId = getLastItemFromUrl(routingContext.request().uri())
         val patientId = routingContext.request().params()[PATIENT_ID]
         val document = json { obj(
                 COMPLICATION_ID to complicationId,

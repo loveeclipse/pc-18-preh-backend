@@ -12,8 +12,8 @@ import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.kotlin.core.json.get
 
-import services.utils.CheckSchema.checkSchema
-import services.utils.DuplicatedKey.isDuplicateKey
+import utils.MongoUtils.checkSchema
+import utils.MongoUtils.isDuplicateKey
 
 object PatientsService {
 

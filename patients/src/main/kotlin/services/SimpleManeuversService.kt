@@ -12,8 +12,7 @@ import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 
-import services.utils.DuplicatedKey.isDuplicateKey
-import services.utils.UriParser.getLastItemFromUrl
+import utils.MongoUtils.isDuplicateKey
 
 object SimpleManeuversService {
 
@@ -29,10 +28,9 @@ object SimpleManeuversService {
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
     ) }
 
-    fun createSimpleManeuver(routingContext: RoutingContext) {
+    fun createSimpleManeuver(routingContext: RoutingContext, maneuverId: String) {
         log.info("Request to create a simple maneuver")
         val response = routingContext.response()
-        val maneuverId = getLastItemFromUrl(routingContext.request().uri())
         val patientId = routingContext.request().params()[PATIENT_ID]
         val time = routingContext.bodyAsString
         val document = json { obj(
@@ -55,10 +53,9 @@ object SimpleManeuversService {
                 }
     }
 
-    fun deleteSimpleManeuver(routingContext: RoutingContext) {
+    fun deleteSimpleManeuver(routingContext: RoutingContext, maneuverId: String) {
         log.info("Request to delete a simple maneuver")
         val response = routingContext.response()
-        val maneuverId = getLastItemFromUrl(routingContext.request().uri())
         val patientId = routingContext.request().params()[PATIENT_ID]
         val document = json { obj(
                 MANEUVER_ID to maneuverId,

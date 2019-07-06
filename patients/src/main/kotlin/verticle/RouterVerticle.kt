@@ -16,8 +16,8 @@ import services.StatusService
 import services.VitalParametersService
 import utils.PatientsData.HOST
 import utils.PatientsData.PORT
-import services.utils.data.ManeuversItem.maneuversItems
-import services.utils.data.ComplicationsItems.complicationsItems
+import utils.PathItem.maneuversItems
+import utils.PathItem.complicationsItems
 
 class RouterVerticle : AbstractVerticle() {
 
@@ -41,18 +41,18 @@ class RouterVerticle : AbstractVerticle() {
             put(STATUS_PATH).handler { StatusService.updateStatus(it) }
             post(VITAL_PARAMETERS_PATH).handler { VitalParametersService.createVitalParameters(it) }
             post(DRUGS_PATH).handler { DrugsService.createDrug(it) }
-            for (item in maneuversItems) {
-                val path = MANEUVERS_SIMPLE_PATH + "/" + item.fieldName
-                post(path).handler { SimpleManeuversService.createSimpleManeuver(it) }
-                delete(path).handler { SimpleManeuversService.deleteSimpleManeuver(it) }
+            maneuversItems.forEach { name ->
+                val path = "$MANEUVERS_SIMPLE_PATH/$name"
+                post(path).handler { SimpleManeuversService.createSimpleManeuver(it, name) }
+                delete(path).handler { SimpleManeuversService.deleteSimpleManeuver(it, name) }
             }
             post(TREATMENTS_SIMPLE_PATH).handler { SimpleTreatmentsService.createSimpleTreatment(it) }
             post(TREATMENTS_INJECTION_PATH).handler { InjectionTreatmentsService.createInjectionTreatment(it) }
             post(TREATMENTS_IPPV_PATH).handler { IppvTreatmentsService.createIppvTreatment(it) }
-            for (item in complicationsItems) {
-                val path = COMPLICATIONS_PATH + "/" + item.fieldName
-                post(path).handler { ComplicationsService.createComplication(it) }
-                delete(path).handler { ComplicationsService.deleteComplication(it) }
+            complicationsItems.forEach { name ->
+                val path = "$COMPLICATIONS_PATH/$name"
+                post(path).handler { ComplicationsService.createComplication(it, name) }
+                delete(path).handler { ComplicationsService.deleteComplication(it, name) }
             }
         }
     }
