@@ -4,7 +4,6 @@ import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
-import io.vertx.core.json.Json
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.RoutingContext
 import io.vertx.servicediscovery.ServiceDiscovery
@@ -35,6 +34,7 @@ object DiscoveryService {
                 publishOperation.succeeded() -> {
                     registrationList.add(record.registration)
                     response
+                            .putHeader("Content-Type", "text/plain")
                             .setStatusCode(CREATED.code())
                             .end(record.registration)
                 }
@@ -52,8 +52,7 @@ object DiscoveryService {
             when {
                 unpublishOperation.succeeded() && recordRegistration.contains(recordRegistration) -> {
                     registrationList.remove(recordRegistration)
-                    response
-                            .setStatusCode(OK.code()).end()
+                    response.setStatusCode(OK.code()).end()
                 }
                 unpublishOperation.succeeded() ->
                     response.setStatusCode(NOT_FOUND.code()).end()
@@ -73,8 +72,11 @@ object DiscoveryService {
             when {
                 findOperation.succeeded() && findOperation.result() != null -> {
                     val reference = discovery.getReference(findOperation.result())
-                    val location = reference.record().location.first()
-                    response.setStatusCode(OK.code()).end(Json.encodePrettily(location))
+                    val location = reference.record().location.first().value.toString()
+                    response
+                            .putHeader("Content-Type", "text/plain")
+                            .setStatusCode(OK.code())
+                            .end(location)
                     reference.release()
                 }
                 findOperation.succeeded() ->
