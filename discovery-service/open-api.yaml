@@ -24,7 +24,7 @@ paths:
                 $ref: "#/components/schemas/Identifier"
         '400':
           description: 'bad request'
-  '/discovery/unpublish/{serviceRegistrationIdentifier}':
+  '/discovery/unpublish/{serviceRegistration}':
     delete:
       description: 'Delete the record related to a service previously published in discovery.'
       parameters:
@@ -63,7 +63,7 @@ components:
         $ref: "#/components/schemas/ServiceName"
     service-registration-id-param:
       in: path
-      name: "serviceRegistrationIdentifier"
+      name: "serviceRegistration"
       description: "Service registration identifier"
       required: true
       schema:
