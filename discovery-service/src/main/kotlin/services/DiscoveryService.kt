@@ -18,9 +18,9 @@ object DiscoveryService {
     private const val SERVICE_HOST = "serviceHost"
     private const val SERVICE_PORT = "servicePort"
     private const val SERVICE_REGISTRATION = "serviceRegistration"
-    private const val SERVICE_URL = "serviceUri"
+    private const val SERVICE_URI = "serviceUri"
 
-    private lateinit var registrationList: ArrayList<String>
+    private var registrationList: MutableList<String> = ArrayList()
 
     fun publishService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
         log.info("Request to publish service")
@@ -28,16 +28,18 @@ object DiscoveryService {
         val serviceName = routingContext.request().params()[SERVICE_NAME]
         val serviceHost = routingContext.request().params()[SERVICE_HOST]
         val servicePort = routingContext.request().params()[SERVICE_PORT]
-        val serviceUrl = routingContext.request().params()[SERVICE_URL]
-        val record = HttpEndpoint.createRecord(serviceName, serviceHost, servicePort.toInt(), serviceUrl)
-        discovery?.publish(record) { ar ->
-            if (ar.succeeded()) {
-                response
-                        .setStatusCode(CREATED.code())
-                        .end()
-                log.info("Service ${record.name} successfully published.")
-            } else {
-                response.setStatusCode(BAD_REQUEST.code()).end()
+        val serviceUri = routingContext.request().params()[SERVICE_URI]
+        val record = HttpEndpoint.createRecord(serviceName, serviceHost, servicePort.toInt(), serviceUri)
+        discovery?.publish(record) { publishOperation ->
+            when {
+                publishOperation.succeeded() -> {
+                    registrationList.add(record.registration)
+                    response
+                            .setStatusCode(CREATED.code())
+                            .end(record.registration)
+                }
+                else ->
+                    response.setStatusCode(BAD_REQUEST.code()).end()
             }
         }
     }
@@ -52,7 +54,6 @@ object DiscoveryService {
                     registrationList.remove(recordRegistration)
                     response
                             .setStatusCode(OK.code()).end()
-                    log.info("Service $recordRegistration successfully unpublished.")
                 }
                 unpublishOperation.succeeded() ->
                     response.setStatusCode(NOT_FOUND.code()).end()
@@ -74,7 +75,6 @@ object DiscoveryService {
                     val reference = discovery.getReference(findOperation.result())
                     val location = reference.record().location.first()
                     response.setStatusCode(OK.code()).end(Json.encodePrettily(location))
-                    log.info("Service $record successfully found.")
                     reference.release()
                 }
                 findOperation.succeeded() ->
