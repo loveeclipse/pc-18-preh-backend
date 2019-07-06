@@ -20,6 +20,8 @@ object DiscoveryService {
     private const val SERVICE_REGISTRATION = "serviceRegistration"
     private const val SERVICE_URL = "serviceUri"
 
+    private lateinit var registrationList: ArrayList<String>
+
     fun publishService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
         log.info("Request to publish service")
         val response = routingContext.response()
@@ -44,18 +46,23 @@ object DiscoveryService {
         log.info("Request to unpublish service")
         val response = routingContext.response()
         val recordRegistration = routingContext.request().params()[SERVICE_REGISTRATION]
-        discovery?.unpublish(recordRegistration) { ar ->
-            if (ar.succeeded()) {
-                response
-                        .setStatusCode(OK.code()).end()
-                log.info("Service $recordRegistration successfully unpublished.")
-            } else {
-                response.setStatusCode(BAD_REQUEST.code()).end()
+        discovery?.unpublish(recordRegistration) { unpublishOperation ->
+            when {
+                unpublishOperation.succeeded() && recordRegistration.contains(recordRegistration) -> {
+                    registrationList.remove(recordRegistration)
+                    response
+                            .setStatusCode(OK.code()).end()
+                    log.info("Service $recordRegistration successfully unpublished.")
+                }
+                unpublishOperation.succeeded() ->
+                    response.setStatusCode(NOT_FOUND.code()).end()
+                else ->
+                    response.setStatusCode(BAD_REQUEST.code()).end()
             }
         }
     }
 
-    fun getService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
+    fun retrieveService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
         log.info("Request to get service location")
         val response = routingContext.response()
         val record = routingContext.request().params()[SERVICE_NAME]

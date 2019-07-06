@@ -41,7 +41,7 @@ class DiscoveryVerticle : AbstractVerticle() {
             route().handler(BodyHandler.create())
             post(DISCOVERY_PUBLISH_SERVICE).handler { DiscoveryService.publishService(it, discovery) }
             delete(DISCOVERY_UNPUBLISH_SERVICE).handler { DiscoveryService.unpublishService(it, discovery) }
-            get(DISCOVERY_GET_SERVICE).handler { DiscoveryService.getService(it, discovery) }
+            get(DISCOVERY_GET_SERVICE).handler { DiscoveryService.retrieveService(it, discovery) }
         }
     }
 }
