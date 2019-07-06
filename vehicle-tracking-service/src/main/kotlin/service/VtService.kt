@@ -13,14 +13,11 @@ import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 import io.vertx.kotlin.core.json.get
 import io.vertx.ext.mongo.MongoClient
-import io.vertx.ext.mongo.UpdateOptions
 import io.vertx.ext.web.RoutingContext
 import java.util.UUID
 
 object VtService {
     private const val MISSIONS_COLLECTION = "missions"
-    private const val MISSION_ID = "_id"
-    private const val EVENT_ID = "eventId"
 
     private val MONGODB_CONFIGURATION = json { obj(
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
@@ -34,19 +31,18 @@ object VtService {
     fun createMission(context: RoutingContext) {
         val response = context.response()
         val requestBody = context.bodyAsJson
-        val eventId: String? = requestBody[EVENT_ID]
+        val eventId: String? = requestBody["eventId"]
         val vehicle: String? = requestBody["vehicle"]
 
         if (eventId.isNullOrEmpty() || vehicle.isNullOrEmpty()) {
             response.putHeader("Content-Type", "text/plain")
                     .setStatusCode(BAD_REQUEST.code())
                     .end("Please insert \"eventId\" and \"vehicle\" fields in your request JSON body.")
-
         } else {
             val missionId = UUID.randomUUID()
             val newMission = json { obj(
-                    MISSION_ID to missionId.toString(),
-                    EVENT_ID to eventId,
+                    "_id" to missionId.toString(),
+                    "eventId" to eventId,
                     "vehicle" to vehicle,
                     "ongoing" to true
             ) }
@@ -68,7 +64,7 @@ object VtService {
         val params = context.request().params()
 
         val query = json { obj() }
-        params[EVENT_ID]?.let { query.put(EVENT_ID, it) }
+        params["eventId"]?.let { query.put("eventId", it) }
         params["vehicle"]?.let { query.put("vehicle", it) }
         params["ongoing"]?.toBoolean()?.let { query.put("ongoing", it) }
 
@@ -82,6 +78,29 @@ object VtService {
                             response.putHeader("Content-Type", "application/json")
                                     .setStatusCode(OK.code())
                                     .end(Json.encodePrettily(results))
+                        }
+                    } else {
+                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                    }
+                }
+    }
+
+    fun retrieveMission(context: RoutingContext) {
+        val response = context.response()
+        val missionId: String? = context.request().getParam("missionId")
+
+        val query = json { obj("_id" to missionId) }
+
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .find(MISSIONS_COLLECTION, query) { findOperation ->
+                    if (findOperation.succeeded()) {
+                        val results: List<JsonObject> = findOperation.result()
+                        if (results.isEmpty()) {
+                            response.setStatusCode(NOT_FOUND.code()).end()
+                        } else {
+                            response.putHeader("Content-Type", "application/json")
+                                    .setStatusCode(OK.code())
+                                    .end(Json.encodePrettily(results.first()))
                         }
                     } else {
                         response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
