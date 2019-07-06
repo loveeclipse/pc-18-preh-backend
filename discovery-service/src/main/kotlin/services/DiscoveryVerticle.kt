@@ -15,7 +15,7 @@ import utils.DiscoveryData.PORT
 
 class DiscoveryVerticle : AbstractVerticle() {
 
-    private val log = LoggerFactory.getLogger("DiscoveryVerticle")
+    private val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
     private var discovery: ServiceDiscovery? = null
 

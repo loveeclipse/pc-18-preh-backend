@@ -3,6 +3,7 @@ package services
 import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
+import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
 import io.vertx.core.json.Json
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.RoutingContext
@@ -11,7 +12,7 @@ import io.vertx.servicediscovery.types.HttpEndpoint
 
 object DiscoveryService {
 
-    private val log = LoggerFactory.getLogger("DiscoveryService")
+    private val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
     private const val SERVICE_NAME = "serviceName"
     private const val SERVICE_HOST = "serviceHost"
@@ -40,7 +41,7 @@ object DiscoveryService {
     }
 
     fun unpublishService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
-        log.debug("Request to unpublish service")
+        log.info("Request to unpublish service")
         val response = routingContext.response()
         val recordRegistration = routingContext.request().params()[SERVICE_REGISTRATION]
         discovery?.unpublish(recordRegistration) { ar ->
@@ -55,20 +56,24 @@ object DiscoveryService {
     }
 
     fun getService(routingContext: RoutingContext, discovery: ServiceDiscovery?) {
-        log.debug("Request to get service location")
+        log.info("Request to get service location")
         val response = routingContext.response()
         val record = routingContext.request().params()[SERVICE_NAME]
         discovery?.getRecord({ r ->
             r.name == record
-        }, { findService ->
-            if (findService.succeeded() && findService.result() != null) {
-                val reference = discovery.getReference(findService.result())
-                val location = reference.record().location.first()
-                response.setStatusCode(OK.code()).end(Json.encodePrettily(location))
-                log.info("Service $record successfully found.")
-                reference.release()
-            } else {
-                response.setStatusCode(BAD_REQUEST.code()).end()
+        }, { findOperation ->
+            when {
+                findOperation.succeeded() && findOperation.result() != null -> {
+                    val reference = discovery.getReference(findOperation.result())
+                    val location = reference.record().location.first()
+                    response.setStatusCode(OK.code()).end(Json.encodePrettily(location))
+                    log.info("Service $record successfully found.")
+                    reference.release()
+                }
+                findOperation.succeeded() ->
+                    response.setStatusCode(NOT_FOUND.code()).end()
+                else ->
+                    response.setStatusCode(BAD_REQUEST.code()).end()
             }
         })
     }
