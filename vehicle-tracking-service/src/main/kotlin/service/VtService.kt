@@ -108,6 +108,26 @@ object VtService {
                 }
     }
 
+    fun deleteMission(context: RoutingContext) {
+        val response = context.response()
+        val missionId: String? = context.request().getParam("missionId")
+
+        val query = json { obj("_id" to missionId) }
+
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .removeDocument(MISSIONS_COLLECTION, query) { deleteOperation ->
+                    if (deleteOperation.succeeded()) {
+                        if (deleteOperation.result().removedCount == 1L) {
+                            response.setStatusCode(NO_CONTENT.code()).end()
+                        } else {
+                            response.setStatusCode(NOT_FOUND.code()).end()
+                        }
+                    } else {
+                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                    }
+                }
+    }
+
     fun retrieveMissionTracking(context: RoutingContext) {
 //        val response = context.response()
 //        val eventId = context.request().params()[EVENT_ID]
