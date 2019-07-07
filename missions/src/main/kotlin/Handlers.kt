@@ -20,8 +20,16 @@ object Handlers {
     private val MONGODB_CONFIGURATION = json { obj(
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
     ) }
-
+    private val trackingSteps: Map<String, String> = mapOf(
+            "oc-call" to "ocCall",
+            "crew-departure" to "crewDeparture",
+            "arrival-onsite" to "arrivalOnsite",
+            "departure-onsite" to "departureOnsite",
+            "landing-helipad" to "landingHelipad",
+            "arrival-er" to "arrivalEr"
+    )
     private var vertx: Vertx? = null
+
     fun initializeRequestManager(vertx: Vertx) {
         Handlers.vertx = vertx
     }
@@ -36,6 +44,7 @@ object Handlers {
             response.putHeader("Content-Type", "text/plain")
                     .setStatusCode(BAD_REQUEST.code())
                     .end("Please insert \"eventId\" and \"vehicle\" fields in your request JSON body.")
+
         } else {
             val missionId = UUID.randomUUID()
             val newMission = json { obj(
@@ -65,7 +74,6 @@ object Handlers {
         params["eventId"]?.let { query.put("eventId", it) }
         params["vehicle"]?.let { query.put("vehicle", it) }
         params["ongoing"]?.toBoolean()?.let { query.put("ongoing", it) }
-
         MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                 .find(MISSIONS_COLLECTION, query) { findOperation ->
                     if (findOperation.succeeded()) {
@@ -88,7 +96,6 @@ object Handlers {
         val missionId: String? = context.request().getParam("missionId")
 
         val query = json { obj("_id" to missionId) }
-
         MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                 .find(MISSIONS_COLLECTION, query) { findOperation ->
                     if (findOperation.succeeded()) {
@@ -111,7 +118,6 @@ object Handlers {
         val missionId: String? = context.request().getParam("missionId")
 
         val query = json { obj("_id" to missionId) }
-
         MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                 .removeDocument(MISSIONS_COLLECTION, query) { removeOperation ->
                     if (removeOperation.succeeded()) {
@@ -136,7 +142,6 @@ object Handlers {
                 "\$set" to obj("returnInformation" to requestBody)
         ) }
         val options = UpdateOptions(true)
-
         MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                 .updateCollectionWithOptions(MISSIONS_COLLECTION, query, update, options) { updateOperation ->
                     if (updateOperation.succeeded()) {
@@ -151,10 +156,7 @@ object Handlers {
         val response = context.response()
         val missionId: String = context.request().getParam("missionId")
 
-        val query = json { obj(
-                "_id" to missionId
-        ) }
-
+        val query = json { obj("_id" to missionId) }
         MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                 .find(MISSIONS_COLLECTION, query) { findOperation ->
                     if (findOperation.failed()) {
@@ -178,48 +180,33 @@ object Handlers {
                 }
     }
 
-//    fun retrieveTimelineItem(context: RoutingContext, trackingItem: TrackingStep) {
-//        val response = context.response()
-//        val eventId = context.request().params()[EVENT_ID]
-//        val missionId = context.request().params()[MISSION_ID]
-//
-//        try {
-//            UUID.fromString(eventId)
-//            val query = json { obj(
-//                        EVENT_ID to eventId,
-//                        MISSION_ID to missionId
-//            ) }
-//
-//            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-//                    .find(COLLECTION_NAME, query) { findOperation ->
-//                        when {
-//                            findOperation.succeeded() -> {
-//                                val results: List<JsonObject> = findOperation.result()
-//                                if (results.isEmpty()) {
-//                                    response.setStatusCode(NOT_FOUND.code()).end()
-//                                } else {
-//                                    val firstResult: JsonObject = results.first()
-//                                    val missionTracking: JsonObject = firstResult["missionTracking"]
-//                                    val desiredTrackingItem: JsonObject? = missionTracking[trackingItem.fieldName]
-//
-//                                    desiredTrackingItem?.let {
-//                                        response.putHeader("Content-Type", "application/json")
-//                                                .setStatusCode(OK.code())
-//                                                .end(Json.encodePrettily(desiredTrackingItem))
-//                                    } ?: run {
-//                                        response.setStatusCode(NO_CONTENT.code()).end()
-//                                    }
-//                                }
-//                            }
-//                            findOperation.failed() -> {
-//                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-//                            }
-//                        }
-//                    }
-//        } catch (_: IllegalArgumentException) { // eventId is not an UUID
-//            response.setStatusCode(BAD_REQUEST.code()).end()
-//        }
-//    }
+    fun retrieveTracking(context: RoutingContext) {
+        val response = context.response()
+        val missionId: String = context.request().getParam("missionId")
+
+        val query = json { obj("_id" to missionId) }
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .find(MISSIONS_COLLECTION, query) { findOperation ->
+                    if (findOperation.failed()) {
+                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                    } else {
+                        val results: List<JsonObject> = findOperation.result()
+                        if (results.isEmpty()) {
+                            response.setStatusCode(NOT_FOUND.code()).end()
+                        } else {
+                            val firstResult: JsonObject = results.first()
+                            val tracking: JsonObject? = firstResult["tracking"]
+                            if (tracking == null) {
+                                response.setStatusCode(NO_CONTENT.code()).end()
+                            } else {
+                                response.putHeader("Content-Type", "application/json")
+                                        .setStatusCode(OK.code())
+                                        .end(Json.encodePrettily(tracking))
+                            }
+                        }
+                    }
+                }
+    }
 
 //    fun updateTimelineItem(context: RoutingContext, trackingItem: TrackingStep) {
 //        val response = context.response()
@@ -252,7 +239,7 @@ object Handlers {
 //        }
 //    }
 
-    fun retrieveChosenHospital(context: RoutingContext) {
+//    fun retrieveChosenHospital(context: RoutingContext) {
 //        val response = context.response()
 //        val eventId = context.request().params()[EVENT_ID]
 //        val missionId = context.request().params()[MISSION_ID]
@@ -292,5 +279,5 @@ object Handlers {
 //        } catch (_: IllegalArgumentException) { // eventId is not an UUID
 //            response.setStatusCode(BAD_REQUEST.code()).end()
 //        }
-    }
+//    }
 }

@@ -28,6 +28,8 @@ class RouterVerticle : AbstractVerticle() {
 
             put(RETURN_INFORMATION_PATH).handler { Handlers.updateReturnInformation(it) }
             get(RETURN_INFORMATION_PATH).handler { Handlers.retrieveReturnInformation(it) }
+
+            get(TRACKING_PATH).handler { Handlers.retrieveTracking(it) }
         }
     }
 
