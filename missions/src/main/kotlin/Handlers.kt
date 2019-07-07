@@ -331,76 +331,19 @@ object Handlers {
                     .setStatusCode(NOT_FOUND.code())
                     .end("Unknown tracking step: $step")
         } else {
-            val query = json { obj("_id" to missionId) }
-            MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
-                    .findOne(MISSIONS_COLLECTION, query, null) { findOneOperation ->
-                        when {
-                            findOneOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                            findOneOperation.result() == null -> {
-                                response.putHeader("Content-Type", "text/plain")
-                                        .setStatusCode(NOT_FOUND.code())
-                                        .end("Mission not found")
-                            }
-                            else -> {
 
-                                val tracking: JsonObject? = findOneOperation.result()["tracking"]
-                                if (tracking == null) {
-                                    response.setStatusCode(NO_CONTENT.code()).end()
-                                } else {
-                                    val stepTracking: JsonObject? = tracking[trackingStepsConversions.getValue(step)]
-                                    if (stepTracking == null) {
-                                        response.setStatusCode(NO_CONTENT.code()).end()
-                                    } else {
-                                        response.putHeader("Content-Type", "application/json")
-                                                .setStatusCode(OK.code())
-                                                .end(Json.encodePrettily(stepTracking))
-                                    }
-                                }
-                            }
+            val query = json { obj("_id" to missionId) }
+            val update = json { obj(
+                    "\$unset" to obj("tracking.${trackingStepsConversions[step]}" to 1)
+            ) }
+            MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
+                    .updateCollection(MISSIONS_COLLECTION, query, update) { updateOperation ->
+                        when {
+                            updateOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            updateOperation.result().docModified < 1L -> response.setStatusCode(NOT_FOUND.code()).end()
+                            else -> response.setStatusCode(NO_CONTENT.code()).end()
                         }
                     }
         }
     }
-
-//    fun retrieveChosenHospital(context: RoutingContext) {
-//        val response = context.response()
-//        val eventId = context.request().params()[EVENT_ID]
-//        val missionId = context.request().params()[MISSION_ID]
-//
-//        try {
-//            UUID.fromString(eventId)
-//            val query = json { obj(
-//                        EVENT_ID to eventId,
-//                        MISSION_ID to missionId
-//            ) }
-//
-//            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-//                    .find(COLLECTION_NAME, query) { findOperation ->
-//                        when {
-//                            findOperation.succeeded() -> {
-//                                val results: List<JsonObject> = findOperation.result()
-//                                if (results.isEmpty()) {
-//                                    response.setStatusCode(NOT_FOUND.code()).end()
-//                                } else {
-//                                    val firstResult: JsonObject = results.first()
-//                                    val chosenHospital: String? = firstResult[CHOSEN_HOSPITAL]
-//
-//                                    chosenHospital?.let {
-//                                        response.putHeader("Content-Type", "text/plain")
-//                                                .setStatusCode(OK.code())
-//                                                .end(chosenHospital)
-//                                    } ?: run {
-//                                        response.setStatusCode(NO_CONTENT.code()).end()
-//                                    }
-//                                }
-//                            }
-//                            findOperation.failed() -> {
-//                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-//                            }
-//                        }
-//                    }
-//        } catch (_: IllegalArgumentException) { // eventId is not an UUID
-//            response.setStatusCode(BAD_REQUEST.code()).end()
-//        }
-//    }
 }
