@@ -147,11 +147,9 @@ object Handlers {
                         }
                         else -> {
 
-                            val update = json {
-                                obj(
+                            val update = json { obj(
                                         "\$set" to obj("returnInformation" to requestBody)
-                                )
-                            }
+                            ) }
                             val options = UpdateOptions(true)
                             MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
                                     .updateCollectionWithOptions(MISSIONS_COLLECTION, query, update, options) { updateOperation ->
@@ -189,6 +187,24 @@ object Handlers {
                                         .end(Json.encodePrettily(returnInformation))
                             }
                         }
+                    }
+                }
+    }
+
+    fun deleteReturnInformation(context: RoutingContext) {
+        val response = context.response()
+        val missionId: String = context.request().getParam("missionId")
+
+        val query = json { obj("_id" to missionId) }
+        val update = json { obj(
+                "\$unset" to obj("returnInformation" to 1)
+        ) }
+        MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
+                .updateCollection(MISSIONS_COLLECTION, query, update) { updateOperation ->
+                    when {
+                        updateOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                        updateOperation.result().docModified < 1L -> response.setStatusCode(NOT_FOUND.code()).end()
+                        else -> response.setStatusCode(NO_CONTENT.code()).end()
                     }
                 }
     }
@@ -265,6 +281,47 @@ object Handlers {
     }
 
     fun retrieveTrackingStep(context: RoutingContext) {
+        val response = context.response()
+        val missionId: String = context.request().getParam("missionId")
+        val step = context.request().getParam("step")
+
+        if (!trackingStepsConversions.containsKey(step)) {
+            response.putHeader("Content-Type", "text/plain")
+                    .setStatusCode(NOT_FOUND.code())
+                    .end("Unknown tracking step: $step")
+        } else {
+            val query = json { obj("_id" to missionId) }
+            MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
+                    .findOne(MISSIONS_COLLECTION, query, null) { findOneOperation ->
+                        when {
+                            findOneOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            findOneOperation.result() == null -> {
+                                response.putHeader("Content-Type", "text/plain")
+                                        .setStatusCode(NOT_FOUND.code())
+                                        .end("Mission not found")
+                            }
+                            else -> {
+
+                                val tracking: JsonObject? = findOneOperation.result()["tracking"]
+                                if (tracking == null) {
+                                    response.setStatusCode(NO_CONTENT.code()).end()
+                                } else {
+                                    val stepTracking: JsonObject? = tracking[trackingStepsConversions.getValue(step)]
+                                    if (stepTracking == null) {
+                                        response.setStatusCode(NO_CONTENT.code()).end()
+                                    } else {
+                                        response.putHeader("Content-Type", "application/json")
+                                                .setStatusCode(OK.code())
+                                                .end(Json.encodePrettily(stepTracking))
+                                    }
+                                }
+                            }
+                        }
+                    }
+        }
+    }
+
+    fun deleteTrackingStep(context: RoutingContext) {
         val response = context.response()
         val missionId: String = context.request().getParam("missionId")
         val step = context.request().getParam("step")

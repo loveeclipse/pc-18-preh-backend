@@ -25,10 +25,12 @@ class RouterVerticle : AbstractVerticle() {
 
             put(RETURN_INFORMATION_PATH).handler { Handlers.updateReturnInformation(it) }
             get(RETURN_INFORMATION_PATH).handler { Handlers.retrieveReturnInformation(it) }
+            delete(RETURN_INFORMATION_PATH).handler { Handlers.deleteReturnInformation(it) }
 
             get(TRACKING_PATH).handler { Handlers.retrieveTracking(it) }
             put(TRACKING_STEP_PATH).handler { Handlers.updateTrackingStep(it) }
             get(TRACKING_STEP_PATH).handler { Handlers.retrieveTrackingStep(it) }
+            delete(TRACKING_STEP_PATH).handler { Handlers.deleteTrackingStep(it) }
         }
     }
 
