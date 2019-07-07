@@ -9,100 +9,111 @@ info:
 paths:
   '/discovery/publish':
     post:
-      summary: Publish service
-      description: Create a new record and publish an unique service in discovery
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ServiceInformation"
+      description: 'Create a new record and publish an unique service in discovery.'
+      parameters:
+        - $ref: '#/components/parameters/service-name-param-post'
+        - $ref: '#/components/parameters/service-host-param'
+        - $ref: '#/components/parameters/service-port-param'
+        - $ref: '#/components/parameters/service-root-param'
       responses:
         '201':
           description: 'record successfully created'
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Registration"
         '400':
           description: 'bad request'
-  '/discovery/unpublish':
+  '/discovery/unpublish/{serviceRegistration}':
     delete:
-      summary: Unpublish service
-      description: Delete the record related to a service previously published in discovery
+      description: 'Delete the record related to a service previously published in discovery.'
       parameters:
         - $ref: '#/components/parameters/service-registration-id-param'
       responses:
         '200':
           description: 'ok'
+        '404':
+          description: 'not found'
         '400':
           description: 'bad request'
-  '/discovery/discover':
+  '/discovery/discover/{serviceName}':
     get:
-      summary: Returns service details saved in discovery
-      description: You can search for all the currently available service in discovery
+      description: 'By passing in the service name, you can search its location.'
       parameters:
         - $ref: '#/components/parameters/service-name-param'
       responses:
         '200':
           description: 'ok'
           content:
-            application/json:
+             text/plain:
               schema:
                 $ref: '#/components/schemas/ServiceLocation'
+        '404':
+          description: 'not found'
         '400':
           description: 'bad request'
 components:
   parameters:
-    service-name-param:
+    service-name-param-post:
       in: query
+      name: "serviceName"
+      description: "Service name"
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServiceName'
+    service-host-param:
+      in: query
+      name: "serviceHost"
+      description: "Service host"
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServiceHost'
+    service-port-param:
+      in: query
+      name: "servicePort"
+      description: "Service port"
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServicePort'
+    service-root-param:
+      in: query
+      name: "serviceRoot"
+      description: "Service root"
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServiceRoot'
+    service-name-param:
+      in: path
       name: "serviceName"
       description: "Service name"
       required: true
       schema:
         $ref: "#/components/schemas/ServiceName"
     service-registration-id-param:
-      in: query
-      name: "serviceRegistrationIdentifier"
+      in: path
+      name: "serviceRegistration"
       description: "Service registration identifier"
       required: true
       schema:
-        $ref: "#/components/schemas/ServiceRegistrationIdentifier"
+        $ref: "#/components/schemas/Registration"
   schemas:
-    ServiceInformation:
-      type: object
-      required:
-        - serviceName
-        - serviceHost
-        - servicePort
-      properties:
-        serviceName:
-          type: string
-          example: 'mission-service'
-        serviceHost:
+    ServiceName:
+      type: string
+      example: 'missions-service'
+    ServiceHost:
           type: string
           example: '127.0.0.1'
-        servicePort:
+    ServicePort:
           type: integer
           example: 10000
-    ServiceName:
-      type: object
-      required:
-        - serviceName
-      properties:
-        serviceName:
-          type: string
-          example: 'mission-service'
+    ServiceRoot: 
+        type: string
+        example: '/missions'
+    Registration:
+      type: string
+      format: UUID
+      example: "fb37c79f-5820-45d4-8eb1-c9f9f3eebf2c"
     ServiceLocation:
-      type: object
-      required:
-        - serviceLocation
-      properties:
-        serviceLocation:
-          type: string
-          format: url
-          example: 'http://localhost:10000/mission'
-    ServiceRegistrationIdentifier:
-      type: object
-      required:
-        - serviceLocation
-      properties:
-        serviceLocation:
-          type: string
-          format: uuid
-          example: 'fb37c79f-5820-45d4-8eb1-c9f9f3eebf2c'
+      type: string
+      format: url
+      example: 'http://localhost:10000/mission'

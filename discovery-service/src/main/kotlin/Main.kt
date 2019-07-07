@@ -1,5 +1,5 @@
 import io.vertx.core.Vertx
-import service.DiscoveryVerticle
+import services.DiscoveryVerticle
 
 object Main {
     @JvmStatic

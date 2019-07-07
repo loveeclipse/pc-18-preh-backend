@@ -1,9 +1,10 @@
-package service
+package services
 
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
+import service.TrackingStep
 
 class RouterVerticle : AbstractVerticle() {
 
@@ -46,7 +47,7 @@ class RouterVerticle : AbstractVerticle() {
         private const val PORT = 10000
         private const val HOST = "localhost"
 
-        private const val MISSIONS_PATH = "/missions"
+        const val MISSIONS_PATH = "/missions"
         private const val MISSION_PATH = "/missions/:missionId"
         private const val RETURN_INFORMATION_PATH = "$MISSION_PATH/return-information"
         private const val TRACKING_PATH = "$MISSION_PATH/tracking"

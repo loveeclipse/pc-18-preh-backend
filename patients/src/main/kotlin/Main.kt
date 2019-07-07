@@ -2,19 +2,18 @@ import io.vertx.core.Vertx
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.client.WebClient
 
-import services.DiscoveryData.DISCOVERY_PORT
-import services.DiscoveryData.DISCOVERY_HOST
-import services.DiscoveryData.DISCOVERY_PUBLISH_SERVICE
-import services.DiscoveryData.SERVICE_NAME
-import services.DiscoveryData.SERVICE_HOST
-import services.DiscoveryData.SERVICE_PORT
-import services.DiscoveryData.NAME
-import services.DiscoveryData.HOST
-import services.DiscoveryData.PORT
-import services.DiscoveryData.SERVICE_URI
-import services.RouterVerticle.Companion.MISSIONS_PATH
-
-import services.RouterVerticle
+import verticle.RouterVerticle
+import utils.DiscoveryData.DISCOVERY_PORT
+import utils.DiscoveryData.DISCOVERY_HOST
+import utils.DiscoveryData.DISCOVERY_PUBLISH_SERVICE
+import utils.DiscoveryData.SERVICE_NAME
+import utils.PatientsData.NAME
+import utils.DiscoveryData.SERVICE_HOST
+import utils.PatientsData.HOST
+import utils.DiscoveryData.SERVICE_PORT
+import utils.DiscoveryData.SERVICE_URI
+import utils.PatientsData.PORT
+import verticle.RouterVerticle.Companion.PATIENTS_PATH
 
 object Main {
     @JvmStatic
@@ -29,7 +28,7 @@ object Main {
                             .addQueryParam(SERVICE_NAME, NAME)
                             .addQueryParam(SERVICE_HOST, HOST)
                             .addQueryParam(SERVICE_PORT, PORT.toString())
-                            .addQueryParam(SERVICE_URI, MISSIONS_PATH)
+                            .addQueryParam(SERVICE_URI, PATIENTS_PATH)
                             .send { publishResult ->
                                 if (publishResult.succeeded()) {
                                     log.info("Received response with status code ${publishResult.result().statusCode()}")

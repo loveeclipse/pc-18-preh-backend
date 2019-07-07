@@ -1,4 +1,4 @@
-package service
+package services
 
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
@@ -15,6 +15,7 @@ import io.vertx.kotlin.core.json.get
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.mongo.UpdateOptions
 import io.vertx.ext.web.RoutingContext
+import service.TrackingStep
 import java.util.UUID
 
 object VtService {

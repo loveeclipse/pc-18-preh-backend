@@ -1,17 +1,23 @@
-package service
+package services
 
 import io.vertx.core.AbstractVerticle
+import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
 
+import utils.EventsData.HOST
+import utils.EventsData.PORT
+
 class EventsService : AbstractVerticle() {
+
+    val log = LoggerFactory.getLogger(this.javaClass.canonicalName)
 
     override fun start() {
         vertx
                 .createHttpServer()
                 .requestHandler(createRouter())
                 .listen(PORT, HOST)
-        println("Service ready on port $PORT and host $HOST")
+        log.info("Service ready on port $PORT and host $HOST")
     }
 
     private fun createRouter(): Router {
@@ -25,9 +31,7 @@ class EventsService : AbstractVerticle() {
     }
 
     companion object {
-        private const val PORT = 10000
-        private const val HOST = "localhost"
-        private const val EVENTS_PATH = "/v1/events"
+        const val EVENTS_PATH = "/events"
         private const val SINGLE_EVENT_PATH = "$EVENTS_PATH/:eventId"
     }
 }
