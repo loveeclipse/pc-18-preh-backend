@@ -1,5 +1,3 @@
-package services
-
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
@@ -15,19 +13,17 @@ import io.vertx.kotlin.core.json.get
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.mongo.UpdateOptions
 import io.vertx.ext.web.RoutingContext
-import service.TrackingStep
 import java.util.UUID
 
-object VtService {
+object Handlers {
     private const val MISSIONS_COLLECTION = "missions"
-
     private val MONGODB_CONFIGURATION = json { obj(
             "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
     ) }
 
     private var vertx: Vertx? = null
     fun initializeRequestManager(vertx: Vertx) {
-        VtService.vertx = vertx
+        Handlers.vertx = vertx
     }
 
     fun createMission(context: RoutingContext) {
@@ -182,7 +178,7 @@ object VtService {
                 }
     }
 
-    fun retrieveTimelineItem(context: RoutingContext, trackingItem: TrackingStep) {
+//    fun retrieveTimelineItem(context: RoutingContext, trackingItem: TrackingStep) {
 //        val response = context.response()
 //        val eventId = context.request().params()[EVENT_ID]
 //        val missionId = context.request().params()[MISSION_ID]
@@ -223,9 +219,9 @@ object VtService {
 //        } catch (_: IllegalArgumentException) { // eventId is not an UUID
 //            response.setStatusCode(BAD_REQUEST.code()).end()
 //        }
-    }
+//    }
 
-    fun updateTimelineItem(context: RoutingContext, trackingItem: TrackingStep) {
+//    fun updateTimelineItem(context: RoutingContext, trackingItem: TrackingStep) {
 //        val response = context.response()
 //        val eventId = context.request().params()[EVENT_ID]
 //        val missionId = context.request().params()[MISSION_ID]
@@ -254,7 +250,7 @@ object VtService {
 //        } catch (_: IllegalArgumentException) { // eventId is not an UUID
 //            response.setStatusCode(BAD_REQUEST.code()).end()
 //        }
-    }
+//    }
 
     fun retrieveChosenHospital(context: RoutingContext) {
 //        val response = context.response()

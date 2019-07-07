@@ -1,5 +1,3 @@
-package services
-
 object DiscoveryData {
     const val DISCOVERY_HOST = "localhost"
     const val DISCOVERY_PORT = 5150
