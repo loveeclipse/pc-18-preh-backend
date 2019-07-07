@@ -42,9 +42,12 @@ object MissionsHandlers {
                         if (saveOperation.failed()) {
                             response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                         } else {
+                            val id = missionId.toString()
+                            val uri = context.request().absoluteURI().plus("/$id")
                             response.putHeader("Content-Type", "text/plain")
+                                    .putHeader("Location", uri)
                                     .setStatusCode(CREATED.code())
-                                    .end(missionId.toString())
+                                    .end(id)
                         }
                     }
         }
