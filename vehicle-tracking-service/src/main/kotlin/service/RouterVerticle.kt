@@ -29,6 +29,7 @@ class RouterVerticle : AbstractVerticle() {
             delete(MISSION_PATH).handler { VtService.deleteMission(it) }
 
             put(RETURN_INFORMATION_PATH).handler { VtService.updateReturnInformation(it) }
+            get(RETURN_INFORMATION_PATH).handler { VtService.retrieveReturnInformation(it) }
 
 //            for (item in trackingSteps) {
 //                val path = MISSION_TRACKING_PATH + "/timeline/" + item.pathName

@@ -116,9 +116,9 @@ object VtService {
         val query = json { obj("_id" to missionId) }
 
         MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-                .removeDocument(MISSIONS_COLLECTION, query) { deleteOperation ->
-                    if (deleteOperation.succeeded()) {
-                        if (deleteOperation.result().removedCount == 1L) {
+                .removeDocument(MISSIONS_COLLECTION, query) { removeOperation ->
+                    if (removeOperation.succeeded()) {
+                        if (removeOperation.result().removedCount == 1L) {
                             response.setStatusCode(NO_CONTENT.code()).end()
                         } else {
                             response.setStatusCode(NOT_FOUND.code()).end()
@@ -131,7 +131,7 @@ object VtService {
 
     fun updateReturnInformation(context: RoutingContext) {
         val response = context.response()
-        val missionId: String? = context.request().getParam("missionId")
+        val missionId: String = context.request().getParam("missionId")
         val requestBody = context.bodyAsJson
 
         val query = json { obj("_id" to missionId) }
@@ -150,40 +150,35 @@ object VtService {
                 }
     }
 
-    fun retrieveMissionTracking(context: RoutingContext) {
-//        val response = context.response()
-//        val eventId = context.request().params()[EVENT_ID]
-//        val missionId = context.request().params()[MISSION_ID]
-//
-//        try {
-//            UUID.fromString(eventId)
-//            val query = json { obj(
-//                        EVENT_ID to eventId,
-//                        MISSION_ID to missionId
-//            ) }
-//
-//            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-//                    .find(COLLECTION_NAME, query) { findOperation ->
-//                        when {
-//                            findOperation.succeeded() -> {
-//                                val results: List<JsonObject> = findOperation.result()
-//                                if (results.isEmpty()) {
-//                                    response.setStatusCode(NOT_FOUND.code()).end()
-//                                } else {
-//                                    val firstResult = results.first()
-//                                    response.putHeader("Content-Type", "application/json")
-//                                            .setStatusCode(OK.code())
-//                                            .end(Json.encodePrettily(firstResult[TIMELINE]))
-//                                }
-//                            }
-//                            findOperation.failed() -> {
-//                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-//                            }
-//                        }
-//                    }
-//        } catch (_: IllegalArgumentException) { // eventId is not an UUID
-//            response.setStatusCode(BAD_REQUEST.code()).end()
-//        }
+    fun retrieveReturnInformation(context: RoutingContext) {
+        val response = context.response()
+        val missionId: String = context.request().getParam("missionId")
+
+        val query = json { obj(
+                "_id" to missionId
+        ) }
+
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .find(MISSIONS_COLLECTION, query) { findOperation ->
+                    if (findOperation.failed()) {
+                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                    } else {
+                        val results: List<JsonObject> = findOperation.result()
+                        if (results.isEmpty()) {
+                            response.setStatusCode(NOT_FOUND.code()).end()
+                        } else {
+                            val firstResult: JsonObject = results.first()
+                            val returnInformation: JsonObject? = firstResult["returnInformation"]
+                            if (returnInformation == null) {
+                                response.setStatusCode(NO_CONTENT.code()).end()
+                            } else {
+                                response.putHeader("Content-Type", "application/json")
+                                        .setStatusCode(OK.code())
+                                        .end(Json.encodePrettily(returnInformation))
+                            }
+                        }
+                    }
+                }
     }
 
     fun retrieveTimelineItem(context: RoutingContext, trackingItem: TrackingStep) {
