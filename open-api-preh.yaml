@@ -148,7 +148,7 @@ paths:
     post:
       tags: 
         - "Missions"
-      description: "A new mission will be created and its identifier will be returned as plain text. The mission's 'ongoing' propertiy is automatically set to true."
+      description: "A new mission will be created and its identifier will be returned as plain text. The mission's \"ongoing\" propertiy is automatically set to true."
       requestBody:
         content:
           application/json:
@@ -291,9 +291,9 @@ paths:
         '204':
           description: "mission return information successfully updated"
         '400':
-          description: "bad parameters"
-        # '404':
-        #   description: "mission not found"
+          description: "bad request"
+        '404':
+          description: "mission not found"
         '500':
           description: "server error"
     
@@ -326,8 +326,6 @@ paths:
       responses:
         '204':
           description: "mission return information successfully deleted"
-        '400':
-          description: "bad parameters"
         '404':
           description: "mission not found"
         '500':
@@ -372,8 +370,8 @@ paths:
           description: "mission tracking successfully updated"
         '400':
           description: "bad parameters"
-        # '404':
-        #   description: "mission not found"
+        '404':
+          description: "mission not found"
         '500':
           description: "server error"
     
@@ -409,11 +407,11 @@ paths:
         '204':
           description: "mission tracking step information successfully deleted"
         '404':
-          description: "tracking step not found"
+          description: "not found"
         '500':
           description: "server error"
   
-  '/missions/{missionId}/tracking/ongoing':
+  '/missions/{missionId}/ongoing':
     put:
       tags: 
         - "Missions"
@@ -645,8 +643,10 @@ paths:
             text/plain:
               schema:
                 $ref: "#/components/schemas/Identifier"
-        '404':
-          description: "patient not found"
+        '400':
+          description: "bad request"
+        # '404':
+        #   description: "patient not found"
         '500':
           description: "server error"
           
@@ -766,7 +766,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Identifier"
         '400':
-          description: "bad parameters"
+          description: "bad request"
         # '404':
         #   description: "patient not found"
         '500':
@@ -874,6 +874,8 @@ paths:
       responses:
         '201':
           description: "patient's maneuver execution registered successfully"
+        '400':
+          description: "bad request"
         # '404':
         #   description: "patient not found"
         '409':
@@ -941,7 +943,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Identifier"
         '400':
-          description: "bad parameters"
+          description: "bad request"
         # '404':
         #   description: "patient not found"
         '500':
@@ -1133,7 +1135,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Identifier"
         '400':
-          description: "bad parameters"
+          description: "bad request"
         # '404':
         #   description: "treatment not found"
         '500':
@@ -1156,7 +1158,7 @@ paths:
         '200':
           description: "patient's treatment updated successfully"
         '400':
-          description: "bad parameters"
+          description: "bad request"
         # '404':
         #   description: "patient not found"
         '500':
@@ -1221,7 +1223,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Identifier"
         '400':
-          description: "bad parameters"      
+          description: "bad request"      
         # '404':
         #   description: "patient not found"
         '500':
@@ -1366,13 +1368,8 @@ paths:
       responses:
         '201':
           description: "patient's complication registered successfully"
-          headers:
-            Location:
-              schema:
-                type: string
-                format: URI-reference
         '400':
-          description: "bad parameters"
+          description: "bad request"
         '409':
           description: "conflict: complication already registered"
         # '404':
@@ -1475,6 +1472,8 @@ paths:
             text/plain:
               schema:
                 $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad request"
         # '404':
         #   description: "patient not found"
         '500':
@@ -1687,6 +1686,10 @@ components:
     
     MissionReturnInformation:
       type: object
+      required:
+        - returnCode
+        - returnHospital
+        - returnReleaseSite
       properties:
         returnCode:
           type: integer
@@ -1731,9 +1734,9 @@ components:
             $ref: '#/components/schemas/MissionTrackingItem'
           crewDeparture:
             $ref: '#/components/schemas/MissionTrackingItem'
-          landingOnsite:
+          arrivalOnsite:
             $ref: '#/components/schemas/MissionTrackingItem'
-          takeoffOnsite:
+          departureOnsite:
             $ref: '#/components/schemas/MissionTrackingItem'
           landingHelipad:
             $ref: '#/components/schemas/MissionTrackingItem'
@@ -2066,11 +2069,10 @@ components:
     ComplicationName:
       type: string
       enum:
-        - "cardio-circulatory-arrest"
         - "impaired-consciousness"
         - "anisocoria-mydriasis"
         - "respiratory-failure"
-        - "cardiovascular-shock"
+        - "cardiocirculatory-shock"
         - "landing-in-itinere"
         - "demise-in-itinere"
         - "demise-in-ps"
