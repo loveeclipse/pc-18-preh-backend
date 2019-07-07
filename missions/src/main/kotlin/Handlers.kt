@@ -150,7 +150,30 @@ object Handlers {
     }
 
     fun retrieveOngoing(context: RoutingContext) {
-        // TODO
+        val response = context.response()
+        val missionId: String = context.request().getParam("missionId")
+
+        val query = json { obj("_id" to missionId) }
+        MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
+                .findOne(MISSIONS_COLLECTION, query, null) { findOneOperation ->
+                    if (findOneOperation.failed()) {
+                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                    } else {
+                        val result: JsonObject? = findOneOperation.result()
+                        if (result == null) {
+                            response.setStatusCode(NOT_FOUND.code()).end()
+                        } else {
+                            val ongoing: Boolean? = result["ongoing"]
+                            if (ongoing == null) {
+                                response.setStatusCode(NO_CONTENT.code()).end()
+                            } else {
+                                response.putHeader("Content-Type", "text/plain")
+                                        .setStatusCode(OK.code())
+                                        .end(ongoing.toString())
+                            }
+                        }
+                    }
+                }
     }
 
     fun updateReturnInformation(context: RoutingContext) {
