@@ -1,5 +1,5 @@
 rootProject.name = 'pc-18-preh-backend'
-include 'events',
-        'vehicle-tracking-service',
-        'discovery-service',
+include 'discovery-service',
+        'events',
+        'missions',
         'patients'
