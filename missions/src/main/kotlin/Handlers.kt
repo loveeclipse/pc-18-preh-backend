@@ -137,9 +137,8 @@ object Handlers {
             val update = json { obj(
                     "\$set" to obj("ongoing" to ongoing.toBoolean())
             ) }
-            val options = UpdateOptions(true)
             MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
-                    .updateCollectionWithOptions(MISSIONS_COLLECTION, query, update, options) { updateOperation ->
+                    .updateCollection(MISSIONS_COLLECTION, query, update) { updateOperation ->
                         when {
                             updateOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                             updateOperation.result().docMatched == 0L -> response.setStatusCode(NOT_FOUND.code()).end()
@@ -182,30 +181,15 @@ object Handlers {
         val requestBody = context.bodyAsJson
 
         val query = json { obj("_id" to missionId) }
+        val update = json { obj(
+                "\$set" to obj("returnInformation" to requestBody)
+        ) }
         MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
-                .findOne(MISSIONS_COLLECTION, query, null) { findOneOperation ->
+                .updateCollection(MISSIONS_COLLECTION, query, update) { updateOperation ->
                     when {
-                        findOneOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                        findOneOperation.result() == null -> {
-                            response.putHeader("Content-Type", "text/plain")
-                                    .setStatusCode(NOT_FOUND.code())
-                                    .end("Mission not found")
-                        }
-                        else -> {
-
-                            val update = json { obj(
-                                        "\$set" to obj("returnInformation" to requestBody)
-                            ) }
-                            val options = UpdateOptions(true)
-                            MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
-                                    .updateCollectionWithOptions(MISSIONS_COLLECTION, query, update, options) { updateOperation ->
-                                        if (updateOperation.failed()) {
-                                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                                        } else {
-                                            response.setStatusCode(NO_CONTENT.code()).end()
-                                        }
-                                    }
-                        }
+                        updateOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                        updateOperation.result().docMatched == 0L -> response.setStatusCode(NOT_FOUND.code()).end()
+                        else -> response.setStatusCode(NO_CONTENT.code()).end()
                     }
                 }
     }
@@ -293,34 +277,20 @@ object Handlers {
                     .setStatusCode(NOT_FOUND.code())
                     .end("Unknown tracking step: $step")
         } else {
-            val query = json { obj("_id" to missionId) }
-            MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
-                    .findOne(MISSIONS_COLLECTION, query, null) { findOneOperation ->
-                        when {
-                            findOneOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                            findOneOperation.result() == null -> {
-                                response.putHeader("Content-Type", "text/plain")
-                                        .setStatusCode(NOT_FOUND.code())
-                                        .end("Mission not found")
-                            }
-                            else -> {
 
-                                val requestBody: JsonObject? = context.bodyAsJson
-                                val update = json { obj(
-                                        "\$set" to obj(
-                                                "tracking.${trackingStepsConversions.getValue(step)}" to requestBody
-                                        )
-                                ) }
-                                val options = UpdateOptions(true)
-                                MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
-                                        .updateCollectionWithOptions(MISSIONS_COLLECTION, query, update, options) { updateOperation ->
-                                            if (updateOperation.failed()) {
-                                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                                            } else {
-                                                response.setStatusCode(NO_CONTENT.code()).end()
-                                            }
-                                        }
-                            }
+            val query = json { obj("_id" to missionId) }
+            val requestBody: JsonObject? = context.bodyAsJson
+            val update = json { obj(
+                    "\$set" to obj(
+                            "tracking.${trackingStepsConversions.getValue(step)}" to requestBody
+                    )
+            ) }
+            MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
+                    .updateCollection(MISSIONS_COLLECTION, query, update) { updateOperation ->
+                        when {
+                            updateOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            updateOperation.result().docMatched == 0L -> response.setStatusCode(NOT_FOUND.code()).end()
+                            else -> response.setStatusCode(NO_CONTENT.code()).end()
                         }
                     }
         }
@@ -336,6 +306,7 @@ object Handlers {
                     .setStatusCode(NOT_FOUND.code())
                     .end("Unknown tracking step: $step")
         } else {
+
             val query = json { obj("_id" to missionId) }
             MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
                     .findOne(MISSIONS_COLLECTION, query, null) { findOneOperation ->
