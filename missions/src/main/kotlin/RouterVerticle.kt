@@ -2,6 +2,10 @@ import io.vertx.core.AbstractVerticle
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
+import handlers.MissionsHandlers
+import handlers.OngoingHandlers
+import handlers.ReturnInformationHandlers
+import handlers.TrackingHandlers
 
 class RouterVerticle : AbstractVerticle() {
 
@@ -18,23 +22,22 @@ class RouterVerticle : AbstractVerticle() {
         return Router.router(vertx).apply {
             route().handler(BodyHandler.create())
 
-            post(MISSIONS_PATH).handler { Handlers.createMission(it) }
-            get(MISSIONS_PATH).handler { Handlers.retrieveMissions(it) }
+            post(MISSIONS_PATH).handler { MissionsHandlers.createMission(it) }
+            get(MISSIONS_PATH).handler { MissionsHandlers.retrieveMissions(it) }
+            get(MISSION_PATH).handler { MissionsHandlers.retrieveMission(it) }
+            delete(MISSION_PATH).handler { MissionsHandlers.deleteMission(it) }
 
-            get(MISSION_PATH).handler { Handlers.retrieveMission(it) }
-            delete(MISSION_PATH).handler { Handlers.deleteMission(it) }
+            put(ONGOING_PATH).handler { OngoingHandlers.updateOngoing(it) }
+            get(ONGOING_PATH).handler { OngoingHandlers.retrieveOngoing(it) }
 
-            put(ONGOING_PATH).handler { Handlers.updateOngoing(it) }
-            get(ONGOING_PATH).handler { Handlers.retrieveOngoing(it) }
+            put(RETURN_INFORMATION_PATH).handler { ReturnInformationHandlers.updateReturnInformation(it) }
+            get(RETURN_INFORMATION_PATH).handler { ReturnInformationHandlers.retrieveReturnInformation(it) }
+            delete(RETURN_INFORMATION_PATH).handler { ReturnInformationHandlers.deleteReturnInformation(it) }
 
-            put(RETURN_INFORMATION_PATH).handler { Handlers.updateReturnInformation(it) }
-            get(RETURN_INFORMATION_PATH).handler { Handlers.retrieveReturnInformation(it) }
-            delete(RETURN_INFORMATION_PATH).handler { Handlers.deleteReturnInformation(it) }
-
-            get(TRACKING_PATH).handler { Handlers.retrieveTracking(it) }
-            put(TRACKING_STEP_PATH).handler { Handlers.updateTrackingStep(it) }
-            get(TRACKING_STEP_PATH).handler { Handlers.retrieveTrackingStep(it) }
-            delete(TRACKING_STEP_PATH).handler { Handlers.deleteTrackingStep(it) }
+            get(TRACKING_PATH).handler { TrackingHandlers.retrieveTracking(it) }
+            put(TRACKING_STEP_PATH).handler { TrackingHandlers.updateTrackingStep(it) }
+            get(TRACKING_STEP_PATH).handler { TrackingHandlers.retrieveTrackingStep(it) }
+            delete(TRACKING_STEP_PATH).handler { TrackingHandlers.deleteTrackingStep(it) }
         }
     }
 
