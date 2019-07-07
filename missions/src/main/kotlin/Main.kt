@@ -15,12 +15,14 @@ import DiscoveryData.SERVICE_URI
 import RouterVerticle.Companion.MISSIONS_PATH
 
 object Main {
+
+    val vertx = Vertx.vertx()
+
     @JvmStatic
     fun main(args: Array<String>) {
         val log = LoggerFactory.getLogger(this.javaClass.simpleName)
 
-        val vertx = Vertx.vertx()
-        vertx.deployVerticle((RouterVerticle())) { startService ->
+        vertx.deployVerticle(RouterVerticle()) { startService ->
             when {
                 startService.succeeded() ->
                     WebClient.create(vertx).post(DISCOVERY_PORT, DISCOVERY_HOST, DISCOVERY_PUBLISH_SERVICE)
