@@ -123,7 +123,30 @@ object Handlers {
     }
 
     fun updateOngoing(context: RoutingContext) {
-        // TODO
+        val response = context.response()
+        val missionId: String = context.request().getParam("missionId")
+        val ongoing: String = context.bodyAsString
+
+        if (ongoing != "true" && ongoing != "false") {
+            response.putHeader("Content-Type", "plain/text")
+                    .setStatusCode(BAD_REQUEST.code())
+                    .end("Invalid request body. Accepted values: true or false")
+        } else {
+
+            val query = json { obj("_id" to missionId) }
+            val update = json { obj(
+                    "\$set" to obj("ongoing" to ongoing.toBoolean())
+            ) }
+            val options = UpdateOptions(true)
+            MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
+                    .updateCollectionWithOptions(MISSIONS_COLLECTION, query, update, options) { updateOperation ->
+                        when {
+                            updateOperation.failed() -> response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                            updateOperation.result().docMatched == 0L -> response.setStatusCode(NOT_FOUND.code()).end()
+                            else -> response.setStatusCode(NO_CONTENT.code()).end()
+                        }
+                    }
+        }
     }
 
     fun retrieveOngoing(context: RoutingContext) {

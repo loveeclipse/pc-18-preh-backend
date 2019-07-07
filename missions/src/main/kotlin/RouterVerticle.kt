@@ -24,7 +24,7 @@ class RouterVerticle : AbstractVerticle() {
             get(MISSION_PATH).handler { Handlers.retrieveMission(it) }
             delete(MISSION_PATH).handler { Handlers.deleteMission(it) }
 
-            post(ONGOING_PATH).handler { Handlers.updateOngoing(it) }
+            put(ONGOING_PATH).handler { Handlers.updateOngoing(it) }
             get(ONGOING_PATH).handler { Handlers.retrieveOngoing(it) }
 
             put(RETURN_INFORMATION_PATH).handler { Handlers.updateReturnInformation(it) }
