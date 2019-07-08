@@ -8,7 +8,6 @@ import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
 import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
-import io.vertx.core.json.JsonObject
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
@@ -25,31 +24,29 @@ object RequestManager {
     private const val EVENT_ID = "eventId"
     private const val COLLECTION_NAME = "events"
     private const val DUPLICATED_KEY_CODE = "E11000"
-    private val EVENT_SCHEMA = listOf("callTime", "address", "notes", "dispatchCode", "secondary", "dynamic",
-            "patientsNumber", "ongoing")
-    private val EVENT_REQUIRED_SCHEMA = listOf("callTime", "address")
+    private const val FAILED_VALIDATION_MESSAGE = "Document failed validation"
 
     fun createEvent(routingContext: RoutingContext) {
         val response = routingContext.response()
         val eventId = UUID.randomUUID().toString()
+        val uri = routingContext.request().absoluteURI().plus("/$eventId")
         val eventData = routingContext.bodyAsJson
-        if (checkSchema(eventData, EVENT_REQUIRED_SCHEMA, EVENT_SCHEMA)) {
-            val document = eventData.put(DOCUMENT_ID, eventId)
-            MongoClient.createNonShared(vertx, CONFIG).insert(COLLECTION_NAME, document) { insertOperation ->
-                when {
-                    insertOperation.succeeded() ->
-                        response
-                            .putHeader("Content-Type", "text/plain")
-                            .setStatusCode(CREATED.code())
-                            .end(eventId)
-                    isDuplicateKey(insertOperation.cause().message) ->
-                        createEvent(routingContext)
-                    else ->
-                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                }
+        val document = eventData.put(DOCUMENT_ID, eventId)
+        MongoClient.createNonShared(vertx, CONFIG).insert(COLLECTION_NAME, document) { insertOperation ->
+            when {
+                insertOperation.succeeded() ->
+                    response
+                        .putHeader("Content-Type", "text/plain")
+                        .putHeader("Location", uri)
+                        .setStatusCode(CREATED.code())
+                        .end(eventId)
+                isDuplicateKey(insertOperation.cause().message) ->
+                    createEvent(routingContext)
+                insertOperation.cause().message == FAILED_VALIDATION_MESSAGE ->
+                    response.setStatusCode(BAD_REQUEST.code()).end()
+                else ->
+                    response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
             }
-        } else {
-            response.setStatusCode(BAD_REQUEST.code()).end()
         }
     }
 
@@ -81,26 +78,19 @@ object RequestManager {
         val response = routingContext.response()
         val eventId = routingContext.request().getParam(EVENT_ID)
         val eventData = routingContext.bodyAsJson
-        if (checkSchema(eventData, emptyList(), EVENT_SCHEMA)) {
-            val query = json { obj(DOCUMENT_ID to eventId) }
-            val update = json { obj("\$set" to eventData) }
-            MongoClient.createNonShared(vertx, CONFIG).updateCollection(COLLECTION_NAME, query, update) { updateOperation ->
-                when {
-                    updateOperation.succeeded() && updateOperation.result().docModified != 0L ->
-                        response.setStatusCode(NO_CONTENT.code()).end()
-                    updateOperation.succeeded() ->
-                        response.setStatusCode(NOT_FOUND.code()).end()
-                    else ->
-                        response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                }
+        val query = json { obj(DOCUMENT_ID to eventId) }
+        val update = json { obj("\$set" to eventData) }
+        MongoClient.createNonShared(vertx, CONFIG).updateCollection(COLLECTION_NAME, query, update) { updateOperation ->
+            when {
+                updateOperation.succeeded() && updateOperation.result().docModified != 0L ->
+                    response.setStatusCode(NO_CONTENT.code()).end()
+                updateOperation.succeeded() ->
+                    response.setStatusCode(NOT_FOUND.code()).end()
+                updateOperation.cause().message == FAILED_VALIDATION_MESSAGE ->
+                    response.setStatusCode(BAD_REQUEST.code()).end()
+                else ->
+                    response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
             }
-        } else {
-            response.setStatusCode(BAD_REQUEST.code()).end()
         }
-    }
-
-    private fun checkSchema(json: JsonObject, required: List<String>?, parameters: List<String>): Boolean {
-        required?.forEach { key -> if (!json.containsKey(key)) return false }
-        return parameters.containsAll(json.fieldNames())
     }
 }
