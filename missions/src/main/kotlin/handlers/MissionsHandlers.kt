@@ -23,18 +23,12 @@ object MissionsHandlers {
     fun createMission(context: RoutingContext) {
         val response = context.response()
         val requestBody = context.bodyAsJson
-        val eventId: String? = requestBody["eventId"]
-        val vehicle: String? = requestBody["vehicle"]
 
         val missionId = UUID.randomUUID()
-        val newMission = json { obj(
-                "_id" to missionId.toString(),
-                "eventId" to eventId,
-                "vehicle" to vehicle,
-                "ongoing" to true
-        ) }
+        requestBody.put("_id", missionId.toString())
+                .put("ongoing", true)
         MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
-                .save(MISSIONS_COLLECTION, newMission) { saveOperation ->
+                .save(MISSIONS_COLLECTION, requestBody) { saveOperation ->
                     if (saveOperation.failed()) {
                         if (saveOperation.cause().message == FAILED_VALIDATION_MESSAGE) {
                             response.setStatusCode(BAD_REQUEST.code()).end()
