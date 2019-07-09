@@ -78,7 +78,7 @@ object ReturnInformationHandlers {
                 .updateCollection(MISSIONS_COLLECTION, query, update) { updateOperation ->
                     when {
                         updateOperation.failed() -> response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end()
-                        updateOperation.result().docModified < 1L -> response.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end()
+                        updateOperation.result().docModified == 0L -> response.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end()
                         else -> response.setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end()
                     }
                 }
