@@ -20,36 +20,27 @@
             "ongoing" : {
                 "bsonType" : "bool"
             }, 
+            "medic" : {
+                "bsonType" : "string"
+            }, 
             "returnInformation" : {
-                "bsonType" : "object",
-                "required": [
-                    "returnCode",
-                    "returnHospital",
+                "bsonType" : "object", 
+                "required" : [
+                    "returnCode", 
+                    "returnHospital", 
                     "returnReleaseSite"
-                ],
+                ], 
                 "properties" : {
                     "returnCode" : {
-                        "enum" : [
-                            1.0, 
-                            2.0, 
-                            3.0, 
-                            4.0
-                        ]
+                        "bsonType" : "int", 
+                        "minimum" : 1.0, 
+                        "maximum" : 4.0
                     }, 
                     "returnHospital" : {
-                        "enum" : [
-                            "Cesena", 
-                            "Faenza", 
-                            "Forlì", 
-                            "Ravenna", 
-                            "Rimini"
-                        ]
+                        "bsonType" : "string"
                     }, 
                     "returnReleaseSite" : {
-                        "enum" : [
-                            "Emergency Room", 
-                            "Surgery"
-                        ]
+                        "bsonType" : "string"
                     }
                 }
             }, 

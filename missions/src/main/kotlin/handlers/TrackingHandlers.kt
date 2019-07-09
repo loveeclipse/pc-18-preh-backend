@@ -14,7 +14,6 @@ import handlers.Shared.MONGODB_CONFIGURATION
 
 object TrackingHandlers {
     private val trackingStepsConversions: Map<String, String> = mapOf(
-            "oc-call" to "ocCall",
             "crew-departure" to "crewDeparture",
             "arrival-onsite" to "arrivalOnsite",
             "departure-onsite" to "departureOnsite",

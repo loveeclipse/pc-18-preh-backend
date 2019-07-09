@@ -17,7 +17,7 @@ object DiscoveryService {
     private const val SERVICE_HOST = "serviceHost"
     private const val SERVICE_PORT = "servicePort"
     private const val SERVICE_REGISTRATION = "serviceRegistration"
-    private const val SERVICE_URI = "serviceUri"
+    private const val SERVICE_URI = ""
 
     private var registrationList: MutableList<String> = ArrayList()
 
@@ -27,8 +27,7 @@ object DiscoveryService {
         val serviceName = routingContext.request().params()[SERVICE_NAME]
         val serviceHost = routingContext.request().params()[SERVICE_HOST]
         val servicePort = routingContext.request().params()[SERVICE_PORT]
-        val serviceUri = routingContext.request().params()[SERVICE_URI]
-        val record = HttpEndpoint.createRecord(serviceName, serviceHost, servicePort.toInt(), "/")
+        val record = HttpEndpoint.createRecord(serviceName, serviceHost, servicePort.toInt(), SERVICE_URI)
         discovery?.publish(record) { publishOperation ->
             when {
                 publishOperation.succeeded() -> {

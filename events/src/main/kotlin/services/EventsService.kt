@@ -31,7 +31,7 @@ class EventsService : AbstractVerticle() {
     }
 
     companion object {
-        const val EVENTS_PATH = "/events"
+        private const val EVENTS_PATH = "/events"
         private const val SINGLE_EVENT_PATH = "$EVENTS_PATH/:eventId"
     }
 }

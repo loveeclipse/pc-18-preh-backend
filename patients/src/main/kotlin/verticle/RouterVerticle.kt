@@ -70,7 +70,7 @@ class RouterVerticle : AbstractVerticle() {
         VitalParametersService.vertx = vertx
     }
     companion object {
-        const val PATIENTS_PATH = "/patients"
+        private const val PATIENTS_PATH = "/patients"
         private const val PATIENT_PATH = "$PATIENTS_PATH/:patientId"
         private const val ANAGRAPHIC_PATH = "$PATIENT_PATH/anagraphic"
         private const val STATUS_PATH = "$PATIENT_PATH/status"
