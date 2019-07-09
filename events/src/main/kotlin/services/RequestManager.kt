@@ -31,7 +31,7 @@ object RequestManager {
         val eventId = UUID.randomUUID().toString()
         val uri = routingContext.request().absoluteURI().plus("/$eventId")
         val eventData = routingContext.bodyAsJson
-        val document = eventData.put(DOCUMENT_ID, eventId)
+        val document = eventData.put(DOCUMENT_ID, eventId).put("ongoing", true)
         MongoClient.createNonShared(vertx, CONFIG).insert(COLLECTION_NAME, document) { insertOperation ->
             when {
                 insertOperation.succeeded() ->
