@@ -11,8 +11,6 @@ import DiscoveryData.SERVICE_PORT
 import DiscoveryData.NAME
 import DiscoveryData.HOST
 import DiscoveryData.PORT
-import DiscoveryData.SERVICE_URI
-import RouterVerticle.Companion.MISSIONS_PATH
 
 object Main {
 
@@ -29,7 +27,6 @@ object Main {
                             .addQueryParam(SERVICE_NAME, NAME)
                             .addQueryParam(SERVICE_HOST, HOST)
                             .addQueryParam(SERVICE_PORT, PORT.toString())
-                            .addQueryParam(SERVICE_URI, MISSIONS_PATH)
                             .send { publishResult ->
                                 if (publishResult.succeeded()) {
                                     log.info("Received response with status code ${publishResult.result().statusCode()}")

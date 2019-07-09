@@ -45,7 +45,7 @@ class RouterVerticle : AbstractVerticle() {
         const val PORT = 10000
         const val HOST = "localhost"
 
-        const val MISSIONS_PATH = "/missions"
+        private const val MISSIONS_PATH = "/missions"
         private const val MISSION_PATH = "$MISSIONS_PATH/:missionId"
         private const val ONGOING_PATH = "$MISSION_PATH/ongoing"
         private const val RETURN_INFORMATION_PATH = "$MISSION_PATH/return-information"
