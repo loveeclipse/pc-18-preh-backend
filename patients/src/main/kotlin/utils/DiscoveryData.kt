@@ -9,5 +9,4 @@ object DiscoveryData {
     const val SERVICE_NAME = "serviceName"
     const val SERVICE_HOST = "serviceHost"
     const val SERVICE_PORT = "servicePort"
-    const val SERVICE_URI = "serviceUri"
 }
