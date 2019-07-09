@@ -9,6 +9,7 @@ import io.vertx.kotlin.core.json.get
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 import handlers.Shared.MISSIONS_COLLECTION
+import handlers.Shared.FAILED_VALIDATION_MESSAGE
 import handlers.Shared.MONGODB_CONFIGURATION
 
 object ReturnInformationHandlers {
@@ -25,7 +26,13 @@ object ReturnInformationHandlers {
         MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
                 .updateCollection(MISSIONS_COLLECTION, query, update) { updateOperation ->
                     when {
-                        updateOperation.failed() -> response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end()
+                        updateOperation.failed() -> {
+                            if (updateOperation.cause().message == FAILED_VALIDATION_MESSAGE) {
+                                response.setStatusCode(HttpResponseStatus.BAD_REQUEST.code()).end()
+                            } else {
+                                response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end()
+                            }
+                        }
                         updateOperation.result().docMatched == 0L -> response.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end()
                         else -> response.setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end()
                     }
