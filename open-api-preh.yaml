@@ -52,6 +52,7 @@ paths:
           schema:
             type: string
             format: date-time
+            example: '2019-07-13T12:00:00'
         - in: query
           name: "before"
           description: "the date-time before which consider the events to retrieve"
@@ -59,6 +60,7 @@ paths:
           schema:
             type: string
             format: date-time
+            example: '2019-07-14T12:00:00'
         - in: query
           name: "ongoing"
           description: "true if the event is still ongoing: an event is considered ongoing if at least one of its missions is still ongoing"
@@ -273,7 +275,104 @@ paths:
           description: "mission not found"
         '500':
           description: "server error"
-  
+    
+  '/missions/{missionId}/ongoing':
+    put:
+      tags: 
+        - "Missions"
+      description: "Tells if the mission is ongoing or not."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: boolean
+              example: true
+      responses:
+        '204':
+          description: "mission ongoing value successfully updated"
+        '400':
+          description: "bad parameters"
+        # '404':
+        #   description: "mission not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Missions"
+      description: "Tells if the mission is still ongoing or not."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            text/plain:
+              schema:
+                type: boolean
+                example: false
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+  '/missions/{missionId}/medic':
+    put:
+      tags: 
+        - "Missions"
+      description: "Updates the assigned medic for the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: "Marco Benni"
+      responses:
+        '204':
+          description: "mission ongoing value successfully updated"
+        '400':
+          description: "bad parameters"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Missions"
+      description: "Retrieves the medic name assigned to the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Marco Benni"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Missions"
+      description: "Deletes the medic name assigned to the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '204':
+          description: "medic name successfully deleted"
+        '404':
+          description: "not found"
+        '500':
+          description: "server error"
   
   '/missions/{missionId}/return-information':
     put:
@@ -410,48 +509,6 @@ paths:
           description: "not found"
         '500':
           description: "server error"
-  
-  '/missions/{missionId}/ongoing':
-    put:
-      tags: 
-        - "Missions"
-      description: "Tells if the mission is ongoing or not."
-      parameters:
-        - $ref: "#/components/parameters/mission-id-param"
-      requestBody:
-        content:
-          text/plain:
-            schema:
-              type: boolean
-              example: true
-      responses:
-        '204':
-          description: "mission ongoing value successfully updated"
-        '400':
-          description: "bad parameters"
-        # '404':
-        #   description: "mission not found"
-        '500':
-          description: "server error"
-    
-    get:
-      tags: 
-        - "Missions"
-      description: "Tells if the mission is still ongoing or not."
-      parameters:
-        - $ref: "#/components/parameters/mission-id-param"
-      responses:
-        '200':
-          description: "ok"
-          content:
-            text/plain:
-              schema:
-                type: boolean
-                example: false
-        '404':
-          description: "mission not found"
-        '500':
-          description: "server error"
 
   '/patients':
     post:
@@ -498,6 +555,7 @@ paths:
           schema:
             type: string
             format: date-time
+            example: '2019-07-13T12:00:00'
         - in: query
           name: "before"
           description: "the date-time (of taking-care) before which consider the patients to retrieve"
@@ -505,6 +563,7 @@ paths:
           schema:
             type: string
             format: date-time
+            example: '2019-07-14T12:00:00'
         - in: query
           name: "missionId"
           description: "the identifier of the mission relative to the patient"
@@ -871,6 +930,7 @@ paths:
             schema:
               type: string
               format: date-time
+              example: '2019-07-13T12:05:09'
       responses:
         '201':
           description: "patient's maneuver execution registered successfully"
@@ -898,6 +958,7 @@ paths:
               schema:
                 type: string
                 format: date-time
+                example: '2019-07-13T12:05:09'
         '404':
           description: "not found"
         '500':
@@ -1365,6 +1426,7 @@ paths:
             schema:
               type: string
               format: date-time
+              example: '2019-07-13T13:05:10'
       responses:
         '201':
           description: "patient's complication registered successfully"
@@ -1392,6 +1454,7 @@ paths:
              schema:
                type: string
                format: date-time
+               example: '2019-07-13T13:05:10'
         '404':
           description: "not found"
         '500':
@@ -1570,7 +1633,6 @@ components:
       schema:
         type: string
         enum:
-          - "oc-call"
           - "crew-departure"
           - "arrival-onsite"
           - "departure-onsite"
@@ -1665,8 +1727,10 @@ components:
         callTime:
           type: string
           format: date-time
+          example: '2019-07-13T11:05:11'
         address:
           type: string
+          example: "Via della Madonnina 123, Cesena (FC) 47521"
         notes:
           type: string
           example: "The patient switches between the state of consciousness and unconsciousness continuously."
@@ -1722,7 +1786,7 @@ components:
         datetime:
           type: string
           format: date-time
-          example: '1985-04-12T23:20:50.52Z'
+          example: '2019-04-12T23:20:50'
         place:
           type: string
           example: 'Via Cervese 123'
@@ -1826,6 +1890,7 @@ components:
         time:
           type: string
           format: date-time
+          example: '2019-07-12T12:20:50'
           
     VitalParameters:
       type: object
@@ -1930,6 +1995,7 @@ components:
         time:
           type: string
           format: date-time
+          example: '2019-07-13T12:21:50'
     
     Drug:
       type: object
@@ -1957,6 +2023,7 @@ components:
         time:
           type: string
           format: date-time
+          example: '2019-07-13T13:21:50'
 
     SimpleManeuver:
       type: object
@@ -1966,6 +2033,7 @@ components:
         time:
           type: string
           format: date-time
+          example: '2019-07-13T12:21:50'
     SimpleManeuverName:
       type: string
       enum:
@@ -1985,6 +2053,7 @@ components:
         time:
           type: string
           format: date-time
+          example: '2019-07-22T12:21:55'
     
     SimpleTreatment:
       type: object
@@ -2010,6 +2079,7 @@ components:
         time:
           type: string
           format: date-time
+          example: '2019-07-25T17:01:50'
     
     TimedTreatment:
       type: object
@@ -2024,9 +2094,11 @@ components:
         startTime:
           type: string
           format: date-time
+          example: '2019-07-13T12:21:50'
         endTime:
           type: string
           format: date-time
+          example: '2019-07-13T12:23:12'
     
     InjectionTreatment:
       type: object
@@ -2042,6 +2114,7 @@ components:
         time:
           type: string
           format: date-time
+          example: '2019-07-13T12:21:55'
     
     IppvTreatment:
       type: object
@@ -2057,6 +2130,7 @@ components:
         time:
           type: string
           format: date-time
+          example: '2019-07-29T12:11:01'
     
     Complication:
       type: object
@@ -2066,6 +2140,7 @@ components:
         time:
           type: string
           format: date-time
+          example: '2019-07-23T12:21:59'
     ComplicationName:
       type: string
       enum:
