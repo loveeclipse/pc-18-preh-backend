@@ -14,7 +14,6 @@ paths:
         - $ref: '#/components/parameters/service-name-param-post'
         - $ref: '#/components/parameters/service-host-param'
         - $ref: '#/components/parameters/service-port-param'
-        - $ref: '#/components/parameters/service-root-param'
       responses:
         '201':
           description: 'record successfully created'
@@ -75,13 +74,6 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/ServicePort'
-    service-root-param:
-      in: query
-      name: "serviceRoot"
-      description: "Service root"
-      required: true
-      schema:
-        $ref: '#/components/schemas/ServiceRoot'
     service-name-param:
       in: path
       name: "serviceName"
@@ -106,9 +98,6 @@ components:
     ServicePort:
           type: integer
           example: 10000
-    ServiceRoot: 
-        type: string
-        example: '/missions'
     Registration:
       type: string
       format: UUID
@@ -116,4 +105,4 @@ components:
     ServiceLocation:
       type: string
       format: url
-      example: 'http://localhost:10000/mission'
+      example: 'http://localhost:10000/'
