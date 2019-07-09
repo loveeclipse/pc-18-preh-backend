@@ -17,7 +17,7 @@ import handlers.Shared.MISSIONS_COLLECTION
 import handlers.Shared.FAILED_VALIDATION_MESSAGE
 import handlers.Shared.MONGODB_CONFIGURATION
 
-object MissionsHandlers {
+object GenericMissionsHandlers {
 
     fun createMission(context: RoutingContext) {
         val response = context.response()
@@ -62,9 +62,19 @@ object MissionsHandlers {
                         if (results.isEmpty()) {
                             response.setStatusCode(NO_CONTENT.code()).end()
                         } else {
+                            val ids: List<String> = results.map { result ->
+                                result.getString("_id")
+                            }
+                            val links: List<String> = ids.map { id ->
+                                context.request().absoluteURI().plus(id)
+                            }
+                            val resultsAndLinks: JsonObject = json { obj(
+                                    "ids" to ids,
+                                    "links" to links
+                            ) }
                             response.putHeader("Content-Type", "application/json")
                                     .setStatusCode(OK.code())
-                                    .end(Json.encodePrettily(results))
+                                    .end(Json.encodePrettily(resultsAndLinks))
                         }
                     }
                 }

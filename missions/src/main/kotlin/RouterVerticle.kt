@@ -2,7 +2,7 @@ import io.vertx.core.AbstractVerticle
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
-import handlers.MissionsHandlers
+import handlers.GenericMissionsHandlers
 import handlers.OngoingHandlers
 import handlers.ReturnInformationHandlers
 import handlers.TrackingHandlers
@@ -22,13 +22,16 @@ class RouterVerticle : AbstractVerticle() {
         return Router.router(vertx).apply {
             route().handler(BodyHandler.create())
 
-            post(MISSIONS_PATH).handler { MissionsHandlers.createMission(it) }
-            get(MISSIONS_PATH).handler { MissionsHandlers.retrieveMissions(it) }
-            get(MISSION_PATH).handler { MissionsHandlers.retrieveMission(it) }
-            delete(MISSION_PATH).handler { MissionsHandlers.deleteMission(it) }
+            post(MISSIONS_PATH).handler { GenericMissionsHandlers.createMission(it) }
+            get(MISSIONS_PATH).handler { GenericMissionsHandlers.retrieveMissions(it) }
+            get(MISSION_PATH).handler { GenericMissionsHandlers.retrieveMission(it) }
+            delete(MISSION_PATH).handler { GenericMissionsHandlers.deleteMission(it) }
 
             put(ONGOING_PATH).handler { OngoingHandlers.updateOngoing(it) }
             get(ONGOING_PATH).handler { OngoingHandlers.retrieveOngoing(it) }
+
+            put(MEDIC_PATH).handler { OngoingHandlers.updateOngoing(it) }
+            get(MEDIC_PATH).handler { OngoingHandlers.retrieveOngoing(it) }
 
             put(RETURN_INFORMATION_PATH).handler { ReturnInformationHandlers.updateReturnInformation(it) }
             get(RETURN_INFORMATION_PATH).handler { ReturnInformationHandlers.retrieveReturnInformation(it) }
@@ -48,6 +51,7 @@ class RouterVerticle : AbstractVerticle() {
         const val MISSIONS_PATH = "/missions"
         private const val MISSION_PATH = "$MISSIONS_PATH/:missionId"
         private const val ONGOING_PATH = "$MISSION_PATH/ongoing"
+        private const val MEDIC_PATH = "$MISSION_PATH/medic"
         private const val RETURN_INFORMATION_PATH = "$MISSION_PATH/return-information"
         private const val TRACKING_PATH = "$MISSION_PATH/tracking"
         private const val TRACKING_STEP_PATH = "$TRACKING_PATH/:step"
