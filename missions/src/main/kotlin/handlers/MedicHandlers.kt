@@ -45,13 +45,13 @@ object MedicHandlers {
                         if (result == null) {
                             response.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end()
                         } else {
-                            val ongoing: Boolean? = result["ongoing"]
-                            if (ongoing == null) {
+                            val medic: String? = result["medic"]
+                            if (medic == null) {
                                 response.setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end()
                             } else {
                                 response.putHeader("Content-Type", "text/plain")
                                         .setStatusCode(HttpResponseStatus.OK.code())
-                                        .end(ongoing.toString())
+                                        .end(medic)
                             }
                         }
                     }
@@ -63,24 +63,15 @@ object MedicHandlers {
         val missionId: String = context.request().getParam("missionId")
 
         val query = json { obj("_id" to missionId) }
+        val update = json { obj(
+                "\$unset" to obj("medic" to 1)
+        ) }
         MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
-                .findOne(MISSIONS_COLLECTION, query, null) { findOneOperation ->
-                    if (findOneOperation.failed()) {
-                        response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end()
-                    } else {
-                        val result: JsonObject? = findOneOperation.result()
-                        if (result == null) {
-                            response.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end()
-                        } else {
-                            val ongoing: Boolean? = result["ongoing"]
-                            if (ongoing == null) {
-                                response.setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end()
-                            } else {
-                                response.putHeader("Content-Type", "text/plain")
-                                        .setStatusCode(HttpResponseStatus.OK.code())
-                                        .end(ongoing.toString())
-                            }
-                        }
+                .updateCollection(MISSIONS_COLLECTION, query, update) { updateOperation ->
+                    when {
+                        updateOperation.failed() -> response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end()
+                        updateOperation.result().docModified == 0L -> response.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end()
+                        else -> response.setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end()
                     }
                 }
     }

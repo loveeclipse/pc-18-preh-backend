@@ -3,6 +3,7 @@ import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
 import handlers.GenericMissionsHandlers
+import handlers.MedicHandlers
 import handlers.OngoingHandlers
 import handlers.ReturnInformationHandlers
 import handlers.TrackingHandlers
@@ -30,8 +31,9 @@ class RouterVerticle : AbstractVerticle() {
             put(ONGOING_PATH).handler { OngoingHandlers.updateOngoing(it) }
             get(ONGOING_PATH).handler { OngoingHandlers.retrieveOngoing(it) }
 
-            put(MEDIC_PATH).handler { OngoingHandlers.updateOngoing(it) }
-            get(MEDIC_PATH).handler { OngoingHandlers.retrieveOngoing(it) }
+            put(MEDIC_PATH).handler { MedicHandlers.updateMedic(it) }
+            get(MEDIC_PATH).handler { MedicHandlers.retrieveMedic(it) }
+            delete(MEDIC_PATH).handler { MedicHandlers.deleteMedic(it) }
 
             put(RETURN_INFORMATION_PATH).handler { ReturnInformationHandlers.updateReturnInformation(it) }
             get(RETURN_INFORMATION_PATH).handler { ReturnInformationHandlers.retrieveReturnInformation(it) }
