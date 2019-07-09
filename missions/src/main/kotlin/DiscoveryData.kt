@@ -1,9 +1,9 @@
 object DiscoveryData {
-    const val DISCOVERY_HOST = "localhost"
+    const val DISCOVERY_HOST = "192.168.1.113"
     const val DISCOVERY_PORT = 5150
     const val NAME = "missions-service"
-    const val HOST = "localhost"
-    const val PORT = 10000
+    const val HOST = "192.168.1.113"
+    const val PORT = 10002
 
     const val DISCOVERY_PUBLISH_SERVICE = "/discovery/publish"
 

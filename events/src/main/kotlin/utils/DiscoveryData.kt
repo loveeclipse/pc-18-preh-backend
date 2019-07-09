@@ -1,7 +1,7 @@
 package utils
 
 object DiscoveryData {
-    const val DISCOVERY_HOST = "localhost"
+    const val DISCOVERY_HOST = "192.168.1.113"
     const val DISCOVERY_PORT = 5150
 
     const val DISCOVERY_PUBLISH_SERVICE = "/discovery/publish"

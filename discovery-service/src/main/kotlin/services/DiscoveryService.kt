@@ -28,7 +28,7 @@ object DiscoveryService {
         val serviceHost = routingContext.request().params()[SERVICE_HOST]
         val servicePort = routingContext.request().params()[SERVICE_PORT]
         val serviceUri = routingContext.request().params()[SERVICE_URI]
-        val record = HttpEndpoint.createRecord(serviceName, serviceHost, servicePort.toInt(), serviceUri)
+        val record = HttpEndpoint.createRecord(serviceName, serviceHost, servicePort.toInt(), "/")
         discovery?.publish(record) { publishOperation ->
             when {
                 publishOperation.succeeded() -> {
