@@ -16,7 +16,7 @@ class RouterVerticle : AbstractVerticle() {
         vertx.createHttpServer()
                 .requestHandler(createRoute())
                 .listen(PORT, HOST)
-        log.info("Service ready on port $PORT and host $HOST")
+        log.info("Service ready on host ${System.getenv("HEROKU_HOST_NAME")?.toString()}")
     }
 
     private fun createRoute(): Router {
@@ -47,8 +47,8 @@ class RouterVerticle : AbstractVerticle() {
     }
 
     companion object {
-        const val PORT = 10000
-        const val HOST = "localhost"
+        val PORT = System.getenv("PORT")?.toInt() ?: 10000
+        const val HOST = "0.0.0.0"
 
         private const val MISSIONS_PATH = "/missions"
         private const val MISSION_PATH = "$MISSIONS_PATH/:missionId"

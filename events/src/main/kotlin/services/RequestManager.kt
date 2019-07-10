@@ -18,7 +18,7 @@ import java.util.UUID
 object RequestManager {
     var vertx: Vertx? = null
     private val CONFIG = json { obj(
-            "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
+            "connection_string" to System.getenv("MONGO_CONNECTION_STRING")?.toString()
     ) }
     private const val DOCUMENT_ID = "_id"
     private const val EVENT_ID = "eventId"

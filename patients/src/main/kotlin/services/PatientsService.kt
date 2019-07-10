@@ -3,8 +3,6 @@ package services
 import io.vertx.core.Vertx
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
-import io.vertx.kotlin.core.json.json
-import io.vertx.kotlin.core.json.obj
 import java.util.UUID
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
@@ -14,6 +12,7 @@ import io.vertx.kotlin.core.json.get
 
 import utils.MongoUtils.checkSchema
 import utils.MongoUtils.isDuplicateKey
+import utils.MongoUtils.MONGODB_CONFIGURATION
 
 object PatientsService {
 
@@ -28,9 +27,6 @@ object PatientsService {
             "anticoagulants", "antiplatelets")
 
     var vertx: Vertx? = null
-    private val MONGODB_CONFIGURATION = json { obj(
-            "connection_string" to "mongodb://loveeclipse:PC-preh2019@ds149676.mlab.com:49676/heroku_jw7pjmcr"
-    ) }
 
     fun createPatient(routingContext: RoutingContext) {
         log.info("Request to create a new patients")

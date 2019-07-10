@@ -14,8 +14,6 @@ import services.PatientsService
 import services.SimpleTreatmentsService
 import services.StatusService
 import services.VitalParametersService
-import utils.PatientsData.HOST
-import utils.PatientsData.PORT
 import utils.PathItem.maneuversItems
 import utils.PathItem.complicationsItems
 
@@ -70,6 +68,9 @@ class RouterVerticle : AbstractVerticle() {
         VitalParametersService.vertx = vertx
     }
     companion object {
+        private const val HOST = "0.0.0.0"
+        private val PORT = System.getenv("PORT")?.toInt() ?: 10000
+
         private const val PATIENTS_PATH = "/patients"
         private const val PATIENT_PATH = "$PATIENTS_PATH/:patientId"
         private const val ANAGRAPHIC_PATH = "$PATIENT_PATH/anagraphic"

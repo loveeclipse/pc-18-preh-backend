@@ -1,8 +1,8 @@
 package utils
 
 object DiscoveryData {
-    const val PORT = 5150
-    const val HOST = "192.168.1.113"
+    val PORT = System.getenv("PORT")?.toInt() ?: 5150
+    const val HOST = "0.0.0.0"
 
     private const val DISCOVERY_BASE_PATH = "/discovery"
     const val DISCOVERY_PUBLISH_SERVICE = "$DISCOVERY_BASE_PATH/publish"
