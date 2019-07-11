@@ -30,9 +30,12 @@ object OngoingHandlers {
             MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
                     .updateCollection(MISSIONS_COLLECTION, query, update) { updateOperation ->
                         when {
-                            updateOperation.failed() -> response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end()
-                            updateOperation.result().docMatched == 0L -> response.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end()
-                            else -> response.setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end()
+                            updateOperation.failed() ->
+                                response.setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()).end()
+                            updateOperation.result().docMatched == 0L ->
+                                response.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end()
+                            else ->
+                                response.setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end()
                         }
                     }
         }

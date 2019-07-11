@@ -28,19 +28,19 @@ object GenericMissionsHandlers {
                 .put("ongoing", true)
         MongoClient.createNonShared(Main.vertx, MONGODB_CONFIGURATION)
                 .save(MISSIONS_COLLECTION, requestBody) { saveOperation ->
-                    if (saveOperation.failed()) {
-                        if (saveOperation.cause().message == FAILED_VALIDATION_MESSAGE) {
+                    when {
+                        saveOperation.failed() && saveOperation.cause().message == FAILED_VALIDATION_MESSAGE ->
                             response.setStatusCode(BAD_REQUEST.code()).end()
-                        } else {
+                        saveOperation.failed() ->
                             response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                        else -> {
+                            val id = missionId.toString()
+                            val uri = context.request().absoluteURI().plus("/$id")
+                            response.putHeader("Content-Type", "text/plain")
+                                    .putHeader("Location", uri)
+                                    .setStatusCode(CREATED.code())
+                                    .end(id)
                         }
-                    } else {
-                        val id = missionId.toString()
-                        val uri = context.request().absoluteURI().plus("/$id")
-                        response.putHeader("Content-Type", "text/plain")
-                                .putHeader("Location", uri)
-                                .setStatusCode(CREATED.code())
-                                .end(id)
                     }
                 }
     }
