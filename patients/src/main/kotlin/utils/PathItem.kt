@@ -4,18 +4,18 @@ object PathItem {
 
     val complicationsItems = listOf(
             "cardiocirculatory-shock",
-            "state-of-consciousness-deterioration",
+            "impaired-consciousness",
             "anisocoria-mydriasis",
-            "respiratory-deficiency",
-            "landing-for-maneuver",
-            "death-during-commute",
-            "death-in-er"
+            "respiratory-failure",
+            "landing-in-itinere",
+            "demise-in-itinere",
+            "demise-in-ps"
     )
     val maneuversItems = listOf(
             "cervical-collar",
             "immobilization",
-            "synchronized-electrical-cardioversion",
-            "gastric-probe",
-            "bladder-probe"
+            "electrical-cardioversion",
+            "feeding-tube",
+            "vesical-catheter"
     )
 }
