@@ -294,8 +294,8 @@ paths:
           description: "mission ongoing value successfully updated"
         '400':
           description: "bad parameters"
-        # '404':
-        #   description: "mission not found"
+        '404':
+          description: "mission not found"
         '500':
           description: "server error"
     
@@ -615,8 +615,8 @@ paths:
           description: "anagraphic data successfully updated"
         '400':
           description: "bad request"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
     
@@ -655,8 +655,8 @@ paths:
           description: "patient's status successfully updated"
         '400':
           description: "bad request"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
     
@@ -704,8 +704,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
         '400':
           description: "bad request"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
           
@@ -742,8 +742,8 @@ paths:
           description: "vital parameters updated"
         '400':
           description: "bad request"
-        # '404':
-        #   description: "not found"
+        '404':
+          description: "not found"
         '500':
           description: "server error"
           
@@ -826,8 +826,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
         '400':
           description: "bad request"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
     
@@ -936,8 +936,8 @@ paths:
           description: "patient's maneuver execution registered successfully"
         '400':
           description: "bad request"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '409':
           description: "conflict: maneuver already executed"
         '500':
@@ -1005,8 +1005,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
         '400':
           description: "bad request"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
   
@@ -1131,8 +1131,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
         '400':
           description: "bad parameters"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
           
@@ -1197,8 +1197,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
         '400':
           description: "bad request"
-        # '404':
-        #   description: "treatment not found"
+        '404':
+          description: "treatment not found"
         '500':
           description: "server error"
   
@@ -1220,8 +1220,8 @@ paths:
           description: "patient's treatment updated successfully"
         '400':
           description: "bad request"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
     
@@ -1285,8 +1285,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
         '400':
           description: "bad request"      
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
   
@@ -1434,8 +1434,8 @@ paths:
           description: "bad request"
         '409':
           description: "conflict: complication already registered"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
     
@@ -1492,8 +1492,8 @@ paths:
           description: "patient's textual notes successfully updated"
         '400':
           description: "bad parameters"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
       
@@ -1537,8 +1537,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
         '400':
           description: "bad request"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
     
@@ -1747,6 +1747,7 @@ components:
           example: 1
         ongoing:
           type: boolean
+          example: true
     
     MissionReturnInformation:
       type: object
@@ -1794,18 +1795,16 @@ components:
     MissionTracking:
       type: object
       properties:
-          ocCall:
-            $ref: '#/components/schemas/MissionTrackingItem'
-          crewDeparture:
-            $ref: '#/components/schemas/MissionTrackingItem'
-          arrivalOnsite:
-            $ref: '#/components/schemas/MissionTrackingItem'
-          departureOnsite:
-            $ref: '#/components/schemas/MissionTrackingItem'
-          landingHelipad:
-            $ref: '#/components/schemas/MissionTrackingItem'
-          arrivalEr:
-            $ref: '#/components/schemas/MissionTrackingItem'
+        crewDeparture:
+          $ref: '#/components/schemas/MissionTrackingItem'
+        arrivalOnsite:
+          $ref: '#/components/schemas/MissionTrackingItem'
+        departureOnsite:
+          $ref: '#/components/schemas/MissionTrackingItem'
+        landingHelipad:
+          $ref: '#/components/schemas/MissionTrackingItem'
+        arrivalEr:
+          $ref: '#/components/schemas/MissionTrackingItem'
     
     Anagraphic:
       type: object
@@ -1831,8 +1830,10 @@ components:
           example: "M"
         anticoagulants:
           type: boolean
+          example: false
         antiplatelets:
           type: boolean
+          example: false
     
     PatientStatus:
       type: object
@@ -1857,36 +1858,52 @@ components:
       properties:
         traumaticCondition:
           type: boolean
+          example: true
         closedTrauma:
           type: boolean
+          example: true
         penetratingTrauma:
           type: boolean
+          example: false
         helmetSeatbelt:
           type: boolean
+          example: true
         externalHaemorrhage:
           type: boolean
+          example: false
         respiratoryTract:
           type: boolean
+          example: true
         tachypneaDyspnoea:
           type: boolean
+          example: true
         thoraxDeformities:
           type: boolean
+          example: false
         ecofast:
           type: boolean
+          example: false
         deformedPelvis:
           type: boolean
+          example: false
         amputation:
           type: boolean
+          example: false
         sunkenSkullFracture:
           type: boolean
+          example: false
         otorrhagia:
           type: boolean
+          example: true
         paraparesis:
           type: boolean
+          example: false
         tetraparesis:
           type: boolean
+          example: false
         paraesthesia:
           type: boolean
+          example: false
         time:
           type: string
           format: date-time
@@ -1918,35 +1935,43 @@ components:
           enum:
             - "open"
             - "closed"
+          example: "open"
         breathingRate:
           type: string
           enum:
             - "<10"
             - "10-29"
             - ">29"
+          example: ">29"
         outlyingSaturationPercentage:
           type: integer
+          example: 85
         heartbeatRate:
           type: integer
+          example: 60
         heartbeatType:
           type: string
           enum:
             - "rithmic"
             - "arithmic"
+          example: "rithmic"
         bloodPressure:
           type: integer
+          example: 110
         capRefillTime:
           type: string
           enum:
             - "normal"
             - "augmented"
             - "none"
+          example: "normal"
         skinColor:
           type: string
           enum:
             - "normal"
             - "pale"
             - "cyanotic"
+          example: "pale"
         eyeOpening:
           type: string
           enum:
@@ -1977,21 +2002,26 @@ components:
         leftPupil:
           type: string
           enum:
-            - "Miosis"
-            - "Mydriasis"
-            - "Normal"
+            - "miosis"
+            - "mydriasis"
+            - "normal"
+          example: "normal"
         rightPupil:
           type: string
           enum:
-            - "Miosis"
-            - "Mydriasis"
-            - "Normal"
+            - "miosis"
+            - "mydriasis"
+            - "normal"
+          example: "mydriasis"
         leftPhotoReactive:
           type: boolean
+          example: true
         rightPhotoReactive:
           type: boolean
+          example: true
         temperatureInCelsius:
           type: number
+          example: 37.1
         time:
           type: string
           format: date-time
@@ -2014,12 +2044,13 @@ components:
             - "ketamine"
             - "curare"
             - "tranexamic-acid"
+          example: "crystalloids"
         quantity:
           type: number
           example: 500
         measurementUnit:
           type: string
-          example: "ml" 
+          example: "ml"
         time:
           type: string
           format: date-time
@@ -2042,14 +2073,17 @@ components:
         - "electrical-cardioversion"
         - "feeding-tube"
         - "vesical-catheter"
+      example: "immobilisation"
 
     PacingManeuver:
       type: object
       properties:
         captureRateInBpm:
           type: integer
+          example: 90
         amperageInMilliAmps:
           type: number
+          example: 120
         time:
           type: string
           format: date-time
@@ -2076,6 +2110,7 @@ components:
             - "pelvic-binder"
             - "neuroprotection"
             - "thermal-protection"
+          example: "guedel"
         time:
           type: string
           format: date-time
@@ -2091,6 +2126,7 @@ components:
             - "tourniquet"
             - "reboa-zone-1"
             - "reboa-zone-3"
+          example: "tourniquet"
         startTime:
           type: string
           format: date-time
@@ -2109,8 +2145,10 @@ components:
             - "peripheral"
             - "central"
             - "intreosseus"
+          example: "intreosseus"
         caliber:
           type: string
+          example: "M"
         time:
           type: string
           format: date-time
@@ -2121,12 +2159,16 @@ components:
       properties:
         vt:
           type: number
+          example: 250
         fr:
           type: integer
+          example: 20
         peep:
           type: integer
+          example: 45
         fio2:
           type: number
+          example: 35
         time:
           type: string
           format: date-time
@@ -2149,8 +2191,9 @@ components:
         - "respiratory-failure"
         - "cardiocirculatory-shock"
         - "landing-in-itinere"
-        - "demise-in-itinere"
-        - "demise-in-ps"
+        - "death-in-itinere"
+        - "death-in-ps"
+      example: "respiratory-failure"
           
     MultimediaContent:
       type: string
