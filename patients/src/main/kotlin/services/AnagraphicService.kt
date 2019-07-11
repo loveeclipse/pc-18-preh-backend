@@ -34,13 +34,13 @@ object AnagraphicService {
         val response = routingContext.response()
         val patientId = routingContext.request().params()[PATIENT_ID]
         val anagraphicData = routingContext.bodyAsJson
-        if (checkSchema(anagraphicData, ANAGRAPHIC_SCHEMA, ANAGRAPHIC_SCHEMA)) {
+        if (checkSchema(anagraphicData, emptyList(), ANAGRAPHIC_SCHEMA)) {
             val query = json { obj(DOCUMENT_ID to patientId) }
             val update = json { obj("\$set" to obj(ANAGRAPHIC to anagraphicData)) }
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .updateCollection(COLLECTION_NAME, query, update) { updateOperation ->
                         when {
-                            updateOperation.succeeded() && updateOperation.result().docModified != 0L ->
+                            updateOperation.succeeded() && updateOperation.result().docMatched != 0L ->
                                 response.setStatusCode(NO_CONTENT.code()).end()
                             updateOperation.succeeded() ->
                                 response.setStatusCode(NOT_FOUND.code()).end()

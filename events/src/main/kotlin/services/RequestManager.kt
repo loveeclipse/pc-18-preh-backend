@@ -82,7 +82,7 @@ object RequestManager {
         val update = json { obj("\$set" to eventData) }
         MongoClient.createNonShared(vertx, CONFIG).updateCollection(COLLECTION_NAME, query, update) { updateOperation ->
             when {
-                updateOperation.succeeded() && updateOperation.result().docModified != 0L ->
+                updateOperation.succeeded() && updateOperation.result().docMatched != 0L ->
                     response.setStatusCode(NO_CONTENT.code()).end()
                 updateOperation.succeeded() ->
                     response.setStatusCode(NOT_FOUND.code()).end()
