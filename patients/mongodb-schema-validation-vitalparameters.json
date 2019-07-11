@@ -1,0 +1,85 @@
+{
+    "$jsonSchema" : {
+        "bsonType" : "object",
+        "required" : [
+            "_id",
+            "patientId",
+            "respiratoryTract",
+            "breathingRate",
+            "outlyingSaturationPercentage",
+            "heartbeatRate",
+            "heartbeatType",
+            "bloodPressure",
+            "capRefillTime",
+            "skinColor",
+            "eyeOpening",
+            "verbalResponse",
+            "motorResponse",
+            "leftPupil",
+            "rightPupil",
+            "leftPhotoReactive",
+            "rightPhotoReactive",
+            "temperatureInCelsius",
+            "time"
+        ],
+        "properties" : {
+            "_id" : {
+                "bsonType" : "string"
+            },
+            "patientId" : {
+                "bsonType" : "string"
+            },
+            "respiratoryTract" : {
+                "bsonType" : "string"
+            },
+            "breathingRate" : {
+                "bsonType" : "string"
+            },
+            "outlyingSaturationPercentage" : {
+                "bsonType" : "int"
+            },
+            "heartbeatRate" : {
+                "bsonType" : "int"
+            },
+            "heartbeatType" : {
+                "bsonType" : "string"
+            },
+            "bloodPressure" : {
+                "bsonType" : "int"
+            },
+            "capRefillTime" : {
+                "bsonType" : "string"
+            },
+            "skinColor" : {
+                "bsonType" : "string"
+            },
+            "eyeOpening" : {
+                "bsonType" : "string"
+            },
+            "verbalResponse" : {
+                "bsonType" : "string"
+            },
+            "motorResponse" : {
+                "bsonType" : "string"
+            },
+            "leftPupil" : {
+                "bsonType" : "string"
+            },
+            "rightPupil" : {
+                "bsonType" : "string"
+            },
+            "leftPhotoReactive" : {
+                "bsonType" : "bool"
+            },
+            "rightPhotoReactive" : {
+                "bsonType" : "bool"
+            },
+            "temperatureInCelsius" : {
+                "bsonType" : "double"
+            },
+            "time" : {
+                "bsonType" : "string"
+            }
+        }
+    }
+}

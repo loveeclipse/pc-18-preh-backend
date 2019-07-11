@@ -1,0 +1,50 @@
+{
+    "$jsonSchema" : {
+        "bsonType" : "object",
+        "required" : [
+            "_id",
+            "assignedEvent",
+            "assignedMission"
+        ],
+        "properties" : {
+            "_id" : {
+                "bsonType" : "string"
+            },
+            "assignedEvent" : {
+                "bsonType" : "string"
+            },
+            "assignedMission" : {
+                "bsonType" : "string"
+            },
+            "anagraphic" : {
+                "bsonType" : "object",
+                "properties" : {
+                    "name" : {
+                        "bsonType" : "string"
+                    },
+                    "surname" : {
+                        "bsonType" : "string"
+                    },
+                    "residency" : {
+                        "bsonType" : "string"
+                    },
+                    "birthPlace" : {
+                        "bsonType" : "string"
+                    },
+                    "birthDate" : {
+                        "bsonType" : "string"
+                    },
+                    "gender" : {
+                        "bsonType" : "string"
+                    },
+                    "anticoagulants" : {
+                        "bsonType" : "bool"
+                    },
+                    "antiplatelets" : {
+                        "bsonType" : "bool"
+                    }
+                }
+            }
+        }
+    }
+}
