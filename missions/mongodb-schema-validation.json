@@ -27,8 +27,7 @@
                 "bsonType" : "object", 
                 "required" : [
                     "returnCode", 
-                    "returnHospital", 
-                    "returnReleaseSite"
+                    "returnHospital"
                 ], 
                 "properties" : {
                     "returnCode" : {
