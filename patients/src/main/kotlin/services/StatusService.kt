@@ -1,5 +1,6 @@
 package services
 
+import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
 import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
 import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
@@ -40,8 +41,10 @@ object StatusService {
             MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
                     .updateCollectionWithOptions(COLLECTION_NAME, query, update, options) { updateOperation ->
                         when {
-                            updateOperation.succeeded() ->
+                            updateOperation.succeeded() && updateOperation.result().docMatched != 0L ->
                                 response.setStatusCode(NO_CONTENT.code()).end()
+                            updateOperation.succeeded() ->
+                                response.setStatusCode(NOT_FOUND.code()).end()
                             else ->
                                 response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                         }
