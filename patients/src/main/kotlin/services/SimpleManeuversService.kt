@@ -1,5 +1,6 @@
 package services
 
+import io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST
 import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.netty.handler.codec.http.HttpResponseStatus.CONFLICT
 import io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR
@@ -11,9 +12,9 @@ import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
-
 import utils.MongoUtils.isDuplicateKey
 import utils.MongoUtils.MONGODB_CONFIGURATION
+import utils.MongoUtils.FAILED_VALIDATION_MESSAGE
 
 object SimpleManeuversService {
 
@@ -45,6 +46,8 @@ object SimpleManeuversService {
                                     .end()
                         isDuplicateKey(insertOperation.cause().message) ->
                             response.setStatusCode(CONFLICT.code()).end()
+                        insertOperation.cause().message == FAILED_VALIDATION_MESSAGE ->
+                            response.setStatusCode(BAD_REQUEST.code()).end()
                         else ->
                             response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                     }

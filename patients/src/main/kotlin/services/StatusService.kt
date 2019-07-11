@@ -11,9 +11,8 @@ import io.vertx.ext.mongo.UpdateOptions
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
-
-import utils.MongoUtils.checkSchema
 import utils.MongoUtils.MONGODB_CONFIGURATION
+import utils.MongoUtils.FAILED_VALIDATION_MESSAGE
 
 object StatusService {
 
@@ -22,10 +21,6 @@ object StatusService {
     private const val DOCUMENT_ID = "_id"
     private const val PATIENT_ID = "patientId"
     private const val COLLECTION_NAME = "status"
-    private val STATUS_SCHEMA = listOf("traumaticCondition", "closedTrauma", "penetratingTrauma", "helmetSeatbelt",
-            "externalHaemorrhage", "respiratoryTract", "tachypneaDyspnoea", "thoraxDeformities", "ecofast",
-            "deformedPelvis", "amputation", "sunkenSkullFracture", "otorrhagia", "paraparesis", "tetraparesis",
-            "paraesthesia", "time")
 
     var vertx: Vertx? = null
 
@@ -34,23 +29,21 @@ object StatusService {
         val response = routingContext.response()
         val patientId = routingContext.request().params()[PATIENT_ID]
         val statusData = routingContext.bodyAsJson
-        if (checkSchema(statusData, STATUS_SCHEMA, STATUS_SCHEMA)) {
-            val query = json { obj(DOCUMENT_ID to patientId) }
-            val update = json { obj("\$set" to statusData) }
-            val options = UpdateOptions(true)
-            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-                    .updateCollectionWithOptions(COLLECTION_NAME, query, update, options) { updateOperation ->
-                        when {
-                            updateOperation.succeeded() && updateOperation.result().docMatched != 0L ->
-                                response.setStatusCode(NO_CONTENT.code()).end()
-                            updateOperation.succeeded() ->
-                                response.setStatusCode(NOT_FOUND.code()).end()
-                            else ->
-                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                        }
+        val query = json { obj(DOCUMENT_ID to patientId) }
+        val update = json { obj("\$set" to statusData) }
+        val options = UpdateOptions(true)
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .updateCollectionWithOptions(COLLECTION_NAME, query, update, options) { updateOperation ->
+                    when {
+                        updateOperation.succeeded() && updateOperation.result().docMatched != 0L ->
+                            response.setStatusCode(NO_CONTENT.code()).end()
+                        updateOperation.succeeded() ->
+                            response.setStatusCode(NOT_FOUND.code()).end()
+                        updateOperation.cause().message == FAILED_VALIDATION_MESSAGE ->
+                            response.setStatusCode(BAD_REQUEST.code()).end()
+                        else ->
+                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                     }
-        } else {
-            response.setStatusCode(BAD_REQUEST.code()).end()
-        }
+                }
     }
 }

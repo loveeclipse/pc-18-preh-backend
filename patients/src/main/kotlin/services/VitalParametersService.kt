@@ -8,10 +8,9 @@ import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import java.util.UUID
-
-import utils.MongoUtils.checkSchema
 import utils.MongoUtils.isDuplicateKey
 import utils.MongoUtils.MONGODB_CONFIGURATION
+import utils.MongoUtils.FAILED_VALIDATION_MESSAGE
 
 object VitalParametersService {
 
@@ -20,10 +19,6 @@ object VitalParametersService {
     private const val COLLECTION_NAME = "vitalparameters"
     private const val PATIENT_ID = "patientId"
     private const val DOCUMENT_ID = "_id"
-    private val VITAL_PARAMETERS_SCHEMA = listOf("respiratoryTract", "breathingRate", "outlyingSaturationPercentage",
-            "heartbeatRate", "heartbeatType", "bloodPressure", "capRefillTime", "skinColor", "eyeOpening",
-            "verbalResponse", "motorResponse", "leftPupil", "rightPupil", "leftPhotoReactive", "rightPhotoReactive",
-            "temperatureInCelsius", "time")
 
     var vertx: Vertx? = null
 
@@ -34,7 +29,6 @@ object VitalParametersService {
         val vitalParameterId = UUID.randomUUID().toString()
         val vitalParametersData = routingContext.bodyAsJson
         val uri = routingContext.request().absoluteURI().plus("/$vitalParameterId")
-        if (checkSchema(vitalParametersData, VITAL_PARAMETERS_SCHEMA, VITAL_PARAMETERS_SCHEMA)) {
             val document = vitalParametersData
                     .put(DOCUMENT_ID, vitalParameterId)
                     .put(PATIENT_ID, patientId)
@@ -49,11 +43,11 @@ object VitalParametersService {
                                         .end(vitalParameterId)
                             isDuplicateKey(insertOperation.cause().message) ->
                                 createVitalParameters(routingContext)
+                            insertOperation.cause().message == FAILED_VALIDATION_MESSAGE ->
+                                response.setStatusCode(BAD_REQUEST.code()).end()
                             else ->
                                 response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                         }
                     }
-        } else
-            response.setStatusCode(BAD_REQUEST.code()).end()
     }
 }

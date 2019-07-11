@@ -12,9 +12,8 @@ import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
-
+import utils.MongoUtils.FAILED_VALIDATION_MESSAGE
 import utils.MongoUtils.MONGODB_CONFIGURATION
-import utils.MongoUtils.checkSchema
 
 object AnagraphicService {
 
@@ -24,8 +23,6 @@ object AnagraphicService {
     private const val PATIENT_ID = "patientId"
     private const val COLLECTION_NAME = "patients"
     private const val ANAGRAPHIC = "anagraphic"
-    private val ANAGRAPHIC_SCHEMA = listOf("name", "surname", "residency", "birthPlace", "birthDate", "gender",
-            "anticoagulants", "antiplatelets")
 
     var vertx: Vertx? = null
 
@@ -34,22 +31,20 @@ object AnagraphicService {
         val response = routingContext.response()
         val patientId = routingContext.request().params()[PATIENT_ID]
         val anagraphicData = routingContext.bodyAsJson
-        if (checkSchema(anagraphicData, emptyList(), ANAGRAPHIC_SCHEMA)) {
-            val query = json { obj(DOCUMENT_ID to patientId) }
-            val update = json { obj("\$set" to obj(ANAGRAPHIC to anagraphicData)) }
-            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-                    .updateCollection(COLLECTION_NAME, query, update) { updateOperation ->
-                        when {
-                            updateOperation.succeeded() && updateOperation.result().docMatched != 0L ->
-                                response.setStatusCode(NO_CONTENT.code()).end()
-                            updateOperation.succeeded() ->
-                                response.setStatusCode(NOT_FOUND.code()).end()
-                            else ->
-                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                        }
-            }
-        } else {
-            response.setStatusCode(BAD_REQUEST.code()).end()
+        val query = json { obj(DOCUMENT_ID to patientId) }
+        val update = json { obj("\$set" to obj(ANAGRAPHIC to anagraphicData)) }
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .updateCollection(COLLECTION_NAME, query, update) { updateOperation ->
+                    when {
+                        updateOperation.succeeded() && updateOperation.result().docMatched != 0L ->
+                            response.setStatusCode(NO_CONTENT.code()).end()
+                        updateOperation.succeeded() ->
+                            response.setStatusCode(NOT_FOUND.code()).end()
+                        updateOperation.cause().message == FAILED_VALIDATION_MESSAGE ->
+                            response.setStatusCode(BAD_REQUEST.code()).end()
+                        else ->
+                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
+                    }
         }
     }
 

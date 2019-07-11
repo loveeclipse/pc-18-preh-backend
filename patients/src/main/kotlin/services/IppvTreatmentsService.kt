@@ -8,10 +8,9 @@ import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.mongo.MongoClient
 import io.vertx.ext.web.RoutingContext
 import java.util.UUID
-
-import utils.MongoUtils.checkSchema
 import utils.MongoUtils.isDuplicateKey
 import utils.MongoUtils.MONGODB_CONFIGURATION
+import utils.MongoUtils.FAILED_VALIDATION_MESSAGE
 
 object IppvTreatmentsService {
     private val log = LoggerFactory.getLogger(this.javaClass.simpleName)
@@ -19,7 +18,6 @@ object IppvTreatmentsService {
     private const val COLLECTION_NAME = "ippvtreatments"
     private const val PATIENT_ID = "patientId"
     private const val DOCUMENT_ID = "_id"
-    private val IPPV_TREATMENT_SCHEMA = listOf("vt", "fr", "peep", "fio2", "time")
 
     var vertx: Vertx? = null
 
@@ -30,25 +28,25 @@ object IppvTreatmentsService {
         val patientId = routingContext.request().params()[PATIENT_ID]
         val ippvTreatmentId = UUID.randomUUID().toString()
         val uri = routingContext.request().absoluteURI().plus("/$ippvTreatmentId")
-        if (checkSchema(ippvTreatmentData, IPPV_TREATMENT_SCHEMA, IPPV_TREATMENT_SCHEMA)) {
-            val document = ippvTreatmentData
-                    .put(DOCUMENT_ID, ippvTreatmentId)
-                    .put(PATIENT_ID, patientId)
-            MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
-                    .insert(COLLECTION_NAME, document) { insertOperation ->
-                        when {
-                            insertOperation.succeeded() ->
-                                response
-                                        .putHeader("Content-Type", "text/plain")
-                                        .putHeader("Location", uri)
-                                        .setStatusCode(CREATED.code())
-                                        .end(ippvTreatmentId)
-                            isDuplicateKey(insertOperation.cause().message) ->
-                                createIppvTreatment(routingContext)
-                            else ->
-                                response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
-                        }
+        val document = ippvTreatmentData
+                .put(DOCUMENT_ID, ippvTreatmentId)
+                .put(PATIENT_ID, patientId)
+        MongoClient.createNonShared(vertx, MONGODB_CONFIGURATION)
+                .insert(COLLECTION_NAME, document) { insertOperation ->
+                    when {
+                        insertOperation.succeeded() ->
+                            response
+                                    .putHeader("Content-Type", "text/plain")
+                                    .putHeader("Location", uri)
+                                    .setStatusCode(CREATED.code())
+                                    .end(ippvTreatmentId)
+                        isDuplicateKey(insertOperation.cause().message) ->
+                            createIppvTreatment(routingContext)
+                        insertOperation.cause().message == FAILED_VALIDATION_MESSAGE ->
+                            response.setStatusCode(BAD_REQUEST.code()).end()
+                        else ->
+                            response.setStatusCode(INTERNAL_SERVER_ERROR.code()).end()
                     }
-        } else response.setStatusCode(BAD_REQUEST.code()).end()
+                }
     }
 }
