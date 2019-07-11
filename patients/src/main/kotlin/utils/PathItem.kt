@@ -8,8 +8,8 @@ object PathItem {
             "anisocoria-mydriasis",
             "respiratory-failure",
             "landing-in-itinere",
-            "demise-in-itinere",
-            "demise-in-ps"
+            "death-in-itinere",
+            "death-in-ps"
     )
     val maneuversItems = listOf(
             "cervical-collar",
