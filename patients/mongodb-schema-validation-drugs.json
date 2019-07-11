@@ -16,7 +16,7 @@
                 "bsonType" : "string"
             },
             "quantity" : {
-                "bsonType" : "string"
+                "bsonType" : "double"
             },
             "measurementUnit" : {
                 "bsonType" : "string"
