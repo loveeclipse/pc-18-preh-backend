@@ -26,7 +26,7 @@ class RouterVerticle : AbstractVerticle() {
                 .createHttpServer()
                 .requestHandler(createRoute())
                 .listen(PORT, HOST)
-        log.info("Service ready on port $PORT and host $HOST")
+        log.info("Service ready on host ${System.getenv("HEROKU_HOST_NAME")?.toString()}")
     }
 
     private fun createRoute(): Router {
