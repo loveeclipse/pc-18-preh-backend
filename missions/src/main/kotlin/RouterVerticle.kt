@@ -1,3 +1,5 @@
+import ServiceData.HOST
+import ServiceData.PORT
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.Router
@@ -16,7 +18,7 @@ class RouterVerticle : AbstractVerticle() {
         vertx.createHttpServer()
                 .requestHandler(createRoute())
                 .listen(PORT, HOST)
-        log.info("Service ready on host ${System.getenv("HEROKU_HOST_NAME")?.toString()}")
+        log.info("Service ready on host ${System.getenv("MISSIONS_EXTERNAL_HOST")?.toString() ?: "$HOST:$PORT"}")
     }
 
     private fun createRoute(): Router {
@@ -47,9 +49,6 @@ class RouterVerticle : AbstractVerticle() {
     }
 
     companion object {
-        val PORT = System.getenv("PORT")?.toInt() ?: 10000
-        const val HOST = "0.0.0.0"
-
         private const val MISSIONS_PATH = "/missions"
         private const val MISSION_PATH = "$MISSIONS_PATH/:missionId"
         private const val ONGOING_PATH = "$MISSION_PATH/ongoing"
