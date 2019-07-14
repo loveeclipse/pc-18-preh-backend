@@ -16,6 +16,8 @@ import services.StatusService
 import services.VitalParametersService
 import utils.PathItem.maneuversItems
 import utils.PathItem.complicationsItems
+import utils.ServiceData.HOST
+import utils.ServiceData.PORT
 
 class RouterVerticle : AbstractVerticle() {
 
@@ -26,7 +28,7 @@ class RouterVerticle : AbstractVerticle() {
                 .createHttpServer()
                 .requestHandler(createRoute())
                 .listen(PORT, HOST)
-        log.info("Service ready on host ${System.getenv("HEROKU_HOST_NAME")?.toString()}")
+        log.info("Service ready on host ${System.getenv("PATIENTS_EXTERNAL_HOST")?.toString() ?: "$HOST:$PORT"}")
     }
 
     private fun createRoute(): Router {
@@ -68,9 +70,6 @@ class RouterVerticle : AbstractVerticle() {
         VitalParametersService.vertx = vertx
     }
     companion object {
-        private const val HOST = "0.0.0.0"
-        private val PORT = System.getenv("PORT")?.toInt() ?: 10000
-
         private const val PATIENTS_PATH = "/patients"
         private const val PATIENT_PATH = "$PATIENTS_PATH/:patientId"
         private const val ANAGRAPHIC_PATH = "$PATIENT_PATH/anagraphic"

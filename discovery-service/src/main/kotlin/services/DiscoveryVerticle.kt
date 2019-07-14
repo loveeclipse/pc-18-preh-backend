@@ -25,7 +25,7 @@ class DiscoveryVerticle : AbstractVerticle() {
                 .createHttpServer()
                 .requestHandler(initializeRouter())
                 .listen(PORT, HOST)
-        log.info("Starting Discovery service on host ${System.getenv("HEROKU_HOST_NAME")?.toString()}")
+        log.info("Starting Discovery service on host ${System.getenv("DISCOVERY_EXTERNAL_HOST")?.toString() ?: "$HOST:$PORT"}")
     }
 
     private fun initializeDiscovery() {

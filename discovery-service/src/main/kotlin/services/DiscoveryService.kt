@@ -6,9 +6,8 @@ import io.netty.handler.codec.http.HttpResponseStatus.CREATED
 import io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.ext.web.RoutingContext
-import io.vertx.servicediscovery.Record
 import io.vertx.servicediscovery.ServiceDiscovery
-import io.vertx.servicediscovery.types.HttpLocation
+import io.vertx.servicediscovery.types.HttpEndpoint
 
 object DiscoveryService {
 
@@ -16,6 +15,7 @@ object DiscoveryService {
 
     private const val SERVICE_NAME = "serviceName"
     private const val SERVICE_HOST = "serviceHost"
+    private const val SERVICE_PORT = "servicePort"
     private const val SERVICE_REGISTRATION = "serviceRegistration"
 
     private var registrationList: MutableList<String> = ArrayList()
@@ -25,16 +25,8 @@ object DiscoveryService {
         val response = routingContext.response()
         val serviceName = routingContext.request().params()[SERVICE_NAME]
         val serviceHost = routingContext.request().params()[SERVICE_HOST]
-        val record = Record().apply {
-            name = serviceName
-            type = "http-endpoint"
-            location = HttpLocation().apply {
-                host = serviceHost
-                isSsl = true
-                port = 443
-                root = "/"
-            }.toJson()
-        }
+        val servicePort = routingContext.request().params()[SERVICE_PORT]
+        val record = HttpEndpoint.createRecord(serviceName, servicePort == "443", serviceHost, servicePort.toInt(), "", null)
         discovery?.publish(record) { publishOperation ->
             when {
                 publishOperation.succeeded() -> {
