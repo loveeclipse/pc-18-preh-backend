@@ -1,0 +1,39 @@
+{ 
+    "$jsonSchema" : {
+        "bsonType" : "object", 
+        "required" : [
+            "callTime", 
+            "address"
+        ], 
+        "properties" : {
+            "_id" : {
+                "bsonType" : "string"
+            }, 
+            "callTime" : {
+                "bsonType" : "string"
+            }, 
+            "address" : {
+                "bsonType" : "string"
+            }, 
+            "notes" : {
+                "bsonType" : "string"
+            }, 
+            "dispatchCode" : {
+                "bsonType" : "string"
+            }, 
+            "secondary" : {
+                "bsonType" : "bool"
+            }, 
+            "dynamic" : {
+                "bsonType" : "string"
+            }, 
+            "patientsNumber" : {
+                "bsonType" : "int", 
+                "minimum" : NumberInt(0)
+            }, 
+            "ongoing" : {
+                "bsonType" : "bool"
+            }
+        }
+    }
+}

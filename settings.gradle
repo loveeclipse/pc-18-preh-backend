@@ -1,2 +1,5 @@
-rootProject.name = 'pc-18-ph'
-
+rootProject.name = 'pc-18-preh-backend'
+include 'discovery-service',
+        'events',
+        'missions',
+        'patients'

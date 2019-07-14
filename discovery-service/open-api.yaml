@@ -1,0 +1,97 @@
+openapi: 3.0.0
+
+info:
+  title: "Discovery Service API"
+  version: "1"
+  description: |
+    A RESTful API to interact with Discovery serivce.
+
+paths:
+  '/discovery/publish':
+    post:
+      description: 'Create a new record and publish an unique service in discovery.'
+      parameters:
+        - $ref: '#/components/parameters/service-name-param-post'
+        - $ref: '#/components/parameters/service-host-param'
+      responses:
+        '201':
+          description: 'record successfully created'
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Registration"
+        '400':
+          description: 'bad request'
+  '/discovery/unpublish/{serviceRegistration}':
+    delete:
+      description: 'Delete the record related to a service previously published in discovery.'
+      parameters:
+        - $ref: '#/components/parameters/service-registration-id-param'
+      responses:
+        '200':
+          description: 'ok'
+        '404':
+          description: 'not found'
+        '400':
+          description: 'bad request'
+  '/discovery/discover/{serviceName}':
+    get:
+      description: 'By passing in the service name, you can search its location.'
+      parameters:
+        - $ref: '#/components/parameters/service-name-param'
+      responses:
+        '200':
+          description: 'ok'
+          content:
+             text/plain:
+              schema:
+                $ref: '#/components/schemas/ServiceLocation'
+        '404':
+          description: 'not found'
+        '400':
+          description: 'bad request'
+components:
+  parameters:
+    service-name-param-post:
+      in: query
+      name: "serviceName"
+      description: "Service name"
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServiceName'
+    service-host-param:
+      in: query
+      name: "serviceHost"
+      description: "Service host"
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServiceHost'
+    service-name-param:
+      in: path
+      name: "serviceName"
+      description: "Service name"
+      required: true
+      schema:
+        $ref: "#/components/schemas/ServiceName"
+    service-registration-id-param:
+      in: path
+      name: "serviceRegistration"
+      description: "Service registration identifier"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Registration"
+  schemas:
+    ServiceName:
+      type: string
+      example: 'missions-service'
+    ServiceHost:
+          type: string
+          example: 'http://192.163.137.2:10000'
+    Registration:
+      type: string
+      format: UUID
+      example: "fb37c79f-5820-45d4-8eb1-c9f9f3eebf2c"
+    ServiceLocation:
+      type: string
+      format: url
+      example: 'http://192.163.137.2:10000/'

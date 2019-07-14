@@ -1,0 +1,143 @@
+{ 
+    "$jsonSchema" : {
+        "bsonType" : "object", 
+        "required" : [
+            "_id", 
+            "eventId", 
+            "vehicle", 
+            "ongoing"
+        ], 
+        "properties" : {
+            "_id" : {
+                "bsonType" : "string"
+            }, 
+            "eventId" : {
+                "bsonType" : "string"
+            }, 
+            "vehicle" : {
+                "bsonType" : "string"
+            }, 
+            "ongoing" : {
+                "bsonType" : "bool"
+            }, 
+            "medic" : {
+                "bsonType" : "string"
+            }, 
+            "returnInformation" : {
+                "bsonType" : "object", 
+                "required" : [
+                    "returnCode", 
+                    "returnHospital"
+                ], 
+                "properties" : {
+                    "returnCode" : {
+                        "bsonType" : "int", 
+                        "minimum" : 1.0, 
+                        "maximum" : 4.0
+                    }, 
+                    "returnHospital" : {
+                        "bsonType" : "string"
+                    }, 
+                    "returnReleaseSite" : {
+                        "bsonType" : "string"
+                    }
+                }
+            }, 
+            "tracking" : {
+                "bsonType" : "object", 
+                "properties" : {
+                    "ocCall" : {
+                        "bsonType" : "object", 
+                        "required" : [
+                            "datetime", 
+                            "place"
+                        ], 
+                        "properties" : {
+                            "datetime" : {
+                                "bsonType" : "string"
+                            }, 
+                            "place" : {
+                                "bsonType" : "string"
+                            }
+                        }
+                    }, 
+                    "crewDeparture" : {
+                        "bsonType" : "object", 
+                        "required" : [
+                            "datetime", 
+                            "place"
+                        ], 
+                        "properties" : {
+                            "datetime" : {
+                                "bsonType" : "string"
+                            }, 
+                            "place" : {
+                                "bsonType" : "string"
+                            }
+                        }
+                    }, 
+                    "arrivalOnsite" : {
+                        "bsonType" : "object", 
+                        "required" : [
+                            "datetime", 
+                            "place"
+                        ], 
+                        "properties" : {
+                            "datetime" : {
+                                "bsonType" : "string"
+                            }, 
+                            "place" : {
+                                "bsonType" : "string"
+                            }
+                        }
+                    }, 
+                    "departureOnsite" : {
+                        "bsonType" : "object", 
+                        "required" : [
+                            "datetime", 
+                            "place"
+                        ], 
+                        "properties" : {
+                            "datetime" : {
+                                "bsonType" : "string"
+                            }, 
+                            "place" : {
+                                "bsonType" : "string"
+                            }
+                        }
+                    }, 
+                    "landingHelipad" : {
+                        "bsonType" : "object", 
+                        "required" : [
+                            "datetime", 
+                            "place"
+                        ], 
+                        "properties" : {
+                            "datetime" : {
+                                "bsonType" : "string"
+                            }, 
+                            "place" : {
+                                "bsonType" : "string"
+                            }
+                        }
+                    }, 
+                    "arrivalEr" : {
+                        "bsonType" : "object", 
+                        "required" : [
+                            "datetime", 
+                            "place"
+                        ], 
+                        "properties" : {
+                            "datetime" : {
+                                "bsonType" : "string"
+                            }, 
+                            "place" : {
+                                "bsonType" : "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

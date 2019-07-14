@@ -1,0 +1,29 @@
+{
+    "$jsonSchema" : {
+        "bsonType" : "object",
+        "required" : [
+            "_id",
+            "caliber",
+            "name",
+            "time",
+            "patientId"
+        ],
+        "properties" : {
+            "_id" : {
+                "bsonType" : "string"
+            },
+            "caliber" : {
+                "bsonType" : "string"
+            },
+            "name" : {
+                "bsonType" : "string"
+            },
+            "time" : {
+                "bsonType" : "string"
+            },
+            "patientId" : {
+                "bsonType" : "string"
+            }
+        }
+    }
+}

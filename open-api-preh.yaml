@@ -1,0 +1,2230 @@
+openapi: "3.0.2"
+
+info:
+  title: "Pre-Hospital"
+  version: "1"
+  description: |
+    <p>A RESTful API to interact with Events, Missions and Patients.</p>
+    <p>An <b>Event</b> represents an accident or a crash, therefore it's distinguished by an address, a call time, a dispatch code and other details; for every Event one or more rescue missions can start off.</p>
+    <p>Every <b>Mission</b> is associated to one vehicle and one Patient, and it keeps track of all the times and places concerning the movement of the rescue vehicle.</p>
+    <p>For every <b>Patient</b> it's possible to retrieve and update in real time its personal data, anagraphics, its current status, its current and previous vital parameters, administered drugs, performed maneuvers, performed treatments, and the eventual complications that happened in itinere.</p>
+
+paths:
+  '/events':
+    post:
+      tags: 
+        - "Events"
+      description: "A new event will be created and its identifier will be returned as plain text."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventInformation"
+              required:
+                - callTime
+                - address
+      responses:
+        '201':
+          description: "event successfully created"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad parameters"
+        '500':
+          description: "server error"
+  
+    get:
+      tags: 
+        - "Events"
+      description: "Returns two lists: one with all the missions' identifiers and one with all the missions' URI. The query parameter 'after', 'before' and 'ongoing' can be used to filter the results."
+      parameters:
+        - in: query
+          name: "after"
+          description: "the date-time after which consider the events to retrieve"
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2019-07-13T12:00:00'
+        - in: query
+          name: "before"
+          description: "the date-time before which consider the events to retrieve"
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2019-07-14T12:00:00'
+        - in: query
+          name: "ongoing"
+          description: "true if the event is still ongoing: an event is considered ongoing if at least one of its missions is still ongoing"
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ids:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Identifier"
+                  links:
+                    type: array
+                    items:
+                      type: string
+                      format: URI-reference
+                      example: "/events/d290f1ee-6c54-4b01-90e6-d701748f0851"
+        '204':
+          description: "no content"
+        '404':
+          description: "event not found"
+        '500':
+          description: "server error"
+        
+  '/events/{eventId}':
+    patch:
+      tags: 
+        - "Events"
+      description: "Updates the information about the event."
+      parameters:
+        - $ref: "#/components/parameters/event-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventInformation"
+      responses:
+        '204':
+          description: "event's information successfully patched"
+        '400':
+          description: "bad parameters"
+        '404':
+          description: "event not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Events"
+      description: "Retrieves all the available information about the event"
+      parameters:
+        - $ref: "#/components/parameters/event-id-param"
+      responses:
+        '200':
+          description: "event's information successfully retrieved"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventInformation"
+        '404':
+          description: "event not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Events"
+      description: "Deletes the event."
+      parameters:
+        - $ref: "#/components/parameters/event-id-param"
+      responses:
+        '204':
+          description: "event successfully deleted"
+        '404':
+          description: "event not found"
+        '500':
+          description: "server error"
+          
+  '/missions':
+    post:
+      tags: 
+        - "Missions"
+      description: "A new mission will be created and its identifier will be returned as plain text. The mission's \"ongoing\" propertiy is automatically set to true."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - eventId
+                - vehicle
+              properties:
+                eventId:
+                  $ref: "#/components/schemas/Identifier"
+                vehicle:
+                  type: string
+                  example: "chopper-bravo1"
+      responses:
+        '201':
+          description: "mission successfully created"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad parameters"
+        '500':
+          description: "server error"
+          
+    get:
+      tags: 
+        - "Missions"
+      description: "Returns two lists: one with all the missions' identifiers and one with all the missions' URI. Query parameters \"ongoing\", \"vehicle\" and \"eventId\" can be used to narrow down the results."
+      parameters:
+        - in: query
+          name: "ongoing"
+          description: "true if the mission is still ongoing."
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: "vehicle"
+          description: "the name of the vehicle involved in the mission."
+          required: false
+          schema:
+            type: string
+            example: "chopper-bravo1"
+        - in: query
+          name: "eventId"
+          description: "the identifier of the mission's event."
+          required: false
+          schema:
+            $ref: "#/components/schemas/Identifier"
+      responses:
+        '200':
+          description: "missions successfully retrieved"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ids:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Identifier"
+                  links:
+                    type: array
+                    items:
+                      type: string
+                      format: URI-reference
+                      example: "/missions/d290f1ee-6c54-4b01-90e6-d701748f0851"
+        '204':
+          description: "no content"
+        '500':
+          description: "server error"
+          
+  '/missions/{missionId}':
+    get:
+      tags: 
+        - "Missions"
+      description: "Returns the mission's details, including the return and tracking information."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '200':
+          description: "mission information successfully retrieved"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  eventId:
+                    $ref: "#/components/schemas/Identifier"
+                  vehicle:
+                    type: string
+                    example: "chopper-bravo1"
+                  returnInformation:
+                    $ref: "#/components/schemas/MissionReturnInformation"
+                  tracking:
+                    $ref: "#/components/schemas/MissionTracking"
+                  ongoing:
+                    type: boolean
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Missions"
+      description: "Deletes the desired mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '204':
+          description: "mission successfully deleted"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+  '/missions/{missionId}/ongoing':
+    put:
+      tags: 
+        - "Missions"
+      description: "Tells if the mission is ongoing or not."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: boolean
+              example: true
+      responses:
+        '204':
+          description: "mission ongoing value successfully updated"
+        '400':
+          description: "bad parameters"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Missions"
+      description: "Tells if the mission is still ongoing or not."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            text/plain:
+              schema:
+                type: boolean
+                example: false
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+  '/missions/{missionId}/medic':
+    put:
+      tags: 
+        - "Missions"
+      description: "Updates the assigned medic for the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: "Marco Benni"
+      responses:
+        '204':
+          description: "mission ongoing value successfully updated"
+        '400':
+          description: "bad parameters"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Missions"
+      description: "Retrieves the medic name assigned to the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Marco Benni"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Missions"
+      description: "Deletes the medic name assigned to the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '204':
+          description: "medic name successfully deleted"
+        '404':
+          description: "not found"
+        '500':
+          description: "server error"
+  
+  '/missions/{missionId}/return-information':
+    put:
+      tags: 
+        - "Missions"
+      description: "Updates the return information about the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MissionReturnInformation"
+      responses:
+        '204':
+          description: "mission return information successfully updated"
+        '400':
+          description: "bad request"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Missions"
+      description: "Retrieves the return information about the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '200':
+          description: "mission return information successfully retrieved"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MissionReturnInformation"
+        '204':
+          description: "no content"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Missions"
+      description: "Deletes the return information about the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '204':
+          description: "mission return information successfully deleted"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+  
+  '/missions/{missionId}/tracking':
+    get:
+      tags: 
+        - "Missions"
+      description: "Retrieves the tracking information about the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+      responses:
+        '200':
+          description: "tracking information successfully retrieved"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MissionTracking"
+        '204':
+          description: "no content"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+  '/missions/{missionId}/tracking/{trackingStep}':
+    put:
+      tags: 
+        - "Missions"
+      description: "Updates the return information about the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+        - $ref: "#/components/parameters/tracking-step-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MissionTrackingItem"
+      responses:
+        '204':
+          description: "mission tracking successfully updated"
+        '400':
+          description: "bad parameters"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Missions"
+      description: "Retrieves the specific tracking step information about the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+        - $ref: "#/components/parameters/tracking-step-param"
+      responses:
+        '200':
+          description: "mission tracking step information successfully retrieved"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MissionTrackingItem"
+        '204':
+          description: "no content"
+        '404':
+          description: "mission not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Missions"
+      description: "Deletes the tracking step information about the mission."
+      parameters:
+        - $ref: "#/components/parameters/mission-id-param"
+        - $ref: "#/components/parameters/tracking-step-param"
+      responses:
+        '204':
+          description: "mission tracking step information successfully deleted"
+        '404':
+          description: "not found"
+        '500':
+          description: "server error"
+
+  '/patients':
+    post:
+      tags: 
+        - "Patients"
+      description: "By passing in the assignedEvent, the assignedMission and, optionally, available anagraphic data in the request body, a new patient will be added and its identifier will be returned as plain text."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - assignedEvent
+                - assignedMission
+              properties:
+                assignedEvent:
+                  $ref: "#/components/schemas/Identifier"
+                assignedMission:
+                  $ref: "#/components/schemas/Identifier"
+                anagraphic:
+                  $ref: "#/components/schemas/Anagraphic"
+      responses:
+        '201':
+          description: "a new Pre-H patient has been registered"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad request"
+        '500':
+          description: "server error"
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieve all the patients. The query parameter \"after\", \"before\", \"missionId\" and \"eventId\" can be used to filter the results."
+      parameters:
+        - in: query
+          name: "after"
+          description: "the date-time (of taking-care) after which consider the patients to retrieve"
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2019-07-13T12:00:00'
+        - in: query
+          name: "before"
+          description: "the date-time (of taking-care) before which consider the patients to retrieve"
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2019-07-14T12:00:00'
+        - in: query
+          name: "missionId"
+          description: "the identifier of the mission relative to the patient"
+          schema:
+            $ref: "#/components/schemas/Identifier"
+        - in: query
+          name: "eventId"
+          description: "the identifier of the event that involves the patient."
+          required: false
+          schema:
+            $ref: "#/components/schemas/Identifier"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ids:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Identifier"
+                  links:
+                    type: array
+                    items:
+                      type: string
+                      format: URI-reference
+                      example: "/events/d290f1ee-6c54-4b01-90e6-d701748f0851"
+        '404':
+          description: "event not found"
+        '500':
+          description: "server error"
+        
+  '/patients/{patientId}/anagraphic':
+    put:
+      tags: 
+        - "Patients"
+      description: "Updates the anagraphic data for the desired patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Anagraphic"
+      responses:
+        '204':
+          description: "anagraphic data successfully updated"
+        '400':
+          description: "bad request"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Patients"
+      description: "By passing in the patient's identifier, you can search for its anagraphic information."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Anagraphic"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/status':
+    put:
+      tags: 
+        - "Patients"
+      description: "Updates the patient's status."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientStatus"
+      responses:
+        '204':
+          description: "patient's status successfully updated"
+        '400':
+          description: "bad request"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Patients"
+      description: "By passing in the patient's identifier, you can search for its status."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientStatus"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/vital-parameters':
+    post:
+      tags: 
+        - "Patients"
+      description: "Submit a new snapshot of the patient's vital parameters."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VitalParameters"
+      responses:
+        '201':
+          description: "patient's vital parameters successfully uploaded"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad request"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+          
+    get:
+      tags: 
+        - "Patients"
+      description: "By passing in the patient's identifier, you can search for its vital parameters' history."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '201':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VitalParameters"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/vital-parameters/{vitalParametersId}':
+    put:
+      tags: 
+        - "Patients"
+      description: "By passing in the identifiers of the patient and the vital parameters snapshot, you can update the snapshot values."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/vital-parameters-id-param"
+      responses:
+        '204':
+          description: "vital parameters updated"
+        '400':
+          description: "bad request"
+        '404':
+          description: "not found"
+        '500':
+          description: "server error"
+          
+    get:
+      tags: 
+        - "Patients"
+      description: "By passing in the patient's identifier, you can search for its latest vital parameters registered."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/vital-parameters-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VitalParameters"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Patients"
+      description: "By passing in the identifiers of the patient and the vital parameters snapshot, you can delete the snapshot."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/vital-parameters-id-param"
+      responses:
+        '204':
+          description: "vital parameters snapshot deleted"
+        '404':
+          description: "not found"
+        '500':
+          description: "server error"
+    
+  '/patients/{patientId}/vital-parameters/last':
+    get:
+      tags: 
+        - "Patients"
+      description: "By passing in the patient's identifier, you can search for its latest vital parameters registered."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VitalParameters"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/drugs':
+    post:
+      tags: 
+        - "Patients"
+      description: "Register a new drug administration for the patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Drug"
+      responses:
+        '201':
+          description: "patient's drug administered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad request"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieve all the drugs administered to the patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Drug"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/drugs/{drugId}':  
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieve the requested drug administered to the patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/drug-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Drug"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Patients"
+      description: "Removes the requested drug."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/drug-id-param"
+      responses:
+        '204':
+          description: "deletion successful"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/maneuvers':
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieves the summary of all the maneuvers performed on the patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  simple:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SimpleManeuver"
+                  pacing:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PacingManeuver"
+        '204':
+          description: "no content: no maneuvers executed on the requested patient"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/maneuvers/simple/{simpleManeuver}':
+    post:
+      tags: 
+        - "Patients"
+      description: "Registers a maneuver's execution time"
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/simple-maneuver-param"
+      requestBody:
+        content:
+          plain/text:
+            schema:
+              type: string
+              format: date-time
+              example: '2019-07-13T12:05:09'
+      responses:
+        '201':
+          description: "patient's maneuver execution registered successfully"
+        '400':
+          description: "bad request"
+        '404':
+          description: "patient not found"
+        '409':
+          description: "conflict: maneuver already executed"
+        '500':
+          description: "server error"
+  
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieves the maneuver's execution time."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/simple-maneuver-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: string
+                format: date-time
+                example: '2019-07-13T12:05:09'
+        '404':
+          description: "not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Patients"
+      description: "Cancels the maneuver execution"
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/simple-maneuver-param"
+      responses:
+        '204':
+          description: "deletion completed"
+        '404':
+          description: "not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/maneuvers/pacing':
+    post:
+      tags: 
+        - "Patients"
+      description: "Registers a transcutaneous pacing execution"
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PacingManeuver"
+      responses:
+        '201':
+          description: "patient's maneuver executed successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad request"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieves a specific transcutaneous pacing execution."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/pacing-maneuver-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PacingManeuver"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/maneuvers/pacing/{pacingManeuverId}':
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieves a specific transcutaneous pacing execution."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/pacing-maneuver-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PacingManeuver"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Patients"
+      description: "Deletes a specific transcutaneous pacing execution."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/pacing-maneuver-id-param"
+      responses:
+        '204':
+          description: "deletion successful"
+        '404':
+          description: "not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/treatments/':
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieve all the treatments performed for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  simple:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SimpleTreatment"
+                  timed:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SimpleTreatment"
+                  injection:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/InjectionTreatment"
+                  ippv:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/IppvTreatment"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  
+  '/patients/{patientId}/treatments/simple':
+    post:
+      tags: 
+        - "Patients"
+      description: "Records a new simple treatment (name and time of execution) for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimpleTreatment"
+      responses:
+        '201':
+          description: "patient's treatment registered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad parameters"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+          
+  '/patients/{patientId}/treatments/simple/{treatmentId}':
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieve a particular simple treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimpleTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Patients"
+      description: "Deletes a particular simple treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '204':
+          description: "deletion successful"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/treatments/timed':
+    post:
+      tags: 
+        - "Patients"
+      description: "Records a new timed treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TimedTreatment"
+      responses:
+        '201':
+          description: "patient's treatment registered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad request"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/treatments/timed/{treatmentId}':
+    patch:
+      tags: 
+        - "Patients"
+      description: "Updates a timed treatment for a patient; especially useful to specify the ending time of the treatment."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TimedTreatment"
+      responses:
+        '200':
+          description: "patient's treatment updated successfully"
+        '400':
+          description: "bad request"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieve a particular timed treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimedTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Patients"
+      description: "Deletes a particular timed treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '204':
+          description: "deletion successful"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/treatments/injection':
+    post:
+      tags: 
+        - "Patients"
+      description: "Records a new injection treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InjectionTreatment"
+      responses:
+        '201':
+          description: "patient's treatment registered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad request"      
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/treatments/injection/{treatmentId}':
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieve a particular injection treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InjectionTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Patients"
+      description: "Deletes a particular injection treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '204':
+          description: "deletion successful"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "server error"
+    
+  '/patients/{patientId}/treatments/ippv':
+    post:
+      tags: 
+        - "Patients"
+      description: "Records a new ippv treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IppvTreatment"
+      responses:
+        '201':
+          description: "patient's treatment registered successfully"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: URI-reference
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad parameters"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+  '/patients/{patientId}/treatments/ippv/{treatmentId}':
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieve a particular ippv treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IppvTreatment"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Patients"
+      description: "Deletes a particular ippv treatment for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/treatment-id-param"
+      responses:
+        '204':
+          description: "deletion successful"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "server error"  
+  
+  '/patients/{patientId}/complications':
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieve all the complicaitons happened for a patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Complication"
+        '404':
+          description: "treatment not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/complications/{complication}':
+    post:
+      tags: 
+        - "Patients"
+      description: "Adds a complication that happened in itinere, specifying at what time it happened."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/complication-param"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+              format: date-time
+              example: '2019-07-13T13:05:10'
+      responses:
+        '201':
+          description: "patient's complication registered successfully"
+        '400':
+          description: "bad request"
+        '409':
+          description: "conflict: complication already registered"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Patients"
+      description: "Retrieve the specific complication time if it happened for the patient."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/complication-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            text/plain:
+             schema:
+               type: string
+               format: date-time
+               example: '2019-07-13T13:05:10'
+        '404':
+          description: "not found"
+        '500':
+          description: "server error"
+          
+    delete:
+      tags: 
+        - "Patients"
+      description: "Removes the specified complication in itinere"
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/complication-param"
+      responses:
+        '204':
+          description: "deletion successful"
+        '404':
+          description: "not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/notes':
+    put:
+      tags: 
+        - "Patients"
+      description: "By passing in the patient's identifier, you can update the textual notes associated with him/her."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        '204':
+          description: "patient's textual notes successfully updated"
+        '400':
+          description: "bad parameters"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+      
+    get:
+      tags: 
+        - "Patients"
+      description: "By passing in the patient's identifier, you can retrieve the textual notes associated with him/her."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+  
+  '/patients/{patientId}/{multimedia}':
+    post:
+      tags: 
+        - "Patients"
+      description: "By passing in the patient's identifier, you can add a multimedia note associated with him/her between: images, audio, video."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/multimedia-param"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              $ref: "#/components/schemas/MultimediaContent"
+      responses:
+        '201':
+          description: "multimedia successfully uploaded"
+          content: 
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "bad request"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+    get:
+      tags: 
+        - "Patients"
+      description: "By passing in the patient's identifier, you can retrieve all the multimedia notes choosing between: images, audio, video"
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/multimedia-param"
+      responses:
+        '201':
+          description: "multimedia note successfully uploaded"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      $ref: "#/components/schemas/Identifier"
+                    content:
+                      $ref: "#/components/schemas/MultimediaContent"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+          
+  '/patients/{patientId}/{multimedia}/{multimediaId}':
+    get:
+      tags: 
+        - "Patients"
+      description: "By passing in the identifiers of the patient and the multimedia note, you can retrieve the desired note."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/multimedia-param"
+        - $ref: "#/components/parameters/multimedia-id-param"
+
+      responses:
+        '201':
+          description: "multimedia note successfully retrieved"
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/MultimediaContent"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+    
+    delete:
+      tags: 
+        - "Patients"
+      description: "By passing in the identifiers of the patient and the multimedia note, you can remove the desired note."
+      parameters:
+        - $ref: "#/components/parameters/patient-id-param"
+        - $ref: "#/components/parameters/multimedia-param"
+        - $ref: "#/components/parameters/multimedia-id-param"
+
+      responses:
+        '204':
+          description: "multimedia note successfully removed"
+        '404':
+          description: "patient not found"
+        '500':
+          description: "server error"
+
+components:
+  parameters:
+    event-id-param:
+      in: path
+      name: "eventId"
+      description: "identifier of the event"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+    
+    mission-id-param:
+      in: path
+      name: "missionId"
+      description: "identifier of the mission"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+    
+    tracking-step-param:
+      in: path
+      name: "trackingStep"
+      description: "the name of the single tracking step during a mission"
+      required: true
+      schema:
+        type: string
+        enum:
+          - "crew-departure"
+          - "arrival-onsite"
+          - "departure-onsite"
+          - "landing-helipad"
+          - "arrival-er"
+    
+    patient-id-param:
+      in: path
+      name: "patientId"
+      description: "identifier of the patient"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+        
+    vital-parameters-id-param:
+      in: path
+      name: "vitalParametersId"
+      description: "identifier of a certain snapshot of the vital parameters"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+        
+    drug-id-param:
+      in: path
+      name: "drugId"
+      description: "identifier of a certain drug admnistration"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+        
+    simple-maneuver-param:
+      in: path
+      name: "simpleManeuver"
+      description: "name of the desired maneuver"
+      required: true
+      schema:
+        $ref: "#/components/schemas/SimpleManeuverName"
+        
+    pacing-maneuver-id-param:
+      in: path
+      name: "pacingManeuverId"
+      description: "identifier of the pacing maneuver execution"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+    
+    treatment-id-param:
+      in: path
+      name: "treatmentId"
+      description: "identifier of a certain treatment administration"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+        
+    complication-param:
+      in: path
+      name: "complication"
+      description: "name of the desired complication"
+      required: true
+      schema:
+        $ref: "#/components/schemas/ComplicationName"
+    
+    multimedia-id-param:
+      in: path
+      name: "multimediaId"
+      description: "identifier of the multimedia file"
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+        
+    multimedia-param:
+      in: path
+      name: "multimedia"
+      description: "multimedia types"
+      required: true
+      schema:
+        type: string
+        enum:
+          - "images"
+          - "audio"
+          - "video"
+
+  schemas:
+    Identifier:
+      type: string
+      format: UUID
+      example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+
+    EventInformation:
+      type: object
+      properties:
+        callTime:
+          type: string
+          format: date-time
+          example: '2019-07-13T11:05:11'
+        address:
+          type: string
+          example: "Via della Madonnina 123, Cesena (FC) 47521"
+        notes:
+          type: string
+          example: "The patient switches between the state of consciousness and unconsciousness continuously."
+        dispatchCode:
+          type: string
+          example: 'SC01R'
+        secondary:
+          type: boolean
+        dynamic:
+          type: string
+          example: "Road accident: pedestrian ran over"
+        patientsNumber:
+          type: integer
+          example: 1
+        ongoing:
+          type: boolean
+          example: true
+    
+    MissionReturnInformation:
+      type: object
+      required:
+        - returnCode
+        - returnHospital
+      properties:
+        returnCode:
+          type: integer
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+        returnHospital:
+          type: string
+          enum:
+            - "Cesena"
+            - "Faenza"
+            - "Forlì"
+            - "Ravenna"
+            - "Rimini"
+        returnReleaseSite:
+          description: "the release site inside the Hospital of return"
+          type: string
+          enum:
+            - "Emergency Room"
+            - "Surgery"
+    
+    MissionTrackingItem:
+      type: object
+      required:
+        - datetime
+        - place
+      properties:
+        datetime:
+          type: string
+          format: date-time
+          example: '2019-04-12T23:20:50'
+        place:
+          type: string
+          example: 'Via Cervese 123'
+    
+    MissionTracking:
+      type: object
+      properties:
+        crewDeparture:
+          $ref: '#/components/schemas/MissionTrackingItem'
+        arrivalOnsite:
+          $ref: '#/components/schemas/MissionTrackingItem'
+        departureOnsite:
+          $ref: '#/components/schemas/MissionTrackingItem'
+        landingHelipad:
+          $ref: '#/components/schemas/MissionTrackingItem'
+        arrivalEr:
+          $ref: '#/components/schemas/MissionTrackingItem'
+    
+    Anagraphic:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "John"
+        surname:
+          type: string
+          example: "Doe"
+        residency:
+          type: string
+          example: "Via della Madonnina 123, Arezzo"
+        birthPlace:
+          type: string
+          example: "Cesena"
+        birthDate:
+          type: string
+          format: date
+          example: "1985-04-12"
+        gender:
+          type: string
+          example: "M"
+        anticoagulants:
+          type: boolean
+          example: false
+        antiplatelets:
+          type: boolean
+          example: false
+    
+    PatientStatus:
+      type: object
+      required:
+        - traumaticCondition
+        - closedTrauma
+        - penetratingTrauma
+        - helmetSeatbelt
+        - externalHaemorrhage
+        - respiratoryTract
+        - tachypneaDyspnoea
+        - thoraxDeformities
+        - ecofast
+        - deformedPelvis
+        - amputation
+        - sunkenSkullFracture
+        - otorrhagia
+        - paraparesis
+        - tetraparesis
+        - paraesthesia
+        - time
+      properties:
+        traumaticCondition:
+          type: boolean
+          example: true
+        closedTrauma:
+          type: boolean
+          example: true
+        penetratingTrauma:
+          type: boolean
+          example: false
+        helmetSeatbelt:
+          type: boolean
+          example: true
+        externalHaemorrhage:
+          type: boolean
+          example: false
+        respiratoryTract:
+          type: boolean
+          example: true
+        tachypneaDyspnoea:
+          type: boolean
+          example: true
+        thoraxDeformities:
+          type: boolean
+          example: false
+        ecofast:
+          type: boolean
+          example: false
+        deformedPelvis:
+          type: boolean
+          example: false
+        amputation:
+          type: boolean
+          example: false
+        sunkenSkullFracture:
+          type: boolean
+          example: false
+        otorrhagia:
+          type: boolean
+          example: true
+        paraparesis:
+          type: boolean
+          example: false
+        tetraparesis:
+          type: boolean
+          example: false
+        paraesthesia:
+          type: boolean
+          example: false
+        time:
+          type: string
+          format: date-time
+          example: '2019-07-12T12:20:50'
+          
+    VitalParameters:
+      type: object
+      required:
+        - respiratoryTract
+        - breathingRate
+        - outlyingSaturation
+        - heartbeatRate
+        - heartbeatType
+        - bloodPressure
+        - capRefillTime
+        - skinColor
+        - eyeOpening
+        - verbalResponse
+        - motorResponse
+        - leftPupil
+        - rightPupil
+        - leftPhotoReactive
+        - rightPhotoReactive
+        - temperatureInCelsius
+        - time
+      properties:
+        respiratoryTract:
+          type: string
+          enum:
+            - "open"
+            - "closed"
+          example: "open"
+        breathingRate:
+          type: string
+          enum:
+            - "<10"
+            - "10-29"
+            - ">29"
+          example: ">29"
+        outlyingSaturationPercentage:
+          type: integer
+          example: 85
+        heartbeatRate:
+          type: integer
+          example: 60
+        heartbeatType:
+          type: string
+          enum:
+            - "rithmic"
+            - "arithmic"
+          example: "rithmic"
+        bloodPressure:
+          type: integer
+          example: 110
+        capRefillTime:
+          type: string
+          enum:
+            - "normal"
+            - "augmented"
+            - "none"
+          example: "normal"
+        skinColor:
+          type: string
+          enum:
+            - "normal"
+            - "pale"
+            - "cyanotic"
+          example: "pale"
+        eyeOpening:
+          type: string
+          enum:
+            - "4 - Spontaneous"
+            - "3 - Sound stimuli"
+            - "2 - Pressure stimuli"
+            - "1 - None"
+            - "ND - Not definable"
+        verbalResponse:
+          type: string
+          enum:
+            - "5 - Oriented"
+            - "4 - Confused"
+            - "3 - Words"
+            - "2 - Sounds"
+            - "1 - None"
+            - "ND - Not definable"
+        motorResponse:
+          type: string
+          enum:
+            - "6 - Executes orders"
+            - "5 - Localizes"
+            - "4 - Normal flexion"
+            - "3 - Abnormal flexion"
+            - "2 - Extension"
+            - "1 - None"
+            - "ND - Not definable"
+        leftPupil:
+          type: string
+          enum:
+            - "miosis"
+            - "mydriasis"
+            - "normal"
+          example: "normal"
+        rightPupil:
+          type: string
+          enum:
+            - "miosis"
+            - "mydriasis"
+            - "normal"
+          example: "mydriasis"
+        leftPhotoReactive:
+          type: boolean
+          example: true
+        rightPhotoReactive:
+          type: boolean
+          example: true
+        temperatureInCelsius:
+          type: number
+          example: 37.1
+        time:
+          type: string
+          format: date-time
+          example: '2019-07-13T12:21:50'
+    
+    Drug:
+      type: object
+      required:
+        - name
+        - quantity
+        - measurementUnit
+        - time
+      properties:
+        name:
+          type: string
+          enum:
+            - "crystalloids"
+            - "mannitol"
+            - "hypertonic-solution"
+            - "packed-red-blood-cells"
+            - "fibrinogen"
+            - "succinylcholine"
+            - "midazolam"
+            - "fentanyl"
+            - "ketamine"
+            - "curare"
+            - "tranexamic-acid"
+          example: "crystalloids"
+        quantity:
+          type: number
+          example: 500
+        measurementUnit:
+          type: string
+          example: "ml"
+        time:
+          type: string
+          format: date-time
+          example: '2019-07-13T13:21:50'
+
+    SimpleManeuver:
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          $ref: "#/components/schemas/SimpleManeuverName"
+        time:
+          type: string
+          format: date-time
+          example: '2019-07-13T12:21:50'
+    SimpleManeuverName:
+      type: string
+      enum:
+        - "cervical-collar"
+        - "immobilization"
+        - "electrical-cardioversion"
+        - "gastric-probe"
+        - "bladder-catheter"
+      example: "immobilization"
+
+    PacingManeuver:
+      type: object
+      properties:
+        captureRateInBpm:
+          type: integer
+          example: 90
+        amperageInMilliAmps:
+          type: number
+          example: 120
+        time:
+          type: string
+          format: date-time
+          example: '2019-07-22T12:21:55'
+    
+    SimpleTreatment:
+      type: object
+      required:
+        - name
+        - time
+      properties:
+        name:
+          type: string
+          enum:
+            - "adrenalin"
+            - "shock"
+            - "jaw-subluxation"
+            - "guedel"
+            - "cricothyrotomy"
+            - "tracheal-tube"
+            - "oxygen-therapy"
+            - "ambu"
+            - "mini-thoracotomy-left"
+            - "mini-thoracotomy-right"
+            - "ippv"
+            - "haemostasis"
+            - "pelvic-binder"
+            - "neuroprotection"
+            - "thermal-protection"
+          example: "guedel"
+        time:
+          type: string
+          format: date-time
+          example: '2019-07-25T17:01:50'
+    
+    TimedTreatment:
+      type: object
+      properties:
+        name:
+          type: string
+          enum:
+            - "reanimation"
+            - "tourniquet"
+            - "reboa-zone-1"
+            - "reboa-zone-3"
+          example: "tourniquet"
+        startTime:
+          type: string
+          format: date-time
+          example: '2019-07-13T12:21:50'
+        endTime:
+          type: string
+          format: date-time
+          example: '2019-07-13T12:23:12'
+    
+    InjectionTreatment:
+      type: object
+      required:
+        - name
+        - caliber
+        - time
+      properties:
+        name:
+          type: string
+          enum:
+            - "peripheral"
+            - "central"
+            - "intreosseus"
+          example: "intreosseus"
+        caliber:
+          type: string
+          example: "M"
+        time:
+          type: string
+          format: date-time
+          example: '2019-07-13T12:21:55'
+    
+    IppvTreatment:
+      type: object
+      required:
+        - vt
+        - fr
+        - peep
+        - fio2
+        - time
+      properties:
+        vt:
+          type: integer
+          example: 250
+        fr:
+          type: integer
+          example: 20
+        peep:
+          type: integer
+          example: 45
+        fio2:
+          type: integer
+          example: 35
+        time:
+          type: string
+          format: date-time
+          example: '2019-07-29T12:11:01'
+    
+    Complication:
+      type: object
+      required:
+        - name
+        - time
+      properties:
+        name:
+          $ref: "#/components/schemas/ComplicationName"
+        time:
+          type: string
+          format: date-time
+          example: '2019-07-23T12:21:59'
+    ComplicationName:
+      type: string
+      enum:
+        - "impaired-consciousness"
+        - "anisocoria-mydriasis"
+        - "respiratory-failure"
+        - "cardiocirculatory-shock"
+        - "landing-in-itinere"
+        - "death-in-itinere"
+        - "death-in-ps"
+      example: "respiratory-failure"
+          
+    MultimediaContent:
+      type: string
+      format: base64
+      example: "SW5kaWEgVGVhbSB3aWxsIHdpbiB0aGUgQ3Vw3aWxsIHdpbiB05kaWEgVGVh"

@@ -1,0 +1,33 @@
+{
+    "$jsonSchema" : {
+        "bsonType" : "object",
+        "required" : [
+            "_id",
+            "vt",
+            "fr",
+            "peep",
+            "fio2",
+            "time"
+        ],
+        "properties" : {
+            "_id" : {
+                "bsonType" : "string"
+            },
+            "vt" : {
+                "bsonType" : "int"
+            },
+            "fr" : {
+                "bsonType" : "int"
+            },
+            "peep" : {
+                "bsonType" : "int"
+            },
+            "fio2" : {
+                "bsonType" : "int"
+            },
+            "time" : {
+                "bsonType" : "string"
+            }
+        }
+    }
+}

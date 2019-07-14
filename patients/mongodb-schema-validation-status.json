@@ -1,0 +1,81 @@
+{
+    "$jsonSchema" : {
+        "bsonType" : "object",
+        "required" : [
+            "_id",
+            "amputation",
+            "closedTrauma",
+            "deformedPelvis",
+            "ecofast",
+            "externalHaemorrhage",
+            "helmetSeatbelt",
+            "otorrhagia",
+            "paraesthesia",
+            "paraparesis",
+            "penetratingTrauma",
+            "respiratoryTract",
+            "sunkenSkullFracture",
+            "tachypneaDyspnoea",
+            "tetraparesis",
+            "thoraxDeformities",
+            "time",
+            "traumaticCondition"
+        ],
+        "properties" : {
+            "_id" : {
+                "bsonType" : "string"
+            },
+            "amputation" : {
+                "bsonType" : "bool"
+            },
+            "closedTrauma" : {
+                "bsonType" : "bool"
+            },
+            "deformedPelvis" : {
+                "bsonType" : "bool"
+            },
+            "ecofast" : {
+                "bsonType" : "bool"
+            },
+            "externalHaemorrhage" : {
+                "bsonType" : "bool"
+            },
+            "helmetSeatbelt" : {
+                "bsonType" : "bool"
+            },
+            "otorrhagia" : {
+                "bsonType" : "bool"
+            },
+            "paraesthesia" : {
+                "bsonType" : "bool"
+            },
+            "paraparesis" : {
+                "bsonType" : "bool"
+            },
+            "penetratingTrauma" : {
+                "bsonType" : "bool"
+            },
+            "respiratoryTract" : {
+                "bsonType" : "bool"
+            },
+            "sunkenSkullFracture" : {
+                "bsonType" : "bool"
+            },
+            "tachypneaDyspnoea" : {
+                "bsonType" : "bool"
+            },
+            "tetraparesis" : {
+                "bsonType" : "bool"
+            },
+            "thoraxDeformities" : {
+                "bsonType" : "bool"
+            },
+            "time" : {
+                "bsonType" : "string"
+            },
+            "traumaticCondition" : {
+                "bsonType" : "bool"
+            }
+        }
+    }
+}
