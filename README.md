@@ -19,8 +19,15 @@ The services can also be run locally, executed by default on *localhost* on the 
 ```
 
 Before running them, the environment variable **MONGO_CONNECTION_STRING** must be added with the following format:  
-mongodb://{user}:{password}@{host}:{port}/{database}
+_mongodb://{user}:{password}@{host}:{port}/{database}_
 
+If deployed on heroku you must add the following environment variables for each service:
+- **{SERVICE_NAME}_HOST**: host of the internal network (use 0.0.0.0 for heroku)
+- **{SERVICE_NAME}_EXTERNAL_HOST**: public host of the server (e.g. pc-18-preh-discovery.herokuapp.com)
+
+Except the discovery service they must also add the environment variables host and port of the discovery service:
+- **DISCOVERY_HOST** (e.g. pc-18-preh-discovery.herokuapp.com)
+- **DISCOVERY_PORT** (e.g. 443 for https)
 
 In order to run these services their jars are found in the release tab.
 ```
