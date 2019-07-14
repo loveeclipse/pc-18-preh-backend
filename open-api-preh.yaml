@@ -156,6 +156,9 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - eventId
+                - vehicle
               properties:
                 eventId:
                   $ref: "#/components/schemas/Identifier"
@@ -235,7 +238,7 @@ paths:
     get:
       tags: 
         - "Missions"
-      description: "Returns the mission's details, including the return information and the movement tracking."
+      description: "Returns the mission's details, including the return and tracking information."
       parameters:
         - $ref: "#/components/parameters/mission-id-param"
       responses:
@@ -514,12 +517,15 @@ paths:
     post:
       tags: 
         - "Patients"
-      description: "By passing in the anagraphic data in the request body, a new patient will be added and its identifier will be returned as plain text."
+      description: "By passing in the assignedEvent, the assignedMission and, optionally, available anagraphic data in the request body, a new patient will be added and its identifier will be returned as plain text."
       requestBody:
         content:
           application/json:
             schema:
               type: object
+              required:
+                - assignedEvent
+                - assignedMission
               properties:
                 assignedEvent:
                   $ref: "#/components/schemas/Identifier"
@@ -804,7 +810,7 @@ paths:
     post:
       tags: 
         - "Patients"
-      description: "Submit a new drug administration for the patient."
+      description: "Register a new drug administration for the patient."
       parameters:
         - $ref: "#/components/parameters/patient-id-param"
       requestBody:
@@ -1351,8 +1357,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
         '400':
           description: "bad parameters"
-        # '404':
-        #   description: "patient not found"
+        '404':
+          description: "patient not found"
         '500':
           description: "server error"
     
@@ -1754,7 +1760,6 @@ components:
       required:
         - returnCode
         - returnHospital
-        - returnReleaseSite
       properties:
         returnCode:
           type: integer
@@ -2029,6 +2034,11 @@ components:
     
     Drug:
       type: object
+      required:
+        - name
+        - quantity
+        - measurementUnit
+        - time
       properties:
         name:
           type: string
@@ -2058,6 +2068,9 @@ components:
 
     SimpleManeuver:
       type: object
+      required:
+        - name
+        - type
       properties:
         name:
           $ref: "#/components/schemas/SimpleManeuverName"
@@ -2069,11 +2082,11 @@ components:
       type: string
       enum:
         - "cervical-collar"
-        - "immobilisation"
+        - "immobilization"
         - "electrical-cardioversion"
-        - "feeding-tube"
-        - "vesical-catheter"
-      example: "immobilisation"
+        - "gastric-probe"
+        - "bladder-catheter"
+      example: "immobilization"
 
     PacingManeuver:
       type: object
@@ -2091,6 +2104,9 @@ components:
     
     SimpleTreatment:
       type: object
+      required:
+        - name
+        - time
       properties:
         name:
           type: string
@@ -2138,6 +2154,10 @@ components:
     
     InjectionTreatment:
       type: object
+      required:
+        - name
+        - caliber
+        - time
       properties:
         name:
           type: string
@@ -2156,9 +2176,15 @@ components:
     
     IppvTreatment:
       type: object
+      required:
+        - vt
+        - fr
+        - peep
+        - fio2
+        - time
       properties:
         vt:
-          type: number
+          type: integer
           example: 250
         fr:
           type: integer
@@ -2167,7 +2193,7 @@ components:
           type: integer
           example: 45
         fio2:
-          type: number
+          type: integer
           example: 35
         time:
           type: string
@@ -2176,6 +2202,9 @@ components:
     
     Complication:
       type: object
+      required:
+        - name
+        - time
       properties:
         name:
           $ref: "#/components/schemas/ComplicationName"
