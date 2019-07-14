@@ -17,7 +17,7 @@ The services found on this repository are normally uploaded on Heroku, but in th
   	java -jar pc-18-preh-backend-1.0-patients.jar
 ```
 
-In order to run the service jars, a version of Java equal or higher than 1.8 is required.						
+In order to run the service jars, a version of Java equal or higher than 1.8 is required.	                          					
 Note: run the discovery service **before** the others.
 
 ## Releases and Project Report
