@@ -14,7 +14,7 @@ The services found on this repository are normally uploaded on Heroku, but in th
 	java -jar pc-18-preh-backend-1.0-discovery-service.jar
 	java -jar pc-18-preh-backend-1.0-events.jar
 	java -jar pc-18-preh-backend-1.0-missions.jar
-  java -jar pc-18-preh-backend-1.0-patients.jar
+  	java -jar pc-18-preh-backend-1.0-patients.jar
 ```
 
 In order to run the service jars, a version of Java equal or higher than 1.8 is required.
