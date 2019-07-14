@@ -15,7 +15,7 @@ object PathItem {
             "cervical-collar",
             "immobilization",
             "electrical-cardioversion",
-            "feeding-tube",
-            "vesical-catheter"
+            "gastric-probe",
+            "bladder-catheter"
     )
 }
