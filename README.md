@@ -16,18 +16,18 @@ The services can also be run locally, executed by default on *localhost* on the 
   events on port 10000
   missions on port 10001
   patients on port 10002
-
 ```
 In order to run these services their jars are found in the release tab.
 Before running them, the environment variable **MONGO_CONNECTION_STRING** must be added with the following format:  
 mongodb://{user}:{password}@{host}:{port}/{database}
+
+For each service 
 
 ```
   java -jar pc-18-preh-backend-1.0-discovery-service.jar
   java -jar pc-18-preh-backend-1.0-events.jar
   java -jar pc-18-preh-backend-1.0-missions.jar
   java -jar pc-18-preh-backend-1.0-patients.jar  
-
 ```
 Note: run the discovery service **before** the others.
 
