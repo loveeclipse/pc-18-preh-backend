@@ -8,16 +8,8 @@ https://www.unibo.it/en/teaching/course-unit-catalogue/course-unit/2018/412647
 In order to use the system all that is needed is the Android application, found at the following link:  
 https://github.com/loveeclipse/pc-18-preh-frontend/releases  
 
-The services found on this repository are normally uploaded on Heroku, but in the eventuality that they aren't active a manual launch of all four services is required:
+The services found on this repository are designet to be uploaded on Heroku, and must be activated in order for the system to work.
 
-```
-	java -jar pc-18-preh-backend-1.0-discovery-service.jar
-	java -jar pc-18-preh-backend-1.0-events.jar
-	java -jar pc-18-preh-backend-1.0-missions.jar
-  	java -jar pc-18-preh-backend-1.0-patients.jar
-```
-
-In order to run the service jars, a version of Java equal or higher than 1.8 is required.   
 Note: run the discovery service **before** the others.
 
 ## Releases and Project Report
