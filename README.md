@@ -18,6 +18,7 @@ The services found on this repository are normally uploaded on Heroku, but in th
 ```
 
 In order to run the service jars, a version of Java equal or higher than 1.8 is required.
+Note: run the discovery service **before** the others.
 
 ## Releases and Project Report
 It is possible to download the source code and all release executable jars, along with the project report at the following page :
