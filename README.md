@@ -1,21 +1,32 @@
 # Pre-Hospital
 ## A Pervasive Computing Project
-<!-- bla bla bla bla bla bla bla bla bla bla bla bla bla -->
-# Continuous Integration
 
-<!--- METTERE IL NOSTRO --->
-[![Build Status](https://travis-ci.org/nicolaAtti/pps-17-fb.svg?branch=master)](https://travis-ci.org/nicolaAtti/pps-17-fb)
+https://www.unibo.it/en/teaching/course-unit-catalogue/course-unit/2018/412647
 
 ## Use Requirements
 
-## Releases
-It is possible to download the source code and all release executable jars at the following page :                  
-<!---https://github.com/nicolaAtti/pps-17-fb/releases --->
+In order to use the system all that is needed is the Android application, found at the following link:
+https://github.com/loveeclipse/pc-18-preh-frontend/releases
 
-## Documentation and Coverage Report
+The services found on this repository are normally uploaded on Heroku, but in the eventuality that they aren't active a manual launch of all four services is required:
 
-<Strong>REST API Documentation</Strong>                                               
-Link to the Swagger files containig our REST API's documentation. <!-- DUMMY LINK -->
+```
+	java -jar pc-18-preh-backend-1.0-discovery-service.jar
+	java -jar pc-18-preh-backend-1.0-events.jar
+	java -jar pc-18-preh-backend-1.0-missions.jar
+  java -jar pc-18-preh-backend-1.0-patients.jar
+```
+
+In order to run the service jars, a version of Java equal or higher than 1.8 is required.
+
+## Releases and Project Report
+It is possible to download the source code and all release executable jars, along with the project report at the following page :
+https://github.com/loveeclipse/pc-18-preh-backend/releases  
+
+## API Documentation
+All the API documentation, concenring the available REST calls can be viewed at the following link:   
+https://app.swaggerhub.com/apis-docs/candoz/pre-hospital/1
+
 
 ## Team members
 Nicola Atti (nicola.atti@studio.unibo.it)              
