@@ -41,7 +41,7 @@ Note: run the discovery service **before** the others.
 
 ## Releases and Project Report
 It is possible to download the source code and all release executable jars, along with the project report
-at the following page :  
+at the following page:  
 https://github.com/loveeclipse/pc-18-preh-backend/releases  
 
 ## API Documentation
