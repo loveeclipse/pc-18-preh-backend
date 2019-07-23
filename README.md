@@ -40,7 +40,7 @@ In order to run these services their jars are found in the release tab.
 Note: run the discovery service **before** the others.
 
 ## Releases and Project Report
-It is possible to download the source code and all release executable jars, along with the project report
+It is possible to download the source code, all the executable jars and the project report
 at the following page:  
 https://github.com/loveeclipse/pc-18-preh-backend/releases  
 
